@@ -21,7 +21,7 @@ async fn init_db() -> SqliteResult<Connection> {
 
     conn.execute(
         "CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY,
+            id TEXT PRIMARY KEY,
             username TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
             role TEXT NOT NULL
