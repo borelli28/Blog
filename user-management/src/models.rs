@@ -33,7 +33,6 @@ pub async fn hash(password: &[u8]) -> String {
 impl User {
     pub async fn create(mut user: User, data: web::Data<AppState>) -> Result<User, String> {
         let conn = db::get_db_connection(&data).map_err(|e| e.to_string())?;
-
         let hash = hash(user.password.as_bytes()).await;
         user.password = hash;
         user.id = Uuid::new_v4().to_string();
@@ -45,15 +44,28 @@ impl User {
         ).map_err(|e| e.to_string())?;
 
         if username_exists {
-            return Err(String::from("Username already exists"));
+            return Err(String::from("Username already exists."));
         }
 
-        // Insert new user
         conn.execute(
             "INSERT INTO users (id, username, password, role) VALUES (?1, ?2, ?3, ?4)",
             &[&user.id, &user.username, &user.password, &user.role],
         ).map_err(|e| e.to_string())?;
+        Ok(user)
+    }
+    
+    pub async fn find_by_id(id: String, data: web::Data<AppState>) -> Result<User, String> {
+        let conn = db::get_db_connection(&data).map_err(|e| e.to_string())?;
+        let mut stmt = conn.prepare("SELECT * FROM users WHERE id = ?1").map_err(|e| e.to_string())?;
 
+        let user = stmt.query_row(&[&id], |row| {
+            Ok(User {
+                id: row.get(0)?,
+                username: row.get(1)?,
+                password: row.get(2)?,
+                role: row.get(3)?
+            })
+        }).map_err(|e| e.to_string())?;
         Ok(user)
     }
 }
