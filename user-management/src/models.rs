@@ -109,4 +109,14 @@ impl User {
         } 
         Ok(format!("Success: {} row(s) updated", rows_affected))
     }
+
+    pub async fn delete_by_id(id: String, data: web::Data<AppState>) -> Result<String, String> {
+        let conn = db::get_db_connection(&data).map_err(|e| e.to_string())?;
+        let rows_affected = conn.execute(
+            "DELETE FROM users WHERE id = ?1", [&id]).map_err(|e| e.to_string())?;
+        if rows_affected == 0 {
+            return Err("No rows deleted, user not found.".to_string());
+        } 
+        Ok(format!("Success: {} row(s) deleted", rows_affected))
+    }
 }
