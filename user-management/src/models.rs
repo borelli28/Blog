@@ -68,4 +68,17 @@ impl User {
         }).map_err(|e| e.to_string())?;
         Ok(user)
     }
+    
+    pub async fn update_username(user: User, data: web::Data<AppState>) -> Result<String, String> {
+        let conn = db::get_db_connection(&data).map_err(|e| e.to_string())?;
+        let rows_affected = conn.execute(
+            "UPDATE users SET username = ?1 WHERE id = ?2",
+            &[&user.username, &user.id],
+        ).map_err(|e| e.to_string())?;
+
+        if rows_affected == 0 {
+            return Err("No rows updated, user not found.".to_string());
+        } 
+        Ok(format!("Success: {} row(s) updated", rows_affected))
+    }
 }
