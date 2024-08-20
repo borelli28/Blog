@@ -9,4 +9,4 @@ argon2 = "0.5.3"
 dotenvy = "0.15.7"
 rusqlite = { version = "0.32.1", features = ["bundled"] }
 serde = {version="1.0.208", features=["derive"]}
-uuid = "1.10.0"
+uuid = { version = "1.10.0", features = ["v4", "fast-rng", "macro-diagnostics"] }
