@@ -68,45 +68,17 @@ impl User {
         }).map_err(|e| e.to_string())?;
         Ok(user)
     }
-    
-    pub async fn update_username(user: User, data: web::Data<AppState>) -> Result<String, String> {
-        let conn = db::get_db_connection(&data).map_err(|e| e.to_string())?;
-        let rows_affected = conn.execute(
-            "UPDATE users SET username = ?1 WHERE id = ?2",
-            &[&user.username, &user.id],
-        ).map_err(|e| e.to_string())?;
 
-        if rows_affected == 0 {
-            return Err("No rows updated, user not found.".to_string());
-        } 
-        Ok(format!("Success: {} row(s) updated", rows_affected))
-    }
-    
-    pub async fn update_password(user: User, data: web::Data<AppState>) -> Result<String, String> {
+    pub async fn update(user: User, data: web::Data<AppState>) -> Result<String, String> {
         let conn = db::get_db_connection(&data).map_err(|e| e.to_string())?;
-        let hash = hash(user.password.as_bytes()).await;
+        let username = &user.username;
+        let password = &hash(&user.password.as_bytes()).await;
+        let role = &user.role;
 
         let rows_affected = conn.execute(
-            "UPDATE users SET password = ?1 WHERE id = ?2",
-            &[&hash, &user.id],
+            "UPDATE users SET username = ?1, password = ?2, role = ?3 WHERE id = ?4",
+            &[username, password, role, &user.id],
         ).map_err(|e| e.to_string())?;
-
-        if rows_affected == 0 {
-            return Err("No rows updated, user not found.".to_string());
-        } 
-        Ok(format!("Success: {} row(s) updated", rows_affected))
-    }
-    
-    pub async fn update_role(user: User, data: web::Data<AppState>) -> Result<String, String> {
-        let conn = db::get_db_connection(&data).map_err(|e| e.to_string())?;
-        let rows_affected = conn.execute(
-            "UPDATE users SET role = ?1 WHERE id = ?2",
-            &[&user.role, &user.id],
-        ).map_err(|e| e.to_string())?;
-
-        if rows_affected == 0 {
-            return Err("No rows updated, user not found.".to_string());
-        } 
         Ok(format!("Success: {} row(s) updated", rows_affected))
     }
 
