@@ -23,6 +23,13 @@ async fn get_user(id: web::Json<String>, app_state: web::Data<AppState>) -> impl
     }
 }
 
+async fn delete_user(id: web::Json<String>, app_state: web::Data<AppState>) -> impl Responder {
+    match User::delete_by_id(id.0, app_state).await {
+        Ok(response) => HttpResponse::Ok().json(response),
+        Err(e) => HttpResponse::InternalServerError().body(e),
+    }
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let app_state = web::Data::new(
@@ -37,6 +44,7 @@ async fn main() -> std::io::Result<()> {
                     .route("/", web::get().to(index))
                     .route("/create", web::post().to(create_user))
                     .route("/get", web::get().to(get_user))
+                    .route("/delete", web::delete().to(delete_user))
             )
     })
     .bind(("127.0.0.1", 1234))?
