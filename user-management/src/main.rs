@@ -23,6 +23,13 @@ async fn get_user(id: web::Json<String>, app_state: web::Data<AppState>) -> impl
     }
 }
 
+async fn update_user(user_json: web::Json<User>, app_state: web::Data<AppState>) -> impl Responder {
+    match User::update(user_json.into_inner(), app_state).await {
+        Ok(response) => HttpResponse::Ok().json(response),
+        Err(e) => HttpResponse::InternalServerError().body(e),
+    }
+}
+
 async fn delete_user(id: web::Json<String>, app_state: web::Data<AppState>) -> impl Responder {
     match User::delete_by_id(id.0, app_state).await {
         Ok(response) => HttpResponse::Ok().json(response),
@@ -44,6 +51,7 @@ async fn main() -> std::io::Result<()> {
                     .route("/", web::get().to(index))
                     .route("/create", web::post().to(create_user))
                     .route("/get", web::get().to(get_user))
+                    .route("/update", web::put().to(update_user))
                     .route("/delete", web::delete().to(delete_user))
             )
     })
