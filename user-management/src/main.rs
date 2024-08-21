@@ -9,9 +9,16 @@ async fn index() -> impl Responder {
     HttpResponse::Ok().body("Hello world!")
 }
 
-async fn create_user(user_json: web::Json<User>, data: web::Data<AppState>) -> impl Responder {    
-    match User::create(user_json.into_inner(), data).await {
+async fn create_user(user_json: web::Json<User>, app_state: web::Data<AppState>) -> impl Responder {    
+    match User::create(user_json.into_inner(), app_state).await {
         Ok(new_user) => HttpResponse::Ok().json(new_user),
+        Err(e) => HttpResponse::InternalServerError().body(e),
+    }
+}
+
+async fn get_user(id: web::Json<String>, app_state: web::Data<AppState>) -> impl Responder {
+    match User::find_by_id(id.0, app_state).await {
+        Ok(user) => HttpResponse::Ok().json(user),
         Err(e) => HttpResponse::InternalServerError().body(e),
     }
 }
@@ -29,6 +36,7 @@ async fn main() -> std::io::Result<()> {
                 web::scope("/User")
                     .route("/", web::get().to(index))
                     .route("/create", web::post().to(create_user))
+                    .route("/get", web::get().to(get_user))
             )
     })
     .bind(("127.0.0.1", 1234))?
