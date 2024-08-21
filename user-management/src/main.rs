@@ -1,4 +1,6 @@
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
+use crate::models::User;
+use crate::db::AppState;
 pub mod models;
 pub mod db;
 
@@ -7,13 +9,27 @@ async fn index() -> impl Responder {
     HttpResponse::Ok().body("Hello world!")
 }
 
+async fn create_user(user_json: web::Json<User>, data: web::Data<AppState>) -> impl Responder {    
+    match User::create(user_json.into_inner(), data).await {
+        Ok(new_user) => HttpResponse::Ok().json(new_user),
+        Err(e) => HttpResponse::InternalServerError().body(e),
+    }
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| {
-        App::new().service(
-            web::scope("/User")
-                .route("/", web::get().to(index))
-        )
+    let app_state = web::Data::new(
+        AppState::new().await.expect("Failed to initialize AppState")
+    );
+
+    HttpServer::new(move || {
+        App::new()
+            .app_data(app_state.clone()) // Share with all routes
+            .service(
+                web::scope("/User")
+                    .route("/", web::get().to(index))
+                    .route("/create", web::post().to(create_user))
+            )
     })
     .bind(("127.0.0.1", 1234))?
     .run()
