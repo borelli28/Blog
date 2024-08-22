@@ -81,6 +81,17 @@ impl User {
         Ok(format!("Success: {} row(s) updated", rows_affected))
     }
 
+    pub async fn update_passwd(user: User, data: web::Data<AppState>) -> Result<String, String> {
+        let conn = db::get_db_connection(&data).map_err(|e| e.to_string())?;
+        let hash = hash(user.password.as_bytes()).await;
+
+        let rows_affected = conn.execute(
+            "UPDATE users SET password = ?1 WHERE id = ?2",
+            &[&hash, &user.id],
+        ).map_err(|e| e.to_string())?;
+        Ok(format!("Success: {} row(s) updated", rows_affected))
+    }
+
     pub async fn delete_by_id(id: String, data: web::Data<AppState>) -> Result<String, String> {
         let conn = db::get_db_connection(&data).map_err(|e| e.to_string())?;
         let rows_affected = conn.execute(
