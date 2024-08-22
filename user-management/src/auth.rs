@@ -8,7 +8,7 @@ use std::env;
 
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Claims {
+pub struct Claims {
     sub: String,
     exp: i64,
     role: String,
@@ -32,7 +32,7 @@ pub fn create_jwt(user: &User) -> Result<String, jsonwebtoken::errors::Error> {
     encode(&Header::default(), &claims, &EncodingKey::from_secret(jwt_secret.as_bytes()))
 }
 
-fn validate_jwt(token: &str) -> Result<Claims, jsonwebtoken::errors::Error> {
+pub fn validate_jwt(token: &str) -> Result<Claims, jsonwebtoken::errors::Error> {
     let jwt_secret = get_jwt_secret();
     let validation = Validation::new(Algorithm::HS256);
     let token_data = decode::<Claims>(token, &DecodingKey::from_secret(jwt_secret.as_bytes()), &validation)?;
