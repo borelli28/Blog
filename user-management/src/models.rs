@@ -72,12 +72,11 @@ impl User {
     pub async fn update(user: User, data: web::Data<AppState>) -> Result<String, String> {
         let conn = db::get_db_connection(&data).map_err(|e| e.to_string())?;
         let username = &user.username;
-        let password = &hash(&user.password.as_bytes()).await;
         let role = &user.role;
 
         let rows_affected = conn.execute(
-            "UPDATE users SET username = ?1, password = ?2, role = ?3 WHERE id = ?4",
-            &[username, password, role, &user.id],
+            "UPDATE users SET username = ?1, role = ?2 WHERE id = ?3",
+            &[username, role, &user.id],
         ).map_err(|e| e.to_string())?;
         Ok(format!("Success: {} row(s) updated", rows_affected))
     }
