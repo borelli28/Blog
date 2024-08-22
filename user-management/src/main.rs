@@ -2,6 +2,7 @@ use actix_web::{web, App, HttpServer};
 use crate::db::AppState;
 pub mod handlers;
 pub mod models;
+pub mod auth;
 pub mod db;
 
 
