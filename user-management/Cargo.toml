@@ -6,8 +6,10 @@ edition = "2021"
 [dependencies]
 actix-web = "4.9.0"
 argon2 = "0.5.3"
+cookie = "0.18.1"
 dotenvy = "0.15.7"
 jsonwebtoken = "9.3.0"
 rusqlite = { version = "0.32.1", features = ["bundled"] }
 serde = { version="1.0.208", features=["derive"] }
+time = "0.3.36"
 uuid = { version = "1.10.0", features = ["v4", "fast-rng", "macro-diagnostics"] }
