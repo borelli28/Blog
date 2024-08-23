@@ -5,10 +5,11 @@ edition = "2021"
 
 [dependencies]
 actix-cors = "0.7.0"
-actix-web = "4.9.0"
+actix-web = { version = "4.9.0", features = ["openssl"] }
 argon2 = "0.5.3"
 dotenvy = "0.15.7"
 jsonwebtoken = "9.3.0"
+openssl = "0.10.66"
 rusqlite = { version = "0.32.1", features = ["bundled"] }
 serde = { version="1.0.208", features=["derive"] }
 time = "0.3.36"
