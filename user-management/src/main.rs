@@ -1,5 +1,6 @@
-use actix_web::{web, App, HttpServer};
+use actix_web::{web, http, App, HttpServer};
 use crate::db::AppState;
+use actix_cors::Cors;
 pub mod handlers;
 pub mod models;
 pub mod auth;
@@ -13,7 +14,15 @@ async fn main() -> std::io::Result<()> {
     );
 
     HttpServer::new(move || {
+        let cors = Cors::default()
+            .allowed_origin("http://localhost:8000")
+            .allowed_methods(vec!["GET", "POST", "PUT", "DELETE"])
+            .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
+            .allowed_header(http::header::CONTENT_TYPE)
+            .max_age(3600);
+
         App::new()
+            .wrap(cors)
             .app_data(app_state.clone()) // Share with all routes
             .service(
                 web::scope("/User")
