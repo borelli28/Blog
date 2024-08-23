@@ -9,9 +9,9 @@ use std::env;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
-    sub: String,
+    pub sub: String,
     exp: i64,
-    role: String,
+    pub role: String,
 }
 
 fn get_jwt_secret() -> String {
