@@ -44,7 +44,7 @@ pub fn create_auth_cookie(jwt: &str) -> Cookie<'static> {
         .path("/")
         .secure(true)
         .http_only(true)
-        .same_site(SameSite::None)
+        .same_site(SameSite::Lax)
         .max_age(TimeDuration::seconds(TOKEN_DURATION))
         .domain("127.0.0.1") 
         .finish()
