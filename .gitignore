@@ -44,3 +44,4 @@ Cargo.lock
 test.html
 *.pem
 *.py
+*.perm
