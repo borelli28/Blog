@@ -3,6 +3,7 @@ use crate::db::{self, AppState};
 use actix_web::web;
 use uuid::Uuid;
 
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct User {
     pub id: String,
@@ -58,7 +59,7 @@ impl User {
         ).map_err(|e| e.to_string())?;
         Ok(user)
     }
-    
+
     pub async fn find_by_id(id: String, data: web::Data<AppState>) -> Result<User, String> {
         let conn = db::get_db_connection(&data).map_err(|e| e.to_string())?;
         let mut stmt = conn.prepare("SELECT * FROM users WHERE id = ?1").map_err(|e| e.to_string())?;
