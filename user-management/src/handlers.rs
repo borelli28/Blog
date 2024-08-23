@@ -1,6 +1,7 @@
+use actix_web::http::header;
 use actix_web::{web, Responder, HttpRequest, HttpResponse};
 use crate::models::{User, LoginCredentials};
-use crate::auth::{validate_jwt, Claims};
+use crate::auth::{validate_jwt, Claims, create_jwt, create_auth_cookie};
 use crate::db::AppState;
 
 
@@ -28,9 +29,20 @@ pub async fn index() -> impl Responder {
     HttpResponse::Ok().body("Hello world!")
 }
 
-pub async fn create_user(user_json: web::Json<LoginCredentials>, app_state: web::Data<AppState>) -> impl Responder {    
+pub async fn create_user(user_json: web::Json<LoginCredentials>, app_state: web::Data<AppState>) -> HttpResponse {
     match User::create(user_json.into_inner(), app_state).await {
-        Ok(new_user) => HttpResponse::Ok().json(new_user),
+        Ok(new_user) => {
+            match create_jwt(&new_user) {
+                Ok(token) => {
+                    let cookie = create_auth_cookie(&token);
+                    let cookie_value = format!("{}; Partitioned", cookie.to_string());
+                    HttpResponse::Ok()
+                        .append_header((header::SET_COOKIE, cookie_value))
+                        .json(new_user)
+                },
+                Err(_) => HttpResponse::InternalServerError().body("Failed to create JWT"),
+            }
+        },
         Err(e) => HttpResponse::InternalServerError().body(e),
     }
 }
