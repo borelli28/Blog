@@ -38,5 +38,9 @@ Cargo.lock
 ### Sqlite ###
 *.db
 
+
+### Other ###
 .env
 test.html
+*.pem
+*.py
