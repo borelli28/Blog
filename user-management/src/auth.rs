@@ -41,6 +41,7 @@ pub fn validate_jwt(token: &str) -> Result<Claims, jsonwebtoken::errors::Error> 
 
 pub fn create_auth_cookie(jwt: &str) -> Cookie<'static> {
     Cookie::build("auth_token", jwt.to_owned())
+        .path("/")
         .secure(true)
         .http_only(true)
         .same_site(SameSite::None)
