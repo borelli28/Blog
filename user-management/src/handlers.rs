@@ -1,5 +1,5 @@
 use actix_web::{web, HttpResponse, Responder};
-use crate::models::User;
+use crate::models::{User, LoginCredentials};
 use crate::db::AppState;
 
 
@@ -7,7 +7,7 @@ pub async fn index() -> impl Responder {
     HttpResponse::Ok().body("Hello world!")
 }
 
-pub async fn create_user(user_json: web::Json<User>, app_state: web::Data<AppState>) -> impl Responder {    
+pub async fn create_user(user_json: web::Json<LoginCredentials>, app_state: web::Data<AppState>) -> impl Responder {    
     match User::create(user_json.into_inner(), app_state).await {
         Ok(new_user) => HttpResponse::Ok().json(new_user),
         Err(e) => HttpResponse::InternalServerError().body(e),
