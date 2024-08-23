@@ -31,11 +31,16 @@ pub async fn hash(password: &[u8]) -> String {
 }
 
 impl User {
-    pub async fn create(mut user: User, data: web::Data<AppState>) -> Result<User, String> {
+    pub async fn create(user_data: LoginCredentials, data: web::Data<AppState>) -> Result<User, String> {
         let conn = db::get_db_connection(&data).map_err(|e| e.to_string())?;
-        let hash = hash(user.password.as_bytes()).await;
-        user.password = hash;
-        user.id = Uuid::new_v4().to_string();
+        let hash = hash(user_data.password.as_bytes()).await;
+
+        let user = User {
+            id: Uuid::new_v4().to_string(),
+            username: user_data.username,
+            password: hash,
+            role: String::from("Test Role")
+        };
 
         let username_exists: bool = conn.query_row(
             "SELECT EXISTS(SELECT 1 FROM users WHERE username = ?1)",
