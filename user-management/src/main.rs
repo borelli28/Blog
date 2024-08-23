@@ -6,12 +6,19 @@ pub mod models;
 pub mod auth;
 pub mod db;
 
+use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
+
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let app_state = web::Data::new(
         AppState::new().await.expect("Failed to initialize AppState")
     );
+
+    // Load TLS keys
+    let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
+    builder.set_private_key_file("key.pem", SslFiletype::PEM).unwrap();
+    builder.set_certificate_chain_file("cert.pem").unwrap();
 
     HttpServer::new(move || {
         let cors = Cors::default()
@@ -36,6 +43,7 @@ async fn main() -> std::io::Result<()> {
                     .route("/delete", web::delete().to(handlers::delete_user))
             )
     })
+    .bind_openssl("127.0.0.1:8443", builder)?
     .bind(("127.0.0.1", 1234))?
     .run()
     .await
