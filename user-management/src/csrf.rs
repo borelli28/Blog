@@ -1,29 +1,30 @@
-use actix_csrf::{CsrfMiddleware, CsrfMiddlewareConfig, extractor::{CsrfToken, CsrfGuarded}};
-use actix_web::{dev::ServiceResponse,error::Error,http::header,web, HttpMessage, HttpResponse};
-use actix_web::cookie::{Cookie, SameSite};
-use std::time::Duration;
-use serde::Deserialize;
+use rand::Rng;
+use actix_session::Session;
+use actix_web::{web, HttpResponse, Error};
 
+const CSRF_TOKEN_KEY: &str = "csrf_token";
 
-pub fn configure_csrf() -> CsrfMiddleware {
-    let config = CsrfMiddlewareConfig::new()
-        .set_cookie_name("csrf_token")
-        .set_cookie_path("/")
-        .set_cookie_domain(127.0.0.1)
-        .set_cookie_secure(true)
-        .set_cookie_http_only(true)
-        .set_cookie_same_site(SameSite::Strict)
-        .set_token_lifetime(Some(Duration::from_secs(15 * 60))); // 15 minutes
-
-    CsrfMiddleware::new(config)
+// Generate a random CSRF token
+pub fn generate_csrf_token() -> String {
+    rand::thread_rng()
+        .sample_iter(&rand::distributions::Alphanumeric)
+        .take(32)
+        .map(char::from)
+        .collect()
 }
 
-pub fn add_csrf_token_to_headers(mut res: ServiceResponse<actix_web::body::BoxBody>) -> Result<ServiceResponse<actix_web::body::BoxBody>, Error> {
-    if let Some(csrf_token) = res.request().extensions().get::<CsrfToken>() {
-        res.headers_mut().insert(
-            header::HeaderName::from_static("x-csrf-token"),
-            header::HeaderValue::from_str(csrf_token.token()).unwrap(),
-        );
+// Set CSRF token in the session
+pub async fn set_csrf_token(session: Session) -> Result<HttpResponse, Error> {
+    let csrf_token = generate_csrf_token();
+    session.insert(CSRF_TOKEN_KEY, csrf_token.clone())?;
+    Ok(HttpResponse::Ok().json(csrf_token)) // Return the token in the response (or render in your form)
+}
+
+// Verify the CSRF token sent from the request
+pub fn verify_csrf_token(session: &Session, token: &str) -> bool {
+    if let Some(stored_token) = session.get::<String>(CSRF_TOKEN_KEY).unwrap_or(None) {
+        stored_token == token
+    } else {
+        false
     }
-    Ok(res)
 }
