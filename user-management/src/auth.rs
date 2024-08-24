@@ -1,5 +1,5 @@
 use jsonwebtoken::{encode, decode, Header, Algorithm, Validation, EncodingKey, DecodingKey};
-use time::{Duration as TimeDuration, OffsetDateTime};
+use time::{Duration, OffsetDateTime};
 use actix_web::cookie::{Cookie, SameSite};
 use serde::{Serialize, Deserialize};
 use crate::models::User;
@@ -19,11 +19,9 @@ fn get_jwt_secret() -> String {
     env::var("JWT_SECRET").expect("JWT_SECRET must be set in .env file")
 }
 
-const TOKEN_DURATION: i64 = 60 * 60; // 1 hour in seconds
-
 pub fn create_jwt(user: &User) -> Result<String, jsonwebtoken::errors::Error> {
     let jwt_secret = get_jwt_secret();
-    let expiration = OffsetDateTime::now_utc() + TimeDuration::seconds(TOKEN_DURATION);
+    let expiration = OffsetDateTime::now_utc() + Duration::hours(1);
     let claims = Claims {
         sub: user.id.clone(),
         exp: expiration.unix_timestamp(),
@@ -45,7 +43,7 @@ pub fn create_auth_cookie(jwt: &str) -> Cookie<'static> {
         .secure(true)
         .http_only(true)
         .same_site(SameSite::Strict)
-        .max_age(TimeDuration::seconds(TOKEN_DURATION))
+        .max_age(Duration::hours(1))
         .domain("127.0.0.1") 
         .finish()
 }
