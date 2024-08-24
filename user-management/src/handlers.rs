@@ -38,6 +38,7 @@ pub async fn create_user(user_json: web::Json<LoginCredentials>, app_state: web:
                     let cookie_value = format!("{}; Partitioned", cookie.to_string());
                     HttpResponse::Ok()
                         .append_header((header::SET_COOKIE, cookie_value))
+                        .append_header((header::AUTHORIZATION, format!("Bearer {}", token)))
                         .json(new_user)
                 },
                 Err(_) => HttpResponse::InternalServerError().body("Failed to create JWT"),
