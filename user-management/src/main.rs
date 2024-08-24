@@ -1,8 +1,10 @@
 use actix_web::{web, http, App, HttpServer};
 use crate::db::AppState;
 use actix_cors::Cors;
+use actix_web::http::header;
 pub mod handlers;
 pub mod models;
+pub mod csrf;
 pub mod auth;
 pub mod db;
 
@@ -24,10 +26,17 @@ async fn main() -> std::io::Result<()> {
         let cors = Cors::default()
             .allowed_origin("https://127.0.0.1:4443")
             .allowed_methods(vec!["GET", "POST", "PUT", "DELETE"])
-            .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
-            .allowed_header(http::header::CONTENT_TYPE)
+            .allowed_headers(vec![
+                header::AUTHORIZATION,
+                header::ACCEPT,
+                header::CONTENT_TYPE,
+                header::HeaderName::from_static("x-csrf-token"),
+            ])
+            .expose_headers(&[
+                header::SET_COOKIE,
+                header::HeaderName::from_static("x-csrf-token"),
+            ])
             .supports_credentials()
-            .expose_headers(&[http::header::SET_COOKIE])
             .max_age(3600);
 
         App::new()
