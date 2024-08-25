@@ -1,3 +1,4 @@
+use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 use actix_web::{web, App, HttpServer};
 use actix_session::{SessionMiddleware};
 use actix_session::storage::CookieSessionStore;
@@ -9,6 +10,11 @@ pub mod token;
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let session_key = Key::generate();
+
+    // Load TLS keys
+    let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
+    builder.set_private_key_file("key.pem", SslFiletype::PEM).unwrap();
+    builder.set_certificate_chain_file("cert.pem").unwrap();
 
     HttpServer::new(move || {
         App::new()
@@ -22,6 +28,7 @@ async fn main() -> std::io::Result<()> {
                     .route("/verify", web::post().to(verify_csrf_token))
             )
     })
+    .bind_openssl("127.0.0.1:8444", builder)?
     .bind("127.0.0.1:8081")?
     .run()
     .await
