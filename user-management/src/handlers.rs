@@ -12,7 +12,7 @@ async fn verify_csrf_token_api(csrf_token: &str) -> Result<bool, reqwest::Error>
         .post("https://127.0.0.1:8444/csrf/verify")
         .json(&csrf_token)
         .send()
-        .await?;
+        .await.expect("error while verifying csrf token");
     Ok(response.status().is_success())
 }
 
