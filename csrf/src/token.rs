@@ -4,6 +4,7 @@ use rand::Rng;
 use rand::distributions::Alphanumeric;
 use actix_web::cookie::{Cookie, SameSite};
 
+
 const CSRF_TOKEN_KEY: &str = "csrf_token";
 
 pub fn generate_csrf_token() -> String {
