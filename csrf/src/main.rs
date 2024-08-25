@@ -1,11 +1,12 @@
-use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 use actix_web::{web, App, HttpServer};
 use actix_session::{SessionMiddleware};
 use actix_session::storage::CookieSessionStore;
 use actix_web::cookie::Key;
+use actix_cors::Cors;
+use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 use crate::token::{send_csrf_token, verify_csrf_token};
-
 pub mod token;
+
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -17,7 +18,16 @@ async fn main() -> std::io::Result<()> {
     builder.set_certificate_chain_file("cert.pem").unwrap();
 
     HttpServer::new(move || {
+        // Configure CORS policy
+        let cors = Cors::default()
+            .allowed_origin("https://127.0.0.1")
+            .allowed_methods(vec!["GET", "POST"])
+            .allowed_headers(vec!["Content-Type", "X-CSRF-Token"])
+            .supports_credentials()
+            .max_age(3600);
+
         App::new()
+            .wrap(cors) // Add CORS middleware
             .wrap(SessionMiddleware::new(
                 CookieSessionStore::default(),
                 session_key.clone(),
