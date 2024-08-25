@@ -24,7 +24,7 @@ async fn extract_and_verify_csrf_token(req: &HttpRequest) -> Result<(), HttpResp
     match verify_csrf_token_api(&csrf_token).await {
         Ok(true) => Ok(()),
         Ok(false) => Err(HttpResponse::Forbidden().json("Invalid CSRF token")),
-        Err(_) => Err(HttpResponse::InternalServerError().json("Failed to contact CSRF service")),
+        Err(e) => Err(HttpResponse::InternalServerError().json(e.to_string())),
     }
 }
 
@@ -52,7 +52,12 @@ pub async fn index() -> impl Responder {
     HttpResponse::Ok().body("Hello world!")
 }
 
-pub async fn create_user(user_json: web::Json<LoginCredentials>, app_state: web::Data<AppState>) -> HttpResponse {
+pub async fn create_user(user_json: web::Json<LoginCredentials>, req: HttpRequest, app_state: web::Data<AppState>)
+-> HttpResponse {
+    if let Err(response) = extract_and_verify_csrf_token(&req).await {
+        return response;
+    }
+
     match User::create(user_json.into_inner(), app_state).await {
         Ok(new_user) => {
             match create_jwt(&new_user) {
