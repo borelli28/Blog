@@ -3,7 +3,18 @@ use actix_web::{web, Responder, HttpRequest, HttpResponse};
 use crate::models::{User, LoginCredentials};
 use crate::auth::{validate_jwt, Claims, create_jwt, create_auth_cookie};
 use crate::db::AppState;
+use reqwest::Client;
 
+
+async fn verify_csrf_token_api(csrf_token: &str) -> Result<bool, reqwest::Error> {
+    let client = Client::new();
+    let response = client
+        .post("https://127.0.0.1:8444/csrf/verify")
+        .json(&csrf_token)
+        .send()
+        .await?;
+    Ok(response.status().is_success())
+}
 
 async fn extract_and_validate_token(req: &HttpRequest) -> Result<Claims, HttpResponse> {
     let token = req
