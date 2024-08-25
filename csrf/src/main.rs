@@ -2,7 +2,7 @@ use actix_web::{web, App, HttpServer};
 use actix_session::{SessionMiddleware};
 use actix_session::storage::CookieSessionStore;
 use actix_web::cookie::Key;
-use crate::token::{get_csrf_token, verify_csrf_token};
+use crate::token::{send_csrf_token, verify_csrf_token};
 
 pub mod token;
 
@@ -18,7 +18,7 @@ async fn main() -> std::io::Result<()> {
             ))
             .service(
                 web::scope("/csrf")
-                    .route("/token", web::get().to(get_csrf_token))
+                    .route("/get_token", web::get().to(send_csrf_token))
                     .route("/verify", web::post().to(verify_csrf_token))
             )
     })
