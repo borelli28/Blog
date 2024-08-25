@@ -16,6 +16,18 @@ async fn verify_csrf_token_api(csrf_token: &str) -> Result<bool, reqwest::Error>
     Ok(response.status().is_success())
 }
 
+async fn extract_and_verify_csrf_token(req: &HttpRequest) -> Result<(), HttpResponse> {
+    let csrf_token = req.cookie("csrf_token")
+        .map(|c| c.value().to_string())
+        .ok_or_else(|| HttpResponse::Unauthorized().json("CSRF token missing"))?;
+
+    match verify_csrf_token_api(&csrf_token).await {
+        Ok(true) => Ok(()),
+        Ok(false) => Err(HttpResponse::Forbidden().json("Invalid CSRF token")),
+        Err(_) => Err(HttpResponse::InternalServerError().json("Failed to contact CSRF service")),
+    }
+}
+
 async fn extract_and_validate_token(req: &HttpRequest) -> Result<Claims, HttpResponse> {
     let token = req
         .cookie("auth_token")
