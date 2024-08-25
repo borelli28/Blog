@@ -20,7 +20,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         // Configure CORS policy
         let cors = Cors::default()
-            .allowed_origin("https://127.0.0.1")
+            .allowed_origin("https://127.0.0.1:4443")   // frontend domain
             .allowed_methods(vec!["GET", "POST"])
             .allowed_headers(vec!["Content-Type", "X-CSRF-Token"])
             .supports_credentials()
