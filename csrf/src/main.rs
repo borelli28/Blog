@@ -5,6 +5,7 @@ use actix_web::cookie::Key;
 use actix_cors::Cors;
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 use crate::token::{send_csrf_token, verify_csrf_token};
+use actix_web::http::header;
 pub mod token;
 
 
@@ -19,9 +20,11 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         let cors = Cors::default()
-            .allowed_origin("https://127.0.0.1:4443")   // frontend domain
+            .allowed_origin("https://127.0.0.1:4443")   // frontend
+            .allowed_origin("https://127.0.0.1:8443")   // user-management service
             .allowed_methods(vec!["GET", "POST"])
             .allowed_headers(vec!["Content-Type", "X-CSRF-Token"])
+            .allowed_headers(vec![header::CONTENT_TYPE, header::AUTHORIZATION])
             .supports_credentials()
             .max_age(3600);
 
