@@ -14,7 +14,7 @@ pub fn generate_csrf_token() -> String {
         .collect()
 }
 
-pub async fn get_csrf_token(session: Session) -> HttpResponse {
+pub async fn send_csrf_token(session: Session) -> HttpResponse {
     let csrf_token = generate_csrf_token();
     session.insert(CSRF_TOKEN_KEY, csrf_token.clone()).unwrap();
     HttpResponse::Ok()
@@ -29,12 +29,12 @@ pub async fn get_csrf_token(session: Session) -> HttpResponse {
 
 pub async fn verify_csrf_token(session: Session, body: web::Json<String>) -> HttpResponse {
     let token = body.into_inner();
-    
+    // Checking that session token == provided token
     let is_valid = match session.get::<String>(CSRF_TOKEN_KEY) {
         Ok(Some(stored_token)) => stored_token == token,
         _ => false,
     };
-    
+
     if is_valid {
         HttpResponse::Ok().finish()
     } else {
