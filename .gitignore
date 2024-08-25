@@ -1,5 +1,14 @@
-# Created by https://www.toptal.com/developers/gitignore/api/rust,react
-# Edit at https://www.toptal.com/developers/gitignore?templates=rust,react
+# Created by https://www.toptal.com/developers/gitignore/api/rust,react,dotnetcore
+# Edit at https://www.toptal.com/developers/gitignore?templates=rust,react,dotnetcore
+
+### DotnetCore ###
+# .NET Core build folders
+bin/
+obj/
+
+# Common node modules locations
+/node_modules
+/wwwroot/node_modules
 
 ### react ###
 .DS_*
@@ -33,7 +42,7 @@ Cargo.lock
 # MSVC Windows builds of rustc generate these, which store debugging information
 *.pdb
 
-# End of https://www.toptal.com/developers/gitignore/api/rust,react
+# End of https://www.toptal.com/developers/gitignore/api/rust,react,dotnetcoret
 
 ### Sqlite ###
 *.db
