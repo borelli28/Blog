@@ -18,7 +18,6 @@ async fn main() -> std::io::Result<()> {
     builder.set_certificate_chain_file("cert.pem").unwrap();
 
     HttpServer::new(move || {
-        // Configure CORS policy
         let cors = Cors::default()
             .allowed_origin("https://127.0.0.1:4443")   // frontend domain
             .allowed_methods(vec!["GET", "POST"])
@@ -27,7 +26,7 @@ async fn main() -> std::io::Result<()> {
             .max_age(3600);
 
         App::new()
-            .wrap(cors) // Add CORS middleware
+            .wrap(cors)
             .wrap(SessionMiddleware::new(
                 CookieSessionStore::default(),
                 session_key.clone(),
