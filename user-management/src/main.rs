@@ -1,14 +1,12 @@
+use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 use actix_web::{web, App, HttpServer};
+use actix_web::http::header;
 use crate::db::AppState;
 use actix_cors::Cors;
-use actix_web::http::header;
 pub mod handlers;
 pub mod models;
-pub mod csrf;
 pub mod auth;
 pub mod db;
-
-use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 
 
 #[actix_web::main]
