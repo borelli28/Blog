@@ -36,4 +36,24 @@ public class UserController : ControllerBase
             return StatusCode(500, "An error occurred while processing your request.");
         }
     }
+
+    [HttpPut]
+    public async Task<IActionResult> UpdateUser(string id)
+    {
+        try
+        {
+            var user = await _userService.GetByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound($"User with id {id} not found.");
+            }
+            User updatedUser = await _userService.UpdateAsync(user);
+            return Ok(updatedUser);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Error occurred while updating user with id {id}.");
+            return StatusCode(500, "An error occurred while processing your request.");
+        }
+    }
 }
