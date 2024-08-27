@@ -16,6 +16,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+builder.Services.AddScoped<IUserService, UserService>();
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

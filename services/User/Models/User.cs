@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
 
-namespace UserService.Models;
+namespace User.Models;
 
 public class User
 {
