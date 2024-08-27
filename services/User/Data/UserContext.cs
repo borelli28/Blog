@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using UserService.Models;
 
 
-namespace UserService.Data;
+namespace User.Data;
 
 public class AppDbContext : DbContext
 {
