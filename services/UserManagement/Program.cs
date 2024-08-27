@@ -1,3 +1,8 @@
+using Microsoft.EntityFrameworkCore;
+using UserManagement.Services;
+using UserManagement.Data;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -13,6 +18,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+builder.Services.AddScoped<IUserService, UserService>();
 
 app.UseHttpsRedirection();
 
