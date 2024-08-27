@@ -11,7 +11,6 @@ public interface IUserService
     Task<(User? user, string? errorMessage)> RegisterAsync(User user);
     Task<(User? user, string? errorMessage)> LoginAsync(string username, string password);
     Task<User?> GetByIdAsync(string id);
-    Task<User?> GetByUsernameAsync(string username);
     Task<IEnumerable<User>> GetAllAsync();
     Task<User> UpdateAsync(User user);
     Task DeleteAsync(string id);
@@ -59,11 +58,6 @@ public class UserService : IUserService
     public async Task<User?> GetByIdAsync(string id)
     {
         return await _context.Users.FindAsync(id);
-    }
-
-    public async Task<User?> GetByUsernameAsync(string username)
-    {
-        return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
     }
 
     public async Task<IEnumerable<User>> GetAllAsync()
