@@ -1,6 +1,5 @@
 use rocket::{Build, Rocket, routes};
 use rocket::fairing::AdHoc;
-use rocket::fs::FileServer;
 use db::AppState;
 mod handlers;
 mod models;
@@ -17,7 +16,6 @@ fn rocket() -> Rocket<Build> {
             handlers::update_password,
             handlers::delete_user,
         ])
-        .mount("/", FileServer::from("static"))
         .attach(AdHoc::on_ignite("Database", |rocket| async {
             let app_state = AppState::new().expect("Failed to initialize app state");
             rocket.manage(app_state)
