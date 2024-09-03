@@ -1,5 +1,6 @@
+use argon2::PasswordVerifier;
 use argon2::{
-    password_hash::{rand_core::OsRng, PasswordHasher, SaltString},
+    password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, SaltString},
     Argon2,
 };
 use serde::{Deserialize, Serialize};
@@ -21,6 +22,12 @@ pub struct User {
 pub struct LoginCredentials {
     pub username: String,
     pub password: String,
+}
+
+#[derive(Serialize)]
+pub struct LoginResponse {
+    pub user: User,
+    pub token: String,
 }
 
 pub async fn hash(password: &[u8]) -> String {
@@ -62,6 +69,32 @@ impl User {
                 params![user.id, user.username, user.password, user.role],
             ).map_err(|e| e.to_string())?;
         }
+        Ok(user)
+    }
+
+    pub async fn login(user_data: LoginCredentials, state: &State<AppState>) -> Result<User, String> {
+        let conn = state.get_db_connection().map_err(|e| e.to_string())?;
+        let mut stmt = conn.prepare("SELECT id, username, password, role FROM users WHERE username = ?1").map_err(|e| e.to_string())?;
+
+        let user = stmt.query_row([&user_data.username], |row| {
+            Ok(User {
+                id: row.get(0)?,
+                username: row.get(1)?,
+                password: row.get(2)?,
+                role: row.get(3)?,
+            })
+        }).map_err(|_| "Invalid username or password.".to_string())?;
+
+        let parsed_hash = PasswordHash::new(&user.password)
+            .map_err(|_| "Failed to parse password hash".to_string())?;
+
+        if Argon2::default()
+            .verify_password(user_data.password.as_bytes(), &parsed_hash)
+            .is_err() 
+        {
+            return Err("Invalid username or password.".to_string());
+        }
+
         Ok(user)
     }
 
