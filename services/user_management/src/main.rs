@@ -1,6 +1,7 @@
 use rocket::{Build, Rocket, routes};
 use rocket::fairing::AdHoc;
 use db::AppState;
+mod auth_middleware;
 mod handlers;
 mod models;
 mod auth;
