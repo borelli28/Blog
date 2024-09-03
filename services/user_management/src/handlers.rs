@@ -1,6 +1,8 @@
+use crate::auth_middleware::AuthenticatedUser;
 use crate::models::{User, LoginCredentials};
 use rocket::{get, put, post, delete};
 use rocket::serde::json::Json;
+use rocket::http::Status;
 use crate::db::AppState;
 use rocket::State;
 
@@ -12,10 +14,16 @@ pub async fn create_user(user_data: Json<LoginCredentials>, state: &State<AppSta
 }
 
 #[get("/<id>")]
-pub async fn get_user(id: u64, state: &State<AppState>) -> Result<Json<User>, String> {
-    let user = User::find_by_id(id, state).await?;
+pub async fn get_user(id: u64, state: &State<AppState>, auth_user: AuthenticatedUser) -> Result<Json<User>, Status> {
+    if auth_user.claims.sub != id {
+        return Err(Status::Forbidden);
+    }
+
+    let user = User::find_by_id(id, state).await
+        .map_err(|_| Status::NotFound)?;
     Ok(Json(user))
 }
+
 
 #[put("/<id>", data = "<user>")]
 pub async fn update_user(id: u64, user: Json<User>, state: &State<AppState>) -> Result<String, String> {
