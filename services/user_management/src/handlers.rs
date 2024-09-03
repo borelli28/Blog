@@ -1,7 +1,8 @@
 use crate::auth_middleware::AuthenticatedUser;
-use crate::models::{User, LoginCredentials};
+use crate::models::{User, LoginCredentials, LoginResponse};
 use rocket::{get, put, post, delete};
 use rocket::serde::json::Json;
+use crate::auth::create_token;
 use rocket::http::Status;
 use crate::db::AppState;
 use rocket::State;
@@ -11,6 +12,25 @@ use rocket::State;
 pub async fn create_user(user_data: Json<LoginCredentials>, state: &State<AppState>) -> Result<Json<User>, String> {
     let user = User::create(user_data.into_inner(), state).await?;
     Ok(Json(user))
+}
+
+#[post("/login", data = "<user_data>")]
+pub async fn login(user_data: Json<LoginCredentials>, state: &State<AppState>) -> Result<Json<LoginResponse>, Status> {
+    match User::login(user_data.into_inner(), state).await {
+        Ok(user) => {
+            match create_token(&user.id, &user.role) {
+                Ok(token) => {
+                    let response = LoginResponse {
+                        user,
+                        token,
+                    };
+                    Ok(Json(response))
+                },
+                Err(_) => Err(Status::InternalServerError),
+            }
+        }
+        Err(_) => Err(Status::Unauthorized),
+    }
 }
 
 #[get("/<id>")]
