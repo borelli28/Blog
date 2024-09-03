@@ -6,9 +6,9 @@ use std::env;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
-    sub: u64,  // User ID
+    pub sub: u64,  // User ID
     exp: i64,     // Expiration time
-    role: String, // User role
+    pub role: String, // User role
 }
 
 pub fn create_token(user_id: &u64, role: &str) -> Result<String, jsonwebtoken::errors::Error> {
