@@ -24,32 +24,38 @@ pub async fn get_user(id: u64, state: &State<AppState>, auth_user: Authenticated
 }
 
 #[put("/<id>", data = "<user>")]
-pub async fn update_user(id: u64, user: Json<User>, state: &State<AppState>, auth_user: AuthenticatedUser) -> Result<String, Status> {
+pub async fn update_user(id: u64, user: Json<User>, state: &State<AppState>, auth_user: AuthenticatedUser) -> Status {
     if auth_user.claims.sub != id {
-        return Err(Status::Forbidden);
+        return Status::Forbidden;
     }
     let mut updated_user = user.into_inner();
     updated_user.id = id;
-    User::update(updated_user, state).await.map_err(|_| Status::InternalServerError)?;
-    Ok(String::from("User updated"))
+    match User::update(updated_user, state).await {
+        Ok(_) => Status::Ok,
+        Err(_) => Status::InternalServerError,
+    }
 }
 
 #[put("/<id>/password", data = "<user>")]
-pub async fn update_password(id: u64, user: Json<User>, state: &State<AppState>, auth_user: AuthenticatedUser) -> Result<String, Status> {
+pub async fn update_password(id: u64, user: Json<User>, state: &State<AppState>, auth_user: AuthenticatedUser) -> Status {
     if auth_user.claims.sub != id {
-        return Err(Status::Forbidden);
+        return Status::Forbidden;
     }
     let mut updated_user = user.into_inner();
     updated_user.id = id;
-    User::update_passwd(updated_user, state).await.map_err(|_| Status::InternalServerError)?;
-    Ok(String::from("User updated"))
+    match User::update_passwd(updated_user, state).await {
+        Ok(_) => return Status::Ok,
+        Err(_) => Status::InternalServerError,
+    }
 }
 
 #[delete("/<id>")]
-pub async fn delete_user(id: u64, state: &State<AppState>, auth_user: AuthenticatedUser) -> Result<String, Status> {
+pub async fn delete_user(id: u64, state: &State<AppState>, auth_user: AuthenticatedUser) -> Status {
     if auth_user.claims.sub != id {
-        return Err(Status::Forbidden);
+        return Status::Forbidden;
     }
-    User::delete_by_id(id, state).await.map_err(|_| Status::InternalServerError)?;
-    Ok(String::from("User deleted"))
+    match User::delete_by_id(id, state).await {
+        Ok(_) => return Status::Ok,
+        Err(_) => return Status::Forbidden,
+    }
 }
