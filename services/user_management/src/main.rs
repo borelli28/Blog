@@ -12,8 +12,9 @@ mod db;
 fn rocket() -> Rocket<Build> {
     rocket::build()
         .mount("/user-management", routes![
-            handlers::get_user,
             handlers::create_user,
+            handlers::login,
+            handlers::get_user,
             handlers::update_user,
             handlers::update_password,
             handlers::delete_user,
