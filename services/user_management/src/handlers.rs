@@ -18,28 +18,38 @@ pub async fn get_user(id: u64, state: &State<AppState>, auth_user: Authenticated
     if auth_user.claims.sub != id {
         return Err(Status::Forbidden);
     }
-
     let user = User::find_by_id(id, state).await
         .map_err(|_| Status::NotFound)?;
     Ok(Json(user))
 }
 
-
 #[put("/<id>", data = "<user>")]
-pub async fn update_user(id: u64, user: Json<User>, state: &State<AppState>) -> Result<String, String> {
+pub async fn update_user(id: u64, user: Json<User>, state: &State<AppState>, auth_user: AuthenticatedUser) -> Result<String, Status> {
+    if auth_user.claims.sub != id {
+        return Err(Status::Forbidden);
+    }
     let mut updated_user = user.into_inner();
     updated_user.id = id;
-    User::update(updated_user, state).await
+    User::update(updated_user, state).await.map_err(|_| Status::InternalServerError)?;
+    Ok(String::from("User updated"))
 }
 
 #[put("/<id>/password", data = "<user>")]
-pub async fn update_password(id: u64, user: Json<User>, state: &State<AppState>) -> Result<String, String> {
+pub async fn update_password(id: u64, user: Json<User>, state: &State<AppState>, auth_user: AuthenticatedUser) -> Result<String, Status> {
+    if auth_user.claims.sub != id {
+        return Err(Status::Forbidden);
+    }
     let mut updated_user = user.into_inner();
     updated_user.id = id;
-    User::update_passwd(updated_user, state).await
+    User::update_passwd(updated_user, state).await.map_err(|_| Status::InternalServerError)?;
+    Ok(String::from("User updated"))
 }
 
 #[delete("/<id>")]
-pub async fn delete_user(id: u64, state: &State<AppState>) -> Result<String, String> {
-    User::delete_by_id(id, state).await
+pub async fn delete_user(id: u64, state: &State<AppState>, auth_user: AuthenticatedUser) -> Result<String, Status> {
+    if auth_user.claims.sub != id {
+        return Err(Status::Forbidden);
+    }
+    User::delete_by_id(id, state).await.map_err(|_| Status::InternalServerError)?;
+    Ok(String::from("User deleted"))
 }
