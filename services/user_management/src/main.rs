@@ -3,6 +3,7 @@ use rocket::fairing::AdHoc;
 use db::AppState;
 mod handlers;
 mod models;
+mod auth;
 mod db;
 
 
