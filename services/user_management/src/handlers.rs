@@ -31,6 +31,12 @@ pub async fn login(user_data: Json<LoginCredentials>, cookies: &CookieJar<'_>, s
     }
 }
 
+#[post("/logout")]
+pub fn logout(cookies: &CookieJar<'_>) -> Status {
+    cookies.remove_private(Cookie::build("jwt"));
+    Status::Ok
+}
+
 #[get("/<id>")]
 pub async fn get_user(id: u64, state: &State<AppState>, auth_user: AuthenticatedUser) -> Result<Json<User>, Status> {
     if auth_user.claims.sub != id {
