@@ -11,6 +11,7 @@ pub struct AuthenticatedUser {
 pub enum AuthError {
     Missing,
     Invalid,
+    Expired
 }
 
 #[rocket::async_trait]
@@ -24,10 +25,18 @@ impl<'r> FromRequest<'r> for AuthenticatedUser {
                 let token = token.split_at(7).1; // Remove "Bearer " prefix
                 match validate_token(token) {
                     Ok(claims) => Outcome::Success(AuthenticatedUser { claims }),
-                    Err(_) => Outcome::Error((Status::Unauthorized, AuthError::Invalid)),
+                    Err(err) => {
+                        if err.to_string().contains("ExpiredSignature") {
+                            Outcome::Error((Status::Unauthorized, AuthError::Expired))
+                        } else {
+                            Outcome::Error((Status::Unauthorized, AuthError::Invalid))
+                        }
+                    }
                 }
             }
-            _ => Outcome::Error((Status::Unauthorized, AuthError::Missing)),
+            _ => {
+                Outcome::Error((Status::Unauthorized, AuthError::Missing))
+            }
         }
     }
 }
