@@ -1,9 +1,9 @@
-use crate::auth_middleware::AuthenticatedUser;
 use crate::models::{User, LoginCredentials, LoginResponse};
+use crate::auth_middleware::AuthenticatedUser;
+use rocket::http::{Cookie, CookieJar, Status};
 use rocket::{get, put, post, delete};
 use rocket::serde::json::Json;
 use crate::auth::create_token;
-use rocket::http::Status;
 use crate::db::AppState;
 use rocket::State;
 
@@ -15,19 +15,17 @@ pub async fn create_user(user_data: Json<LoginCredentials>, state: &State<AppSta
 }
 
 #[post("/login", data = "<user_data>")]
-pub async fn login(user_data: Json<LoginCredentials>, state: &State<AppState>) -> Result<Json<LoginResponse>, Status> {
+pub async fn login(user_data: Json<LoginCredentials>, cookies: &CookieJar<'_>, state: &State<AppState>) -> Result<Json<LoginResponse>, Status> {
     match User::login(user_data.into_inner(), state).await {
         Ok(user) => {
-            match create_token(&user.id, &user.role) {
-                Ok(token) => {
-                    let response = LoginResponse {
-                        user,
-                        token,
-                    };
-                    Ok(Json(response))
-                },
-                Err(_) => Err(Status::InternalServerError),
-            }
+            let token = create_token(&user.id, &user.role).map_err(|_| Status::InternalServerError)?;
+            cookies.add_private(
+                Cookie::build(("jwt", token.clone()))
+                    .http_only(true)
+                    .secure(false)   // Change to true on SSL
+                    .same_site(rocket::http::SameSite::Lax),
+            );
+            Ok(Json(LoginResponse { user, token }))
         }
         Err(_) => Err(Status::Unauthorized),
     }
