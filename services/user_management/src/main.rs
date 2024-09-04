@@ -14,6 +14,7 @@ fn rocket() -> Rocket<Build> {
         .mount("/user-management", routes![
             handlers::create_user,
             handlers::login,
+            handlers::logout,
             handlers::get_user,
             handlers::update_user,
             handlers::update_password,
