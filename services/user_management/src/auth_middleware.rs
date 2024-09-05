@@ -1,5 +1,5 @@
-use crate::auth::{validate_token, Claims};
 use rocket::request::{FromRequest, Outcome, Request};
+use crate::auth::{validate_token, Claims};
 use rocket::http::Status;
 use crate::JwtDenyList;
 
