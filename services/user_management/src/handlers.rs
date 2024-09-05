@@ -1,11 +1,13 @@
 use crate::models::{User, LoginCredentials, LoginResponse};
 use crate::auth_middleware::AuthenticatedUser;
 use rocket::http::{Cookie, CookieJar, Status};
+use crate::jwt_deny_list::JwtDenyList;
 use rocket::{get, put, post, delete};
 use rocket::serde::json::Json;
 use crate::auth::create_token;
 use crate::db::AppState;
 use rocket::State;
+
 
 
 #[post("/", data = "<user_data>")]
@@ -32,9 +34,17 @@ pub async fn login(user_data: Json<LoginCredentials>, cookies: &CookieJar<'_>, s
 }
 
 #[post("/logout")]
-pub fn logout(cookies: &CookieJar<'_>) -> Status {
-    cookies.remove_private(Cookie::build("jwt"));
-    Status::Ok
+pub async fn logout(cookies: &CookieJar<'_>, deny_list: &State<JwtDenyList>) -> Status {
+    if let Some(jwt_cookie) = cookies.get_private("jwt") {
+        let token = jwt_cookie.value();
+        if let Err(e) = deny_list.add(token) {
+            eprintln!("Failed to add token to deny list: {}", e);
+        }
+        cookies.remove_private(Cookie::build("jwt"));
+        Status::Ok
+    } else {
+        Status::NoContent
+    }
 }
 
 #[get("/<id>")]
