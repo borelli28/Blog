@@ -1,13 +1,15 @@
 use rusqlite::{Connection, Result as SqliteResult, params};
 use jsonwebtoken::{decode, Validation, DecodingKey};
 use chrono::{Utc, DateTime};
+use std::sync::{Arc, Mutex};
 use crate::auth::Claims;
-use std::sync::Mutex;
+use std::time::Duration;
+use rocket::tokio;
 use std::env;
 
 
 pub struct JwtDenyList {
-    conn: Mutex<Connection>,
+    conn: Arc<Mutex<Connection>>,
 }
 
 impl JwtDenyList {
@@ -20,12 +22,15 @@ impl JwtDenyList {
             )",
             [],
         )?;
-        Ok(JwtDenyList { conn: Mutex::new(conn) })
+        let deny_list = JwtDenyList {
+            conn: Arc::new(Mutex::new(conn)),
+        };
+        deny_list.start_cleanup_task();
+        Ok(deny_list)
     }
 
     pub fn add(&self, token: &str) -> SqliteResult<()> {
         let secret_key = env::var("JWT_SECRET_KEY").expect("JWT_SECRET_KEY must be set");
-        
         // Decode the token to get the expiration time
         let token_data = decode::<Claims>(
             token,
@@ -56,8 +61,22 @@ impl JwtDenyList {
         Ok(count > 0)
     }
 
-    pub fn cleanup_expired(&self) -> SqliteResult<()> {
-        let conn = self.conn.lock().unwrap();
+    // Scheduled task that runs every 12 hours to remove expired JWT from deny list
+    fn start_cleanup_task(&self) {
+        let conn = Arc::clone(&self.conn);
+        tokio::spawn(async move {
+            let mut interval = tokio::time::interval(Duration::from_secs(12 * 60 * 60));
+            loop {
+                interval.tick().await;
+                if let Err(e) = Self::remove_expired_tokens(&conn) {
+                    eprintln!("Error during cleanup: {}", e);
+                }
+            }
+        });
+    }
+
+    fn remove_expired_tokens(conn: &Arc<Mutex<Connection>>) -> SqliteResult<()> {
+        let conn = conn.lock().unwrap();
         conn.execute(
             "DELETE FROM denied_tokens WHERE expires_at <= datetime('now')",
             [],
