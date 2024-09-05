@@ -1,7 +1,9 @@
 use rusqlite::{Connection, Result as SqliteResult, params};
 use jsonwebtoken::{decode, Validation, DecodingKey};
+use rocket::fairing::{Fairing, Info, Kind};
 use chrono::{Utc, DateTime};
 use std::sync::{Arc, Mutex};
+use rocket::{Rocket, Orbit};
 use crate::auth::Claims;
 use std::time::Duration;
 use rocket::tokio;
@@ -22,11 +24,9 @@ impl JwtDenyList {
             )",
             [],
         )?;
-        let deny_list = JwtDenyList {
+        Ok(JwtDenyList {
             conn: Arc::new(Mutex::new(conn)),
-        };
-        deny_list.start_cleanup_task();
-        Ok(deny_list)
+        })
     }
 
     pub fn add(&self, token: &str) -> SqliteResult<()> {
@@ -61,20 +61,6 @@ impl JwtDenyList {
         Ok(count > 0)
     }
 
-    // Scheduled task that runs every 12 hours to remove expired JWT from deny list
-    fn start_cleanup_task(&self) {
-        let conn = Arc::clone(&self.conn);
-        tokio::spawn(async move {
-            let mut interval = tokio::time::interval(Duration::from_secs(12 * 60 * 60));
-            loop {
-                interval.tick().await;
-                if let Err(e) = Self::remove_expired_tokens(&conn) {
-                    eprintln!("Error during cleanup: {}", e);
-                }
-            }
-        });
-    }
-
     fn remove_expired_tokens(conn: &Arc<Mutex<Connection>>) -> SqliteResult<()> {
         let conn = conn.lock().unwrap();
         conn.execute(
@@ -82,5 +68,33 @@ impl JwtDenyList {
             [],
         )?;
         Ok(())
+    }
+}
+
+pub struct JwtDenyListFairing;
+
+#[rocket::async_trait]
+impl Fairing for JwtDenyListFairing {
+    fn info(&self) -> Info {
+        Info {
+            name: "JWT Deny List Cleanup",
+            kind: Kind::Liftoff,
+        }
+    }
+
+    async fn on_liftoff(&self, rocket: &Rocket<Orbit>) {
+        let deny_list = rocket.state::<JwtDenyList>().expect("JwtDenyList not managed");
+        let conn = Arc::clone(&deny_list.conn);
+        // Scheduled task that runs every 12 hours
+        // Removes expired tokens from deny list
+        rocket::tokio::spawn(async move {
+            let mut interval = tokio::time::interval(Duration::from_secs(12 * 60 * 60));
+            loop {
+                interval.tick().await;
+                if let Err(e) = JwtDenyList::remove_expired_tokens(&conn) {
+                    eprintln!("Error during cleanup: {}", e);
+                }
+            }
+        });
     }
 }

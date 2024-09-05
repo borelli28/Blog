@@ -1,4 +1,4 @@
-use crate::jwt_deny_list::JwtDenyList;
+use crate::jwt_deny_list::{JwtDenyList, JwtDenyListFairing};
 use rocket::{Build, Rocket, routes};
 use rocket::fairing::AdHoc;
 use db::AppState;
@@ -12,9 +12,10 @@ mod db;
 
 #[rocket::launch]
 fn rocket() -> Rocket<Build> {
-    let jwt_deny_list = JwtDenyList::new("denied_tokens.db");
+    let jwt_deny_list = JwtDenyList::new("denied_tokens.db").expect("Failed to create JwtDenyList");
     rocket::build()
         .manage(jwt_deny_list)
+        .attach(JwtDenyListFairing)
         .mount("/user-management", routes![
             handlers::create_user,
             handlers::login,
