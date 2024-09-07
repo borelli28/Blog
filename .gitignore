@@ -54,3 +54,6 @@ test.html
 *.pem
 *.py
 *.perm
+
+### Rust secrets ###
+Rocket.toml
