@@ -123,13 +123,13 @@ impl User {
         Ok(format!("Success: {} row(s) updated", rows_affected))
     }
 
-    pub async fn update_passwd(user: User, state: &State<AppState>) -> Result<String, String> {
+    pub async fn update_passwd(user: LoginCredentials, state: &State<AppState>) -> Result<String, String> {
         let hash = hash(user.password.as_bytes()).await;
         let conn = state.get_db_connection().map_err(|e| e.to_string())?;
 
         let rows_affected = conn.execute(
-            "UPDATE users SET password = ?1 WHERE id = ?2",
-            params![hash, user.id],
+            "UPDATE users SET password = ?1 WHERE username = ?2",
+            params![hash, user.username],
         ).map_err(|e| e.to_string())?;
         Ok(format!("Success: {} row(s) updated", rows_affected))
     }

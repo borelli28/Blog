@@ -70,13 +70,12 @@ pub async fn update_user(id: u64, user: Json<User>, state: &State<AppState>, aut
     }
 }
 
-#[put("/<id>/password", data = "<user>")]
-pub async fn update_password(id: u64, user: Json<User>, state: &State<AppState>, auth_user: AuthenticatedUser) -> Status {
+#[put("/<id>/password", data = "<user_data>")]
+pub async fn update_password(id: u64, user_data: Json<LoginCredentials>, state: &State<AppState>, auth_user: AuthenticatedUser) -> Status {
     if auth_user.claims.sub != id {
         return Status::Forbidden;
     }
-    let mut updated_user = user.into_inner();
-    updated_user.id = id;
+    let updated_user = user_data.into_inner();
     match User::update_passwd(updated_user, state).await {
         Ok(_) => return Status::Ok,
         Err(_) => Status::InternalServerError,
