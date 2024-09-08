@@ -9,16 +9,25 @@ use crate::db::AppState;
 use rocket::State;
 
 
+fn sanitize_input(input: &str) -> String {
+    input.trim().replace(['<', '>', '&', '"', '\''], "")
+}
 
 #[post("/", data = "<user_data>")]
-pub async fn create_user(user_data: Json<LoginCredentials>, state: &State<AppState>) -> Result<Json<User>, String> {
-    let user = User::create(user_data.into_inner(), state).await?;
+pub async fn create_user(user_data: Json<LoginCredentials>, state: &State<AppState>) -> Result<Json<User>, Status> {
+    let mut sanitized_data = user_data.into_inner();
+    sanitized_data.username = sanitize_input(&sanitized_data.username);
+    sanitized_data.password = sanitize_input(&sanitized_data.password);
+    let user = User::create(sanitized_data, state).await.map_err(|_| Status::InternalServerError)?;
     Ok(Json(user))
 }
 
 #[post("/login", data = "<user_data>")]
 pub async fn login(user_data: Json<LoginCredentials>, cookies: &CookieJar<'_>, state: &State<AppState>) -> Result<Json<LoginResponse>, Status> {
-    match User::login(user_data.into_inner(), state).await {
+    let mut sanitized_data = user_data.into_inner();
+    sanitized_data.username = sanitize_input(&sanitized_data.username);
+    sanitized_data.password = sanitize_input(&sanitized_data.password);
+    match User::login(sanitized_data, state).await {
         Ok(user) => {
             let token = create_token(&user.id, &user.role).map_err(|_| Status::InternalServerError)?;
             cookies.add_private(
@@ -64,6 +73,8 @@ pub async fn update_user(id: u64, user: Json<User>, state: &State<AppState>, aut
     }
     let mut updated_user = user.into_inner();
     updated_user.id = id;
+    updated_user.username = sanitize_input(&updated_user.username);
+    updated_user.role = sanitize_input(&updated_user.role);
     match User::update(updated_user, state).await {
         Ok(_) => Status::Ok,
         Err(_) => Status::InternalServerError,
@@ -75,9 +86,11 @@ pub async fn update_password(id: u64, user_data: Json<LoginCredentials>, state: 
     if auth_user.claims.sub != id {
         return Status::Forbidden;
     }
-    let updated_user = user_data.into_inner();
+    let mut updated_user = user_data.into_inner();
+    updated_user.username = sanitize_input(&updated_user.username);
+    updated_user.password = sanitize_input(&updated_user.password);
     match User::update_passwd(updated_user, state).await {
-        Ok(_) => return Status::Ok,
+        Ok(_) => Status::Ok,
         Err(_) => Status::InternalServerError,
     }
 }
@@ -88,7 +101,7 @@ pub async fn delete_user(id: u64, state: &State<AppState>, auth_user: Authentica
         return Status::Forbidden;
     }
     match User::delete_by_id(id, state).await {
-        Ok(_) => return Status::Ok,
-        Err(_) => return Status::Forbidden,
+        Ok(_) => Status::Ok,
+        Err(_) => Status::Forbidden,
     }
 }
