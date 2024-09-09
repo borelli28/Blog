@@ -13,3 +13,4 @@ rocket = { version = "0.5.1", features = ["json", "secrets"] }
 serde = { version = "1.0.209", features = ["derive"] }
 rusqlite = { version = "0.32.1", features = ["bundled"] }
 rocket_cors = "0.6.0"
+dotenvy = "0.15.7"
