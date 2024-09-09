@@ -7,7 +7,7 @@ use rocket::{Rocket, Orbit};
 use crate::auth::Claims;
 use std::time::Duration;
 use rocket::tokio;
-use std::env;
+use dotenvy;
 
 
 pub struct JwtDenyList {
@@ -30,7 +30,7 @@ impl JwtDenyList {
     }
 
     pub fn add(&self, token: &str) -> SqliteResult<()> {
-        let secret_key = env::var("JWT_SECRET_KEY").expect("JWT_SECRET_KEY must be set");
+        let secret_key = dotenvy::var("JWT_SECRET_KEY").expect("JWT_SECRET_KEY must be set");
         // Decode the token to get the expiration time
         let token_data = decode::<Claims>(
             token,
