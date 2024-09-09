@@ -11,7 +11,7 @@ impl AppState {
         let conn = Connection::open("users.db")?;
         conn.execute(
             "CREATE TABLE IF NOT EXISTS users (
-                id TEXT PRIMARY KEY,
+                id INTEGER PRIMARY KEY,
                 username TEXT NOT NULL UNIQUE,
                 password TEXT NOT NULL,
                 role TEXT NOT NULL
