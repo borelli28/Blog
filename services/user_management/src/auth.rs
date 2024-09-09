@@ -2,7 +2,7 @@ use jsonwebtoken::{encode, decode, Header, Validation, EncodingKey, DecodingKey,
 use crate::jwt_deny_list::JwtDenyList;
 use serde::{Serialize, Deserialize};
 use chrono::{Utc, Duration};
-use std::env;
+use dotenvy;
 
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -23,12 +23,12 @@ pub fn create_token(user_id: &u64, role: &str) -> Result<String, jsonwebtoken::e
         exp: expiration,
         role: role.to_owned(),
     };
-    let secret_key: String = env::var("JWT_SECRET_KEY").expect("JWT_SECRET_KEY env variable needs to be set");
+    let secret_key: String = dotenvy::var("JWT_SECRET_KEY").expect("JWT_SECRET_KEY env variable needs to be set");
     encode(&Header::default(), &claims, &EncodingKey::from_secret(secret_key.as_ref()))
 }
 
 pub fn validate_token(token: &str, deny_list: &JwtDenyList) -> Result<Claims, JwtError> {
-    let secret_key = env::var("JWT_SECRET_KEY").expect("JWT_SECRET_KEY env variable needs to be set");
+    let secret_key = dotenvy::var("JWT_SECRET_KEY").expect("JWT_SECRET_KEY env variable needs to be set");
     // Check if the token is in the deny list
     match deny_list.is_denied(token) {
         Ok(true) => return Err(JwtError::from(jsonwebtoken::errors::ErrorKind::InvalidToken)),
