@@ -3,6 +3,7 @@ use crate::auth_middleware::AuthenticatedUser;
 use rocket::http::{Cookie, CookieJar, Status};
 use crate::jwt_deny_list::JwtDenyList;
 use rocket::{get, put, post, delete};
+use rocket::response::status::Custom;
 use rocket::serde::json::Json;
 use crate::auth::create_token;
 use crate::db::AppState;
@@ -23,13 +24,13 @@ pub async fn create_user(user_data: Json<LoginCredentials>, state: &State<AppSta
 }
 
 #[post("/login", data = "<user_data>")]
-pub async fn login(user_data: Json<LoginCredentials>, cookies: &CookieJar<'_>, state: &State<AppState>) -> Result<Json<LoginResponse>, Status> {
+pub async fn login(user_data: Json<LoginCredentials>, cookies: &CookieJar<'_>, state: &State<AppState>) -> Result<Json<LoginResponse>, Custom<String>> {
     let mut sanitized_data = user_data.into_inner();
     sanitized_data.username = sanitize_input(&sanitized_data.username);
     sanitized_data.password = sanitize_input(&sanitized_data.password);
     match User::login(sanitized_data, state).await {
         Ok(user) => {
-            let token = create_token(&user.id, &user.role).map_err(|_| Status::InternalServerError)?;
+            let token = create_token(&user.id, &user.role).map_err(|_| Custom(Status::InternalServerError, "Failed to create token".to_string()))?;
             cookies.add_private(
                 Cookie::build(("jwt", token.clone()))
                     .http_only(true)
@@ -38,7 +39,7 @@ pub async fn login(user_data: Json<LoginCredentials>, cookies: &CookieJar<'_>, s
             );
             Ok(Json(LoginResponse { user, token }))
         }
-        Err(_) => Err(Status::Unauthorized),
+        Err(_) => Err(Custom(Status::InternalServerError, "Login failed".to_string())),
     }
 }
 
