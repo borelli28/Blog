@@ -18,7 +18,7 @@ pub struct User {
     pub role: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct LoginCredentials {
     pub username: String,
     pub password: String,
