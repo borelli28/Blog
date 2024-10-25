@@ -54,6 +54,7 @@ test.html
 *.pem
 *.py
 *.perm
+frontend.html
 
 ### Rust secrets ###
 Rocket.toml
