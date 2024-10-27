@@ -1,15 +1,28 @@
 import express from "express";
-import sqlite3 from 'sqlite3';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import postsRouter from './routes/posts';
+import authRouter from './routes/auth';
+import imagesRouter from './routes/images';
+import { initializeSchema } from './models/schema';
+
+dotenv.config();
 
 const app = express();
-const port = 8080;
+const port = process.env.PORT || 8080;
 
+app.use(cors());
 app.use(express.json());
 
-const db = new sqlite3.Database('./blog.db');
+initializeSchema();
+
+// Routes
+app.use('/api/posts', postsRouter);
+app.use('/api/auth', authRouter);
+app.use('/api/images', imagesRouter);
 
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.send("Welcome to the Blog API");
 });
 
 app.listen(port, () => {
