@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { db } from '../models/db';
 import bcrypt from 'bcrypt';
-import { userRegisterValidator, userLoginValidator, passphraseValidator } from '../utils/validators';
+import { userRegisterValidator, userLoginValidator, passwordValidator } from '../utils/validators';
 
 export const register = async (req: Request, res: Response) => {
   const errors = await userRegisterValidator(req.body);
@@ -9,10 +9,10 @@ export const register = async (req: Request, res: Response) => {
     return res.status(400).json({ errors });
   }
 
-  const { username, passphrase } = req.body;
-  const hashedPassphrase = await bcrypt.hash(passphrase, 10);
+  const { username, password } = req.body;
+  const hashedpassword = await bcrypt.hash(password, 10);
 
-  db.run('INSERT INTO users (username, passphrase) VALUES (?, ?)', [username, hashedPassphrase], function(err) {
+  db.run('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword], function(err) {
     if (err) {
       return res.status(500).json({ error: err.message });
     }
@@ -26,21 +26,21 @@ export const login = async (req: Request, res: Response) => {
     return res.status(400).json({ errors });
   }
 
-  const { username, passphrase } = req.body;
+  const { username, password } = req.body;
   db.get('SELECT * FROM users WHERE username = ?', [username], async (err, user) => {
     if (err) {
       return res.status(500).json({ error: err.message });
     }
     if (!user) {
-      return res.status(400).json({ error: 'Invalid username or passphrase' });
+      return res.status(400).json({ error: 'Invalid username or password' });
     }
-    const match = await bcrypt.compare(passphrase, user.passphrase);
+    const match = await bcrypt.compare(password, user.password);
     if (match) {
       // Create JWT token
       //
       res.json({ message: 'Logged in successfully' });
     } else {
-      res.status(400).json({ error: 'Invalid username or passphrase' });
+      res.status(400).json({ error: 'Invalid username or password' });
     }
   });
 };
@@ -51,16 +51,16 @@ export const logout = (req: Request, res: Response) => {
   res.json({ message: 'Logged out successfully' });
 };
 
-export const updatePassphrase = async (req: Request, res: Response) => {
-  const errors = passphraseValidator(req.body);
+export const updatePassword = async (req: Request, res: Response) => {
+  const errors = passwordValidator(req.body);
   if (Object.keys(errors).length > 0) {
     return res.status(400).json({ errors });
   }
 
-  const { username, newPassphrase } = req.body;
-  const hashedPassphrase = await bcrypt.hash(newPassphrase, 10);
+  const { username, newPassword } = req.body;
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-  db.run('UPDATE users SET passphrase = ? WHERE username = ?', [hashedPassphrase, username], function(err) {
+  db.run('UPDATE users SET password = ? WHERE username = ?', [hashedPassword, username], function(err) {
     if (err) {
       return res.status(500).json({ error: err.message });
     }
