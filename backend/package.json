@@ -1,4 +1,4 @@
-{ "dependencies": { "@types/cors": "^2.8.17", "@types/dotenv": "^8.2.3", "@types/multer": "^1.4.12", "cors": "^2.8.5", "dotenv": "^16.4.5", "express": "^4.21.1", "multer": "^1.4.5-lts.1", "sqlite3": "^5.1.7" }, "name": "backend", "module": "index.ts", "type": "module", "devDependencies": {
+{ "dependencies": { "@types/bcrypt": "^5.0.2", "@types/cors": "^2.8.17", "@types/dotenv": "^8.2.3", "@types/multer": "^1.4.12", "bcrypt": "^5.1.1", "cors": "^2.8.5", "dotenv": "^16.4.5", "express": "^4.21.1", "multer": "^1.4.5-lts.1", "sqlite3": "^5.1.7" }, "name": "backend", "module": "index.ts", "type": "module", "devDependencies": {
   "@types/bun": "latest"
 }, "peerDependencies": {
   "typescript": "^5.0.0"
