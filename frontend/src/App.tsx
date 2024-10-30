@@ -20,7 +20,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/posts" element={<PostList />} />
-          <Route path="/posts/:id" element={<PostDetail />} />
+          <Route path="/posts/:title" element={<PostDetail />} />
           <Route path="/create" element={<CreatePost />} />
         </Routes>
       </div>

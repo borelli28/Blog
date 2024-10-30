@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
 interface Post {
-  id: number
   title: string
   content: string
 }
@@ -11,12 +10,12 @@ const PostDetail: React.FC = () => {
   const [post, setPost] = useState<Post | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const { id } = useParams<{ id: string }>()
+  const { title } = useParams<{ title: string }>()
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${id}`)
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(title!)}`)
         if (!response.ok) {
           throw new Error('Failed to fetch post')
         }
@@ -29,8 +28,10 @@ const PostDetail: React.FC = () => {
       }
     }
 
-    fetchPost()
-  }, [id])
+    if (title) {
+      fetchPost()
+    }
+  }, [title])
 
   if (loading) return <div>Loading...</div>
   if (error) return <div>{error}</div>
