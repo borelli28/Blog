@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import '../styles/Home.css';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -10,7 +11,7 @@ const Layout: React.FC<LayoutProps> = ({ children, username }) => (
   <div>
     <div id="top-section">
       <div id="logo">
-        <h5>Home Page</h5>
+        <h5>Title|Logo Here</h5>
       </div>
       <nav>
         <ul>
@@ -29,7 +30,6 @@ const Layout: React.FC<LayoutProps> = ({ children, username }) => (
       </nav>
     </div>
     <main>{children}</main>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
   </div>
 );
 
