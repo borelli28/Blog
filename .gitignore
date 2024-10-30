@@ -21,3 +21,4 @@ sketch
 
 *.lockb
 *.db
+.env
