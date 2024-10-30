@@ -1,48 +1,54 @@
-import React, { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import Layout from './Layout';
 
-interface Post {
-  title: string
-  content: string
+interface Blog {
+  title: string;
+  description: string;
+  content: string;
+  created_at: string;
+  updated_at: string;
+  article_img?: string;
+  is_public: boolean;
+  author: {
+    username: string;
+  };
 }
 
 const PostDetail: React.FC = () => {
-  const [post, setPost] = useState<Post | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const { title } = useParams<{ title: string }>()
+  const [blog, setBlog] = useState<Blog | null>(null);
+  const { title } = useParams<{ title: string }>();
+  const [username, setUsername] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(title!)}`)
-        if (!response.ok) {
-          throw new Error('Failed to fetch post')
-        }
-        const data = await response.json()
-        setPost(data)
-        setLoading(false)
-      } catch (error) {
-        setError('Error fetching post. Please try again later.')
-        setLoading(false)
-      }
-    }
+    const fetchBlog = async () => {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(title!)}`);
+      const data = await response.json();
+      setBlog(data);
+    };
+    fetchBlog();
+    setUsername('exampleUser');
+  }, [title]);
 
-    if (title) {
-      fetchPost()
-    }
-  }, [title])
-
-  if (loading) return <div>Loading...</div>
-  if (error) return <div>{error}</div>
-  if (!post) return <div>Post not found</div>
+  if (!blog) return <div>Loading...</div>;
 
   return (
-    <div>
-      <h2>{post.title}</h2>
-      <p>{post.content}</p>
-    </div>
-  )
-}
+    <Layout username={username}>
+      {(blog.is_public || blog.author.username === username) && (
+        <article>
+          <h1>{blog.title}</h1>
+          {blog.article_img && <img id="article-img" alt="Article Image" src={blog.article_img} />}
+          <p className="date">Created: {new Date(blog.created_at).toLocaleDateString()}</p>
+          <p className="date">Last Update: {new Date(blog.updated_at).toLocaleDateString()}</p>
+          
+          <div id="content" dangerouslySetInnerHTML={{ __html: blog.content }} />
+        </article>
+      )}
+      {blog.author.username === username && (
+        <Link to={`/edit/${encodeURIComponent(blog.title)}`} className="btn light-blue">Edit Post</Link>
+      )}
+    </Layout>
+  );
+};
 
-export default PostDetail
+export default PostDetail;

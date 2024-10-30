@@ -1,59 +1,72 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Layout from './Layout';
+import EasyMDE from 'easymde';
+import 'easymde/dist/easymde.min.css';
 
 const CreatePost: React.FC = () => {
-  const [title, setTitle] = useState('')
-  const [content, setContent] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const editorRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  useEffect(() => {
+    if (editorRef.current) {
+      const easyMDE = new EasyMDE({ element: editorRef.current });
+      return () => {
+        easyMDE.toTextArea();
+        easyMDE.cleanup();
+      };
+    }
+  }, []);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const blogData = {
+      title: formData.get('title'),
+      description: formData.get('desc'),
+      content: formData.get('content'),
+    };
+
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/posts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ title, content }),
-      })
-      if (!response.ok) {
-        throw new Error('Failed to create post')
+        body: JSON.stringify(blogData),
+      });
+
+      if (response.ok) {
+        navigate('/blogs');
+      } else {
+        console.error('Failed to create blog post');
       }
-      navigate('/posts')
     } catch (error) {
-      setError('Error creating post. Please try again.')
+      console.error('Error:', error);
     }
-  }
+  };
 
   return (
-    <div>
-      <h2>Create New Post</h2>
-      {error && <div>{error}</div>}
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="title">Title:</label>
-          <input
-            type="text"
-            id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="content">Content:</label>
-          <textarea
-            id="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Create Post</button>
-      </form>
-    </div>
-  )
-}
+    <Layout username="exampleUser">
+      <div>
+        <h2>Create Blog</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="title">Title</label>
+            <input type="text" className="form-control" name="title" />
+        
+            <label htmlFor="desc">Description</label>
+            <input type="text" className="form-control" name="desc" />
+        
+            <label htmlFor="content">Content</label>
+            <textarea id="editor" name="content" ref={editorRef}></textarea>
 
-export default CreatePost
+            <button type="submit" className="btn light-blue">Submit</button>
+          </div>
+        </form>
+      </div>
+    </Layout>
+  );
+};
+
+export default CreatePost;
