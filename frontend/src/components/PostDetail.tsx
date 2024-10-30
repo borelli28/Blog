@@ -33,22 +33,35 @@ const PostDetail: React.FC = () => {
   if (!blog) return <div>Loading...</div>;
 
   return (
-    <Layout username={username}>
-      {(blog.is_public || blog.author.username === username) && (
-        <article>
-          <h1>{blog.title}</h1>
-          {blog.article_img && <img id="article-img" alt="Article Image" src={blog.article_img} />}
-          <p className="date">Created: {new Date(blog.created_at).toLocaleDateString()}</p>
-          <p className="date">Last Update: {new Date(blog.updated_at).toLocaleDateString()}</p>
-          
-          <div id="content" dangerouslySetInnerHTML={{ __html: blog.content }} />
-        </article>
-      )}
-      {blog.author.username === username && (
-        <Link to={`/edit/${encodeURIComponent(blog.title)}`} className="btn light-blue">Edit Post</Link>
-      )}
+    <Layout>
+      <article>
+        <h1>{blog.title}</h1>
+        {blog.article_img && <img id="article-img" alt="Article Image" src={blog.article_img} />}
+        <p className="date">Created: {new Date(blog.created_at).toLocaleDateString()}</p>
+        <p className="date">Last Update: {new Date(blog.updated_at).toLocaleDateString()}</p>
+        
+        <div id="content" dangerouslySetInnerHTML={{ __html: blog.content }} />
+      </article>
     </Layout>
   );
+
+  // return (
+  //   <Layout username={username}>
+  //     {(blog.is_public || blog.author.username === username) && (
+  //       <article>
+  //         <h1>{blog.title}</h1>
+  //         {blog.article_img && <img id="article-img" alt="Article Image" src={blog.article_img} />}
+  //         <p className="date">Created: {new Date(blog.created_at).toLocaleDateString()}</p>
+  //         <p className="date">Last Update: {new Date(blog.updated_at).toLocaleDateString()}</p>
+          
+  //         <div id="content" dangerouslySetInnerHTML={{ __html: blog.content }} />
+  //       </article>
+  //     )}
+  //     {blog.author.username === username && (
+  //       <Link to={`/edit/${encodeURIComponent(blog.title)}`} className="btn light-blue">Edit Post</Link>
+  //     )}
+  //   </Layout>
+  // );
 };
 
 export default PostDetail;
