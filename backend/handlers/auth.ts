@@ -85,7 +85,7 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
 };
 
 export const logout = (req: Request, res: Response) => {
-  // Invalidate auth JWT token
+  // TODO: Invalidate auth JWT token
   //
   res.json({ message: 'Logged out successfully' });
 };
