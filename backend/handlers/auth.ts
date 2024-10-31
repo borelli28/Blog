@@ -4,20 +4,24 @@ import bcrypt from 'bcrypt';
 import { userRegisterValidator, userLoginValidator, passwordValidator } from '../utils/validators';
 
 export const register = async (req: Request, res: Response) => {
-  const errors = await userRegisterValidator(req.body);
-  if (Object.keys(errors).length > 0) {
-    return res.status(400).json({ errors });
-  }
-
-  const { username, password } = req.body;
-  const hashedpassword = await bcrypt.hash(password, 10);
-
-  db.run('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword], function(err) {
-    if (err) {
-      return res.status(500).json({ error: err.message });
+  try {
+    const errors = await userRegisterValidator(req.body);
+    if (Object.keys(errors).length > 0) {
+      return res.status(400).json({ errors });
     }
-    res.status(201).json({ id: this.lastID });
-  });
+
+    const { username, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    db.run('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword], function(err) {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      res.status(201).json({ id: this.lastID });
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'An unexpected error occurred' });
+  }
 };
 
 export const login = async (req: Request, res: Response) => {
