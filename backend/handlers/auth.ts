@@ -50,9 +50,15 @@ export const login = async (req: Request, res: Response) => {
         { expiresIn: '1h' }
       );
 
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+        maxAge: 3600000 // 1 hour
+      });
+
       res.json({ 
         message: 'Logged in successfully', 
-        token: token,
         userId: user.id
       });
     } else {
