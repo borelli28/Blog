@@ -2,6 +2,9 @@ import { Request, Response } from 'express';
 import { db } from '../models/db';
 import bcrypt from 'bcrypt';
 import { userRegisterValidator, userLoginValidator, passwordValidator } from '../utils/validators';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -41,8 +44,17 @@ export const login = async (req: Request, res: Response) => {
     const match = await bcrypt.compare(password, user.password);
     if (match) {
       // Create JWT token
-      //
-      res.json({ message: 'Logged in successfully' });
+      const token = jwt.sign(
+        { userId: user.id, username: user.username },
+        JWT_SECRET,
+        { expiresIn: '1h' }
+      );
+
+      res.json({ 
+        message: 'Logged in successfully', 
+        token: token,
+        userId: user.id
+      });
     } else {
       res.status(400).json({ error: 'Invalid username or password' });
     }
