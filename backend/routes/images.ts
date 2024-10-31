@@ -1,10 +1,11 @@
 import express from 'express';
 import * as imageHandlers from '../handlers/images';
+import { authenticateToken } from '../handlers/auth';
 
 const router = express.Router();
 
-router.post('/upload', imageHandlers.uploadImage);
-router.delete('/', imageHandlers.deleteImage);
-router.put('/alt', imageHandlers.updateAltValues);
+router.post('/upload', authenticateToken, imageHandlers.uploadImage);
+router.delete('/', authenticateToken, imageHandlers.deleteImage);
+router.put('/alt', authenticateToken, imageHandlers.updateAltValues);
 
 export default router;

@@ -34,6 +34,7 @@ const CreatePost: React.FC = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(blogData),
+        credentials: 'include',
       });
 
       if (response.ok) {

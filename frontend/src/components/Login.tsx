@@ -20,11 +20,11 @@ const Login: React.FC = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ username, password }),
+        credentials: 'include',
       });
 
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem('token', data.token);
         navigate('/');
       } else {
         const errorData = await response.json();
