@@ -5,6 +5,7 @@ import postsRouter from './routes/posts';
 import authRouter from './routes/auth';
 import imagesRouter from './routes/images';
 import { initializeSchema } from './models/schema';
+import cookieParser from 'cookie-parser';
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(cors({
 }))
 app.use(express.json());
 
+app.use(cookieParser());
 
 initializeSchema();
 
