@@ -4,6 +4,8 @@ import Home from './components/Home';
 import PostList from './components/PostList';
 import PostDetail from './components/PostDetail';
 import CreatePost from './components/CreatePost';
+import Login from './components/Login';
+import Register from './components/Register';
 
 function App() {
   return (
@@ -13,6 +15,8 @@ function App() {
         <Route path="/blogs" element={<PostList />} />
         <Route path="/blog/:title" element={<PostDetail />} />
         <Route path="/create" element={<CreatePost />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
       </Routes>
     </Router>
   );
