@@ -11,7 +11,7 @@ const Layout: React.FC<LayoutProps> = ({ children, username }) => (
   <div>
     <div id="top-section">
       <div id="logo">
-        <h5>Title|Logo Here</h5>
+        <h5>Title Here</h5>
       </div>
       <nav>
         <ul>
