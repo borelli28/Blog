@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import EasyMDE from 'easymde';
@@ -7,16 +7,35 @@ import 'easymde/dist/easymde.min.css';
 const CreatePost: React.FC = () => {
   const navigate = useNavigate();
   const editorRef = useRef<HTMLTextAreaElement>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
+    checkAuth();
+    // Check if the textarea reference is available
     if (editorRef.current) {
+      // Initialize EasyMDE on the textarea
       const easyMDE = new EasyMDE({ element: editorRef.current });
       return () => {
+        // Convert the EasyMDE instance back to a regular textarea
         easyMDE.toTextArea();
+        // Perform any necessary cleanup for the EasyMDE instance
         easyMDE.cleanup();
       };
     }
   }, []);
+
+  const checkAuth = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/check`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      setIsAuthenticated(response.ok);
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      setIsAuthenticated(false);
+    }
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -48,7 +67,7 @@ const CreatePost: React.FC = () => {
   };
 
   return (
-    <Layout username="exampleUser">
+    <Layout isAuthenticated={isAuthenticated}>
       <div>
         <h2>Create Blog</h2>
         <form onSubmit={handleSubmit}>
