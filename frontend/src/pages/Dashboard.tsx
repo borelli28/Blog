@@ -95,85 +95,106 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div>
-      <nav>
-        <ul>
-          <li><Link to="/" className="btn light-blue">Home</Link></li>
-          <li><Link to="/blogs" className="btn light-blue">Blogs</Link></li>
-          <li><Link to="/admin" className="btn light-blue">Admin</Link></li>
-          <li><Link to="/logs_page" className="btn light-blue">Logs</Link></li>
-        </ul>
+    <div className="container-fluid">
+      <nav className="navbar navbar-expand-lg navbar-light bg-light mb-4">
+        <div className="container-fluid">
+          <ul className="navbar-nav">
+            <li className="nav-item"><Link to="/" className="nav-link btn btn-outline-primary mx-1">Home</Link></li>
+            <li className="nav-item"><Link to="/blogs" className="nav-link btn btn-outline-primary mx-1">Blogs</Link></li>
+            <li className="nav-item"><Link to="/logs_page" className="nav-link btn btn-outline-primary mx-1">Logs</Link></li>
+          </ul>
+        </div>
       </nav>
 
-      <main>
+      <main className="container">
         {messages.length > 0 && (
-          <ul className="messages">
-            {messages.map((message, index) => (
-              <li key={index} className="alert-danger">{message}</li>
-            ))}
-          </ul>
+          <div className="alert alert-danger">
+            <ul className="mb-0">
+              {messages.map((message, index) => (
+                <li key={index}>{message}</li>
+              ))}
+            </ul>
+          </div>
         )}
 
-        <div id="blogs">
+        <div id="blogs" className="row">
           {blogs.map(blog => (
-            <div key={blog.id} id="blog">
-              <h4>{blog.title}</h4>
-              <h6>Created: {blog.created_at}</h6>
-              <h6>Last update: {blog.updated_at}</h6>
+            <div key={blog.id} id="blog" className="col-md-6 mb-4">
+              <div className="card">
+                <div className="card-body">
+                  <h4 className="card-title">{blog.title}</h4>
+                  <h6 className="card-subtitle mb-2 text-muted">Created: {blog.created_at}</h6>
+                  <h6 className="card-subtitle mb-2 text-muted">Last update: {blog.updated_at}</h6>
 
-              {!blog.is_favorite && (
-                <button onClick={() => handleBlogAction(blog.title, 'is_fav', true)} className="btn">
-                  Mark as Favorite
-                </button>
-              )}
-              {!blog.is_public && (
-                <button onClick={() => handleBlogAction(blog.title, 'is_pub', true)} className="btn">
-                  Publish Blog
-                </button>
-              )}
-              {blog.is_favorite && (
-                <button onClick={() => handleBlogAction(blog.title, 'is_fav', false)} className="btn">
-                  Unfavorite
-                </button>
-              )}
-              {blog.is_public && (
-                <button onClick={() => handleBlogAction(blog.title, 'is_pub', false)} className="btn">
-                  Unpublish Blog
-                </button>
-              )}
+                  <div className="btn-group mt-3" role="group">
+                    {!blog.is_favorite && (
+                      <button onClick={() => handleBlogAction(blog.title, 'is_fav', true)} className="btn btn-outline-success">
+                        Mark as Favorite
+                      </button>
+                    )}
+                    {!blog.is_public && (
+                      <button onClick={() => handleBlogAction(blog.title, 'is_pub', true)} className="btn btn-outline-primary">
+                        Publish Blog
+                      </button>
+                    )}
+                    {blog.is_favorite && (
+                      <button onClick={() => handleBlogAction(blog.title, 'is_fav', false)} className="btn btn-success">
+                        Unfavorite
+                      </button>
+                    )}
+                    {blog.is_public && (
+                      <button onClick={() => handleBlogAction(blog.title, 'is_pub', false)} className="btn btn-primary">
+                        Unpublish Blog
+                      </button>
+                    )}
+                  </div>
 
-              <Link to={`/edit_blog_page/${blog.title}`} className="btn light-blue">Edit</Link>
-              <Link to={`/blog/${blog.title}`} className="btn light-blue">See Preview</Link>
+                  <div className="mt-3">
+                    <Link to={`/edit_blog_page/${blog.title}`} className="btn btn-warning me-2">Edit</Link>
+                    <Link to={`/blog/${blog.title}`} className="btn btn-info">See Preview</Link>
+                  </div>
+                </div>
+              </div>
             </div>
           ))}
-          <Link to="/blogs" className="btn light-blue">Go to Blogs Page</Link>
         </div>
+        <Link to="/blogs" className="btn btn-primary mb-4">Go to Blogs Page</Link>
       </main>
 
-      <div id="deleted-blogs">
+      <div id="deleted-blogs" className="container mb-4">
+        <h5>Deleted Blogs</h5>
         {blogs.filter(blog => blog.is_deleted).map(blog => (
-          <div key={blog.id}>
-            <h6>{blog.title}</h6>
-            <h6>Last update: {blog.updated_at}</h6>
-            <button onClick={() => handleBlogAction(blog.title, 'perm_delete', true)} className="btn red">
-              Permanently Delete
-            </button>
+          <div key={blog.id} className="card mb-3">
+            <div className="card-body">
+              <h6 className="card-title">{blog.title}</h6>
+              <p className="card-text">Last update: {blog.updated_at}</p>
+              <button onClick={() => handleBlogAction(blog.title, 'perm_delete', true)} className="btn btn-danger">
+                Permanently Delete
+              </button>
+            </div>
           </div>
         ))}
       </div>
 
-      <footer>
-        <div id="update-password">
-          <h6>Update Password</h6>
-          <form onSubmit={handlePasswordUpdate}>
-            <label htmlFor="password">New Password</label>
-            <input
-              name="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-            />
-            <button type="submit" className="btn">Change Password</button>
-          </form>
+      <footer className="container mb-4">
+        <div id="update-password" className="card">
+          <div className="card-body">
+            <h6 className="card-title">Update Password</h6>
+            <form onSubmit={handlePasswordUpdate}>
+              <div className="mb-3">
+                <label htmlFor="password" className="form-label">New Password</label>
+                <input
+                  type="password"
+                  className="form-control"
+                  id="password"
+                  name="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+              </div>
+              <button type="submit" className="btn btn-primary">Change Password</button>
+            </form>
+          </div>
         </div>
       </footer>
     </div>
