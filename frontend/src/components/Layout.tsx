@@ -1,34 +1,15 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Navbar from './Navbar';
 import '../styles/Home.css';
 
 interface LayoutProps {
   children: React.ReactNode;
-  username?: string;
+  isAuthenticated: boolean;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, username }) => (
+const Layout: React.FC<LayoutProps> = ({ children, isAuthenticated }) => (
   <div>
-    <div id="top-section">
-      <div id="logo">
-        <h5>Title Here</h5>
-      </div>
-      <nav>
-        <ul>
-          <li>
-            <Link to="/" className="btn light-blue">Home</Link>
-          </li>
-          <li>
-            <Link to="/blogs" className="btn light-blue">Blogs</Link>
-          </li>
-          {username && (
-            <li>
-              <Link to="/admin" className="btn light-blue">Admin</Link>
-            </li>
-          )}
-        </ul>
-      </nav>
-    </div>
+    <Navbar isAuthenticated={isAuthenticated} />
     <main>{children}</main>
   </div>
 );
