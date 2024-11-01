@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Layout from './Layout';
+import Layout from '../components/Layout';
 import EasyMDE from 'easymde';
 import 'easymde/dist/easymde.min.css';
 

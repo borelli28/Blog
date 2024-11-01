@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import Layout from './Layout';
+import Layout from '../components/Layout';
 
 interface Blog {
   title: string;

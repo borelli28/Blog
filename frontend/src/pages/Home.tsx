@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import Layout from './Layout';
+import Layout from '../components/Layout';
 
 interface Blog {
   title: string;
   description: string;
 }
 
-const PostList: React.FC = () => {
+const Home: React.FC = () => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
 
   useEffect(() => {
@@ -21,13 +21,20 @@ const PostList: React.FC = () => {
 
   return (
     <Layout>
+      <div id="intro">
+        <h2>Welcome</h2>
+        <p>Some description here...</p>
+      </div>
+
       <div id="cards">
         {blogs.map((blog) => (
           <div className="row" key={blog.title}>
-            <div className="card hoverable grey darken-3">
-              <Link to={`/blog/${encodeURIComponent(blog.title)}`} className="card-content white-text">
-                <span className="card-title">{blog.title}</span>
-                <p>{blog.description}</p>
+            <div className="card hoverable">
+              <Link to={`/blog/${encodeURIComponent(blog.title)}`}>
+                <div className="card-content grey darken-3">
+                  <span className="card-title">{blog.title}</span>
+                  <p>{blog.description}</p>
+                </div>
               </Link>
             </div>
           </div>
@@ -37,4 +44,4 @@ const PostList: React.FC = () => {
   );
 };
 
-export default PostList;
+export default Home;
