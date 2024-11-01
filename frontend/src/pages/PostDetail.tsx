@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import Layout from './Layout';
+import Layout from '../components/Layout';
 
 interface Blog {
   title: string;
@@ -19,21 +19,39 @@ const PostDetail: React.FC = () => {
   const [blog, setBlog] = useState<Blog | null>(null);
   const { title } = useParams<{ title: string }>();
   const [username, setUsername] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const fetchBlog = async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(title!)}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(title!)}`, {
+        credentials: 'include',
+      });
       const data = await response.json();
       setBlog(data);
     };
+
+    const checkAuth = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/check`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+        setIsAuthenticated(response.ok);
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        setIsAuthenticated(false);
+      }
+    };
+
     fetchBlog();
+    checkAuth();
     setUsername('exampleUser');
   }, [title]);
 
   if (!blog) return <div>Loading...</div>;
 
   return (
-    <Layout>
+    <Layout isAuthenticated={isAuthenticated}>
       <article>
         <h1>{blog.title}</h1>
         {blog.article_img && <img id="article-img" alt="Article Image" src={blog.article_img} />}
