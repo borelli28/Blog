@@ -6,6 +6,7 @@ import authRouter from './routes/auth';
 import imagesRouter from './routes/images';
 import { initializeSchema } from './models/schema';
 import cookieParser from 'cookie-parser';
+import path from 'path';
 
 dotenv.config();
 
@@ -19,6 +20,9 @@ app.use(cors({
 app.use(express.json());
 
 app.use(cookieParser());
+
+// Serve static files from the 'uploads' directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 initializeSchema();
 
