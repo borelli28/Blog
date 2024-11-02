@@ -142,7 +142,7 @@ const Dashboard: React.FC = () => {
                     </div>
 
                     <div className="mt-3">
-                      <Link to={`/edit_blog_page/${blog.title}`} className="btn btn-warning me-2">Edit</Link>
+                      <Link to={`/blog/edit/${blog.title}`} className="btn btn-warning me-2">Edit</Link>
                       <Link to={`/blog/${blog.title}`} className="btn btn-info">See Preview</Link>
                     </div>
                   </div>
