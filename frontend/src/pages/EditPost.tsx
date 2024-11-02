@@ -123,9 +123,10 @@ const EditPost: React.FC = () => {
   const handleImageUpload = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+    formData.append('blog_id', blog!.id.toString());
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/upload_img`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/images/upload`, {
         method: 'POST',
         body: formData,
         credentials: 'include',
@@ -133,14 +134,8 @@ const EditPost: React.FC = () => {
 
       if (response.ok) {
         setMessages(['Image uploaded successfully']);
-        // Refresh images
-        const blogResponse = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(title!)}`, {
-          credentials: 'include',
-        });
-        if (blogResponse.ok) {
-          const data = await blogResponse.json();
-          setImages(data.images || []);
-        }
+        // Refresh blog data to get updated images
+        fetchBlog();
       } else {
         setMessages(['Failed to upload image']);
       }
