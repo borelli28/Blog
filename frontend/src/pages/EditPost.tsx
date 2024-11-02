@@ -122,8 +122,19 @@ const EditPost: React.FC = () => {
 
   const handleImageUpload = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    
+    if (!blog) {
+      setMessages(['Blog data not available. Please try again.']);
+      return;
+    }
+
     const formData = new FormData(event.currentTarget);
-    formData.append('blog_id', blog!.id.toString());
+    formData.append('blog_id', blog.id.toString());
+    
+    // If description is not provided in the form, add a default one
+    if (!formData.get('description')) {
+      formData.append('description', 'Default description');
+    }
 
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/images/upload`, {
@@ -133,13 +144,14 @@ const EditPost: React.FC = () => {
       });
 
       if (response.ok) {
+        const result = await response.json();
         setMessages(['Image uploaded successfully']);
-        // Refresh blog data to get updated images
-        fetchBlog();
       } else {
-        setMessages(['Failed to upload image']);
+        const errorData = await response.json();
+        setMessages([errorData.error || 'Failed to upload image']);
       }
     } catch (error) {
+      console.error('Upload error:', error);
       setMessages(['An error occurred while uploading the image']);
     }
   };
@@ -187,8 +199,8 @@ const EditPost: React.FC = () => {
 
           <div id="img-upload-container">
             <form onSubmit={handleImageUpload} encType="multipart/form-data">
-              <label htmlFor="article_img">Upload Article Image</label>
-              <input type="file" id="image" name="article_img" />
+              <label htmlFor="image">Upload Article Image</label>
+              <input type="file" id="image" name="image" />
               <button type="submit" className="btn btn-primary">Upload</button>
             </form>
 
