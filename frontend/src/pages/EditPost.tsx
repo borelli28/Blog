@@ -202,6 +202,31 @@ const EditPost: React.FC = () => {
     }
   };
 
+  const handleImageDelete = async (imageId: number) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/images`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: imageId }),
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        setMessages(['Image deleted successfully']);
+        setImages(prevImages => prevImages.filter(img => img.id !== imageId));
+      } else {
+        const errorData = await response.json();
+        setMessages([errorData.error || 'Failed to delete image']);
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      setMessages(['An error occurred while deleting the image']);
+    }
+  };
+
+
   if (!blog) return <div>Loading...</div>;
 
   return (
@@ -270,9 +295,12 @@ const EditPost: React.FC = () => {
                     <input type="text" className="form-control" name="img_desc" defaultValue={img.description} />
                     <button type="submit" className="btn btn-secondary">Edit Description</button>
                   </form>
-                  <button onClick={() => {
-                    // Handle image deletion
-                  }} className="btn btn-danger">Delete Image</button>
+                  <button 
+                    onClick={() => handleImageDelete(img.id)} 
+                    className="btn btn-danger"
+                  >
+                    Delete Image
+                  </button>
                 </div>
               </div>
             ))}
