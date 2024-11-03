@@ -75,7 +75,7 @@ const PostDetail: React.FC = () => {
         </article>
       )}
       {isAuthenticated && (
-        <Link to={`/edit/${encodeURIComponent(blog.title)}`} className="btn light-blue">Edit Post</Link>
+        <Link to={`/blog/edit/${encodeURIComponent(blog.title)}`} className="btn light-blue">Edit Post</Link>
       )}
     </Layout>
   );
