@@ -32,16 +32,37 @@ export const uploadImage = (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Missing description or blog_id' });
     }
 
-    db.run('INSERT INTO images (image, description, blog_id) VALUES (?, ?, ?)',
-      [file.filename, description, blog_id],
-      function(err) {
-        if (err) {
-          console.error('Database error:', err);
-          return res.status(500).json({ error: err.message });
+    db.serialize(() => {
+      db.run('BEGIN TRANSACTION');
+
+      db.run('INSERT INTO images (image, description, blog_id) VALUES (?, ?, ?)',
+        [file.filename, description, blog_id],
+        function(err) {
+          if (err) {
+            console.error('Database error:', err);
+            db.run('ROLLBACK');
+            return res.status(500).json({ error: err.message });
+          }
+
+          const imageId = this.lastID;
+
+          // Update the blog_posts table with the new article_img
+          db.run('UPDATE blog_posts SET article_img = ? WHERE id = ?',
+            [file.filename, blog_id],
+            function(err) {
+              if (err) {
+                console.error('Database error:', err);
+                db.run('ROLLBACK');
+                return res.status(500).json({ error: err.message });
+              }
+
+              db.run('COMMIT');
+              res.status(201).json({ id: imageId, filename: file.filename });
+            }
+          );
         }
-        res.status(201).json({ id: this.lastID, filename: file.filename });
-      }
-    );
+      );
+    });
   });
 };
 
