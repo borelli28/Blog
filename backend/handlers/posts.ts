@@ -76,3 +76,22 @@ export const permanentDeletePost = (req: Request, res: Response) => {
     res.json({ changes: this.changes });
   });
 };
+
+export const getPostImages = (req: Request, res: Response) => {
+  const title = req.params.title;
+  db.get('SELECT id FROM blog_posts WHERE title = ? AND is_deleted = 0', [title], (err, row) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    if (!row) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+    
+    db.all('SELECT * FROM images WHERE blog_id = ?', [row.id], (err, images) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      res.json(images);
+    });
+  });
+};

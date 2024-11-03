@@ -29,20 +29,30 @@ const EditPost: React.FC = () => {
   const editorRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    const fetchBlog = async () => {
+    const fetchBlogAndImages = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(title!)}`, {
+        const blogResponse = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(title!)}`, {
           credentials: 'include',
         });
-        if (response.ok) {
-          const data = await response.json();
-          setBlog(data);
-          setImages(data.images || []);
+        if (blogResponse.ok) {
+          const blogData = await blogResponse.json();
+          setBlog(blogData);
+
+          const imagesResponse = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(title!)}/images`, {
+            credentials: 'include',
+          });
+          if (imagesResponse.ok) {
+            const imagesData = await imagesResponse.json();
+            setImages(imagesData);
+          } else {
+            setMessages(prevMessages => [...prevMessages, 'Failed to fetch images']);
+          }
         } else {
           setMessages(['Failed to fetch blog']);
         }
       } catch (error) {
-        setMessages(['An error occurred while fetching the blog']);
+        console.error("Error fetching blog and images:", error);
+        setMessages(['An error occurred while fetching the blog and images']);
       }
     };
 
@@ -59,7 +69,7 @@ const EditPost: React.FC = () => {
       }
     };
 
-    fetchBlog();
+    fetchBlogAndImages();
     checkAuth();
   }, [title]);
 
@@ -120,7 +130,7 @@ const EditPost: React.FC = () => {
     }
   };
 
-  const handleImageUpload = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleArticleImageUpload = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     
     if (!blog) {
@@ -131,9 +141,44 @@ const EditPost: React.FC = () => {
     const formData = new FormData(event.currentTarget);
     formData.append('blog_id', blog.id.toString());
     
-    // If description is not provided in the form, add a default one
     if (!formData.get('description')) {
-      formData.append('description', 'Default description');
+      formData.append('description', 'Article image');
+    }
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/images/upload-article`, {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setMessages(['Article image uploaded successfully']);
+        setBlog(prevBlog => prevBlog ? {...prevBlog, article_img: result.filename} : null);
+      } else {
+        const errorData = await response.json();
+        setMessages([errorData.error || 'Failed to upload article image']);
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      setMessages(['An error occurred while uploading the article image']);
+    }
+  };
+
+  const handleBlogImageUpload = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    
+    if (!blog) {
+      setMessages(['Blog data not available. Please try again.']);
+      return;
+    }
+
+    const formData = new FormData(event.currentTarget);
+    formData.append('blog_id', blog.id.toString());
+    
+    if (!formData.get('description')) {
+      formData.append('description', 'Blog content image');
     }
 
     try {
@@ -145,14 +190,15 @@ const EditPost: React.FC = () => {
 
       if (response.ok) {
         const result = await response.json();
-        setMessages(['Image uploaded successfully']);
+        setMessages(['Blog image uploaded successfully']);
+        setImages(prevImages => [...prevImages, {id: result.id, image: result.filename, description: formData.get('description') as string}]);
       } else {
         const errorData = await response.json();
-        setMessages([errorData.error || 'Failed to upload image']);
+        setMessages([errorData.error || 'Failed to upload blog image']);
       }
     } catch (error) {
       console.error('Upload error:', error);
-      setMessages(['An error occurred while uploading the image']);
+      setMessages(['An error occurred while uploading the blog image']);
     }
   };
 
@@ -198,16 +244,16 @@ const EditPost: React.FC = () => {
           <button onClick={handleDelete} className="btn btn-danger">Delete Post</button>
 
           <div id="img-upload-container">
-            <form onSubmit={handleImageUpload} encType="multipart/form-data">
-              <label htmlFor="image">Upload Article Image</label>
-              <input type="file" id="image" name="image" />
-              <button type="submit" className="btn btn-primary">Upload</button>
+            <form onSubmit={handleArticleImageUpload} encType="multipart/form-data">
+              <label htmlFor="article_image">Upload Article Image</label>
+              <input type="file" id="article_image" name="image" />
+              <button type="submit" className="btn btn-primary">Upload Article Image</button>
             </form>
 
-            <form onSubmit={handleImageUpload} encType="multipart/form-data">
-              <label htmlFor="blog_img">Upload a Blog Image</label>
-              <input type="file" id="image" name="blog_img" />
-              <button type="submit" className="btn btn-primary">Upload</button>
+            <form onSubmit={handleBlogImageUpload} encType="multipart/form-data">
+              <label htmlFor="blog_image">Upload a Blog Image</label>
+              <input type="file" id="blog_image" name="image" />
+              <button type="submit" className="btn btn-primary">Upload Blog Image</button>
             </form>
           </div>
           <div id="images-container">
@@ -216,7 +262,7 @@ const EditPost: React.FC = () => {
               <div key={img.id} id="image">
                 <p>{img.image}</p>
                 <div id="img-container">
-                  <img src={img.image} alt={img.description} />
+                  <img src={`${import.meta.env.VITE_BACKEND_URL}/uploads/${img.image}`} alt={img.description} />
                   <form onSubmit={(e) => {
                     e.preventDefault();
                     // Handle image description update

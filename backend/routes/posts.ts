@@ -10,5 +10,6 @@ router.post('/', authenticateToken, postHandlers.createPost);
 router.put('/:title', authenticateToken, postHandlers.updatePost);
 router.delete('/', authenticateToken, postHandlers.deletePost);
 router.delete('/permanent', authenticateToken, postHandlers.permanentDeletePost);
+router.get('/:title/images', postHandlers.getPostImages);
 
 export default router;
