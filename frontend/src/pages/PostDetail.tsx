@@ -18,7 +18,6 @@ interface Blog {
 const PostDetail: React.FC = () => {
   const [blog, setBlog] = useState<Blog | null>(null);
   const { title } = useParams<{ title: string }>();
-  const [username, setUsername] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
@@ -38,14 +37,11 @@ const PostDetail: React.FC = () => {
         });
         setIsAuthenticated(response.ok);
       } catch (error) {
-        console.error('Auth check failed:', error);
         setIsAuthenticated(false);
       }
     };
-
     fetchBlog();
     checkAuth();
-    setUsername('exampleUser');
   }, [title]);
 
   if (!blog) return <div>Loading...</div>;
@@ -54,32 +50,30 @@ const PostDetail: React.FC = () => {
     <Layout isAuthenticated={isAuthenticated}>
       <article>
         <h1>{blog.title}</h1>
-        {blog.article_img && <img id="article-img" alt="Article Image" src={blog.article_img} />}
+
+        {blog.article_img && (
+          <img 
+            id="article-img" 
+            alt="Article Image" 
+            src={`${import.meta.env.VITE_BACKEND_URL}/uploads/${blog.article_img}`}
+            style={{ maxWidth: '100%', height: 'auto', marginBottom: '1rem' }}
+            onError={(e) => {
+              console.error('Error loading image:', e);
+              e.currentTarget.style.display = 'none';
+            }}
+          />
+        )}
+
         <p className="date">Created: {new Date(blog.created_at).toLocaleDateString()}</p>
         <p className="date">Last Update: {new Date(blog.updated_at).toLocaleDateString()}</p>
         
         <div id="content" dangerouslySetInnerHTML={{ __html: blog.content }} />
       </article>
+      {isAuthenticated && (
+        <Link to={`/blog/edit/${encodeURIComponent(blog.title)}`} className="btn light-blue">Edit Post</Link>
+      )}
     </Layout>
   );
-
-  // return (
-  //   <Layout username={username}>
-  //     {(blog.is_public || blog.author.username === username) && (
-  //       <article>
-  //         <h1>{blog.title}</h1>
-  //         {blog.article_img && <img id="article-img" alt="Article Image" src={blog.article_img} />}
-  //         <p className="date">Created: {new Date(blog.created_at).toLocaleDateString()}</p>
-  //         <p className="date">Last Update: {new Date(blog.updated_at).toLocaleDateString()}</p>
-          
-  //         <div id="content" dangerouslySetInnerHTML={{ __html: blog.content }} />
-  //       </article>
-  //     )}
-  //     {blog.author.username === username && (
-  //       <Link to={`/edit/${encodeURIComponent(blog.title)}`} className="btn light-blue">Edit Post</Link>
-  //     )}
-  //   </Layout>
-  // );
 };
 
 export default PostDetail;
