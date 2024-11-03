@@ -14,7 +14,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-export const uploadImage = (req: Request, res: Response) => {
+export const uploadArticleImage = (req: Request, res: Response) => {
   upload.single('image')(req, res, function (err) {
     if (err instanceof multer.MulterError) {
       return res.status(500).json({ error: err.message });
@@ -63,6 +63,37 @@ export const uploadImage = (req: Request, res: Response) => {
         }
       );
     });
+  });
+};
+
+export const uploadImage = (req: Request, res: Response) => {
+  upload.single('image')(req, res, function (err) {
+    if (err instanceof multer.MulterError) {
+      return res.status(500).json({ error: err.message });
+    } else if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    const file = req.file;
+    if (!file) {
+      return res.status(400).json({ error: 'Please upload a file' });
+    }
+
+    const { description, blog_id } = req.body;
+    if (!description || !blog_id) {
+      return res.status(400).json({ error: 'Missing description or blog_id' });
+    }
+
+    db.run('INSERT INTO images (image, description, blog_id) VALUES (?, ?, ?)',
+      [file.filename, description, blog_id],
+      function(err) {
+        if (err) {
+          console.error('Database error:', err);
+          return res.status(500).json({ error: err.message });
+        }
+        res.status(201).json({ id: this.lastID, filename: file.filename });
+      }
+    );
   });
 };
 
