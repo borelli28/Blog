@@ -226,6 +226,35 @@ const EditPost: React.FC = () => {
     }
   };
 
+  const handleImageDescriptionUpdate = async (imageId: number, newDescription: string) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/images/alt`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: imageId, description: newDescription }),
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        setMessages(['Image description updated successfully']);
+        // Update the images state with the new description
+        setImages(prevImages =>
+          prevImages.map(img =>
+            img.id === imageId ? { ...img, description: newDescription } : img
+          )
+        );
+      } else {
+        const errorData = await response.json();
+        setMessages([errorData.error || 'Failed to update image description']);
+      }
+    } catch (error) {
+      console.error('Update error:', error);
+      setMessages(['An error occurred while updating the image description']);
+    }
+  };
+
 
   if (!blog) return <div>Loading...</div>;
 
@@ -287,18 +316,24 @@ const EditPost: React.FC = () => {
               <div key={img.id} id="image">
                 <p>{img.image}</p>
                 <div id="img-container">
-                  <img src={`${import.meta.env.VITE_BACKEND_URL}/uploads/${img.image}`} alt={img.description} />
+                  <img 
+                    src={`${import.meta.env.VITE_BACKEND_URL}/uploads/${img.image}`} 
+                    alt={img.description} 
+                  />
                   <form onSubmit={(e) => {
                     e.preventDefault();
-                    // Handle image description update
+                    const newDescription = e.currentTarget.img_desc.value;
+                    handleImageDescriptionUpdate(img.id, newDescription);
                   }}>
-                    <input type="text" className="form-control" name="img_desc" defaultValue={img.description} />
+                    <input 
+                      type="text" 
+                      className="form-control" 
+                      name="img_desc" 
+                      defaultValue={img.description} 
+                    />
                     <button type="submit" className="btn btn-secondary">Edit Description</button>
                   </form>
-                  <button 
-                    onClick={() => handleImageDelete(img.id)} 
-                    className="btn btn-danger"
-                  >
+                  <button onClick={() => handleImageDelete(img.id)} className="btn btn-danger">
                     Delete Image
                   </button>
                 </div>
