@@ -55,6 +55,41 @@ export const updatePost = (req: Request, res: Response) => {
   );
 };
 
+export const updatePostStatus = (req: Request, res: Response) => {
+  const { is_favorite, is_public } = req.body;
+  const title = req.params.title;
+
+  let updateFields = [];
+  let params = [];
+  if (is_favorite !== undefined) {
+    updateFields.push('is_favorite = ?');
+    params.push(is_favorite);
+  }
+  if (is_public !== undefined) {
+    updateFields.push('is_public = ?');
+    params.push(is_public);
+  }
+
+  if (updateFields.length === 0) {
+    return res.status(400).json({ error: 'No valid fields to update' });
+  }
+
+  const sql = `UPDATE blog_posts SET ${updateFields.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE title = ?`;
+  params.push(title);
+
+  db.run(sql, params, function(err) {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    if (this.changes === 0) {
+      res.status(404).json({ error: 'Post not found' });
+      return;
+    }
+    res.json({ changes: this.changes });
+  });
+};
+
 export const deletePost = (req: Request, res: Response) => {
   const { title } = req.body;
   db.run('UPDATE blog_posts SET is_deleted = 1 WHERE title = ?', [title], function(err) {
@@ -86,7 +121,7 @@ export const getPostImages = (req: Request, res: Response) => {
     if (!row) {
       return res.status(404).json({ error: 'Post not found' });
     }
-    
+
     db.all('SELECT * FROM images WHERE blog_id = ?', [row.id], (err, images) => {
       if (err) {
         return res.status(500).json({ error: err.message });

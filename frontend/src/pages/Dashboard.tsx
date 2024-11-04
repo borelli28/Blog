@@ -38,37 +38,73 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleBlogAction = async (blogTitle: string, action: string, value: boolean) => {
+  const handleFavoriteToggle = async (blogTitle: string, isFavorite: boolean) => {
     try {
-      let url = `${import.meta.env.VITE_API_URL}/posts/${blogTitle}`;
-      let method = 'PUT';
-      let body: any = {};
-
-      if (action === 'perm_delete') {
-        url = `${import.meta.env.VITE_API_URL}/posts/permanent`;
-        method = 'DELETE';
-        body = { title: blogTitle };
-      } else if (action === 'is_fav' || action === 'is_pub') {
-        body[action] = value;
-      }
-
-      const response = await fetch(url, {
-        method,
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(blogTitle)}/status`, {
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ is_favorite: isFavorite }),
         credentials: 'include',
       });
 
       if (response.ok) {
         fetchBlogs();
-        setMessages(['Blog updated successfully']);
+        setMessages([`Blog ${isFavorite ? 'marked as favorite' : 'removed from favorites'}`]);
       } else {
-        setMessages(['Failed to update blog']);
+        const errorData = await response.json();
+        setMessages([errorData.error || 'Failed to update favorite status']);
       }
     } catch (error) {
-      setMessages(['An error occurred while updating the blog']);
+      console.error('Error updating favorite status:', error);
+      setMessages(['An error occurred while updating favorite status']);
+    }
+  };
+
+  const handlePublishToggle = async (blogTitle: string, isPublic: boolean) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(blogTitle)}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ is_public: isPublic }),
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        fetchBlogs();
+        setMessages([`Blog ${isPublic ? 'published' : 'unpublished'}`]);
+      } else {
+        const errorData = await response.json();
+        setMessages([errorData.error || 'Failed to update publish status']);
+      }
+    } catch (error) {
+      console.error('Error updating publish status:', error);
+      setMessages(['An error occurred while updating publish status']);
+    }
+  };
+
+  const handlePermanentDelete = async (blogTitle: string) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/permanent`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title: blogTitle }),
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        fetchBlogs();
+        setMessages(['Blog permanently deleted']);
+      } else {
+        setMessages(['Failed to permanently delete blog']);
+      }
+    } catch (error) {
+      setMessages(['An error occurred while permanently deleting the blog']);
     }
   };
 
@@ -119,26 +155,18 @@ const Dashboard: React.FC = () => {
                     <h6 className="card-subtitle mb-2 text-muted">Last update: {blog.updated_at}</h6>
 
                     <div className="btn-group mt-3" role="group">
-                      {!blog.is_favorite && (
-                        <button onClick={() => handleBlogAction(blog.title, 'is_fav', true)} className="btn btn-outline-success">
-                          Mark as Favorite
-                        </button>
-                      )}
-                      {!blog.is_public && (
-                        <button onClick={() => handleBlogAction(blog.title, 'is_pub', true)} className="btn btn-outline-primary">
-                          Publish Blog
-                        </button>
-                      )}
-                      {blog.is_favorite && (
-                        <button onClick={() => handleBlogAction(blog.title, 'is_fav', false)} className="btn btn-success">
-                          Unfavorite
-                        </button>
-                      )}
-                      {blog.is_public && (
-                        <button onClick={() => handleBlogAction(blog.title, 'is_pub', false)} className="btn btn-primary">
-                          Unpublish Blog
-                        </button>
-                      )}
+                      <button 
+                        onClick={() => handleFavoriteToggle(blog.title, !blog.is_favorite)} 
+                        className={`btn ${blog.is_favorite ? 'btn-success' : 'btn-outline-success'}`}
+                      >
+                        {blog.is_favorite ? 'Unfavorite' : 'Mark as Favorite'}
+                      </button>
+                      <button 
+                        onClick={() => handlePublishToggle(blog.title, !blog.is_public)} 
+                        className={`btn ${blog.is_public ? 'btn-primary' : 'btn-outline-primary'}`}
+                      >
+                        {blog.is_public ? 'Unpublish' : 'Publish'}
+                      </button>
                     </div>
 
                     <div className="mt-3">
@@ -160,7 +188,7 @@ const Dashboard: React.FC = () => {
               <div className="card-body">
                 <h6 className="card-title">{blog.title}</h6>
                 <p className="card-text">Last update: {blog.updated_at}</p>
-                <button onClick={() => handleBlogAction(blog.title, 'perm_delete', true)} className="btn btn-danger">
+                <button onClick={() => handlePermanentDelete(blog.title)} className="btn btn-danger">
                   Permanently Delete
                 </button>
               </div>
