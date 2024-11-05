@@ -91,7 +91,7 @@ export const updatePostStatus = (req: Request, res: Response) => {
 };
 
 export const deletePost = (req: Request, res: Response) => {
-  const { title } = req.body;
+  const { title } = req.params;
   db.run('UPDATE blog_posts SET is_deleted = 1 WHERE title = ?', [title], function(err) {
     if (err) {
       res.status(500).json({ error: err.message });
