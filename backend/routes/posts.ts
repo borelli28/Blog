@@ -5,6 +5,8 @@ import { authenticateToken } from '../handlers/auth';
 const router = express.Router();
 
 router.get('/', postHandlers.getAllPosts);
+router.get('/featured', postHandlers.getFeaturedPosts);
+router.get('/published', postHandlers.getPublishedPosts);
 router.get('/:title', postHandlers.getPost);
 router.post('/', authenticateToken, postHandlers.createPost);
 router.put('/:title', authenticateToken, postHandlers.updatePost);

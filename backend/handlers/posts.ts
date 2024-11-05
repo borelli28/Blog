@@ -130,3 +130,23 @@ export const getPostImages = (req: Request, res: Response) => {
     });
   });
 };
+
+export const getFeaturedPosts = (req: Request, res: Response) => {
+  db.all('SELECT * FROM blog_posts WHERE is_favorite = 1 AND is_public = 1 AND is_deleted = 0 ORDER BY created_at DESC', (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json(rows);
+  });
+};
+
+export const getPublishedPosts = (req: Request, res: Response) => {
+  db.all('SELECT * FROM blog_posts WHERE is_public = 1 AND is_deleted = 0 ORDER BY created_at DESC', (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json(rows);
+  });
+};
