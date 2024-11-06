@@ -24,7 +24,7 @@ const Dashboard: React.FC = () => {
 
   const fetchBlogs = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/all`, {
         credentials: 'include',
       });
       if (response.ok) {
@@ -99,6 +99,7 @@ const Dashboard: React.FC = () => {
 
       if (response.ok) {
         fetchBlogs();
+        console.log(response);
         setMessages(['Blog permanently deleted']);
       } else {
         setMessages(['Failed to permanently delete blog']);

@@ -150,3 +150,13 @@ export const getPublishedPosts = (req: Request, res: Response) => {
     res.json(rows);
   });
 };
+
+export const getAllPostsIncludingDeleted = (req: Request, res: Response) => {
+  db.all('SELECT * FROM blog_posts ORDER BY created_at DESC', (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json(rows);
+  });
+};
