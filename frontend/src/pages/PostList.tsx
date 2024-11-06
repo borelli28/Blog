@@ -5,6 +5,7 @@ import Layout from '../components/Layout';
 interface Blog {
   title: string;
   description: string;
+  is_public: boolean;
 }
 
 const PostList: React.FC = () => {
@@ -13,7 +14,7 @@ const PostList: React.FC = () => {
 
   useEffect(() => {
     const fetchBlogs = async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/published`, {
         credentials: 'include',
       });
       const data = await response.json();

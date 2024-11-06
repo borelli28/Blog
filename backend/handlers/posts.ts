@@ -91,7 +91,7 @@ export const updatePostStatus = (req: Request, res: Response) => {
 };
 
 export const deletePost = (req: Request, res: Response) => {
-  const { title } = req.body;
+  const { title } = req.params;
   db.run('UPDATE blog_posts SET is_deleted = 1 WHERE title = ?', [title], function(err) {
     if (err) {
       res.status(500).json({ error: err.message });
@@ -128,5 +128,35 @@ export const getPostImages = (req: Request, res: Response) => {
       }
       res.json(images);
     });
+  });
+};
+
+export const getFeaturedPosts = (req: Request, res: Response) => {
+  db.all('SELECT * FROM blog_posts WHERE is_favorite = 1 AND is_public = 1 AND is_deleted = 0 ORDER BY created_at DESC', (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json(rows);
+  });
+};
+
+export const getPublishedPosts = (req: Request, res: Response) => {
+  db.all('SELECT * FROM blog_posts WHERE is_public = 1 AND is_deleted = 0 ORDER BY created_at DESC', (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json(rows);
+  });
+};
+
+export const getAllPostsIncludingDeleted = (req: Request, res: Response) => {
+  db.all('SELECT * FROM blog_posts ORDER BY created_at DESC', (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json(rows);
   });
 };
