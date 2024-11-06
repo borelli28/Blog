@@ -8,7 +8,7 @@ export const getLogs = (req: Request, res: Response) => {
 
   fs.readFile(logFile, 'utf8', (err, data) => {
     if (err) {
-      logger.error(`Error readin log file: ${err.message}`);
+      logger.error(`Error reading log file: ${err.message}`);
       res.status(500).json({ error: 'Failed to read logs' });
       return;
     }
