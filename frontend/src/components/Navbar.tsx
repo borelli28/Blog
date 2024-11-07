@@ -42,6 +42,9 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
                   <Link to="/dashboard" className="nav-link btn btn-outline-secondary mx-1">Dashboard</Link>
                 </li>
                 <li className="nav-item">
+                  <Link to="/create" className="nav-link btn btn-outline-secondary mx-1">Create Blog</Link>
+                </li>
+                <li className="nav-item">
                   <Link to="/logs" className="nav-link btn btn-outline-secondary mx-1">Logs</Link>
                 </li>
               </>
