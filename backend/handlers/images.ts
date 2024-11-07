@@ -3,6 +3,7 @@ import { db } from '../models/db';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import logger from '../utils/logger';
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -18,8 +19,10 @@ const upload = multer({ storage: storage });
 export const uploadArticleImage = (req: Request, res: Response) => {
   upload.single('image')(req, res, function (err) {
     if (err instanceof multer.MulterError) {
+      logger.error(`Multer error during article image upload: ${err.message}`);
       return res.status(500).json({ error: err.message });
     } else if (err) {
+      logger.error(`Error during article image upload: ${err.message}`);
       return res.status(500).json({ error: err.message });
     }
 
@@ -40,25 +43,25 @@ export const uploadArticleImage = (req: Request, res: Response) => {
         [file.filename, description, blog_id],
         function(err) {
           if (err) {
-            console.error('Database error:', err);
+            logger.error(`Database error during article image upload: ${err.message}`);
             db.run('ROLLBACK');
             return res.status(500).json({ error: err.message });
           }
 
           const imageId = this.lastID;
 
-          // Update the blog_posts table with the new article_img
           db.run('UPDATE blog_posts SET article_img = ? WHERE id = ?',
             [file.filename, blog_id],
             function(err) {
               if (err) {
-                console.error('Database error:', err);
+                logger.error(`Database error updating blog_posts during article image upload: ${err.message}`);
                 db.run('ROLLBACK');
                 return res.status(500).json({ error: err.message });
               }
 
               db.run('COMMIT');
               res.status(201).json({ id: imageId, filename: file.filename });
+              logger.info(`Article image uploaded successfully: ${file.filename}`);
             }
           );
         }
@@ -70,8 +73,10 @@ export const uploadArticleImage = (req: Request, res: Response) => {
 export const uploadImage = (req: Request, res: Response) => {
   upload.single('image')(req, res, function (err) {
     if (err instanceof multer.MulterError) {
+      logger.error(`Multer error during image upload: ${err.message}`);
       return res.status(500).json({ error: err.message });
     } else if (err) {
+      logger.error(`Error during image upload: ${err.message}`);
       return res.status(500).json({ error: err.message });
     }
 
@@ -89,10 +94,11 @@ export const uploadImage = (req: Request, res: Response) => {
       [file.filename, description, blog_id],
       function(err) {
         if (err) {
-          console.error('Database error:', err);
+          logger.error(`Database error during image upload: ${err.message}`);
           return res.status(500).json({ error: err.message });
         }
         res.status(201).json({ id: this.lastID, filename: file.filename });
+        logger.info(`Image uploaded successfully: ${file.filename}`);
       }
     );
   });
@@ -102,6 +108,7 @@ export const updateAltValues = (req: Request, res: Response) => {
   const { id, description } = req.body;
   db.run('UPDATE images SET description = ? WHERE id = ?', [description, id], function(err) {
     if (err) {
+      logger.error(`Error updating image alt text: ${err.message}`);
       return res.status(500).json({ error: err.message });
     }
     res.json({ changes: this.changes });
@@ -114,9 +121,11 @@ export const deleteImage = (req: Request, res: Response) => {
   // Get the image filename from DB
   db.get('SELECT image FROM images WHERE id = ?', [id], (err, row) => {
     if (err) {
+      logger.error(`Database error while fetching image for deletion: ${err.message}`);
       return res.status(500).json({ error: err.message });
     }
     if (!row) {
+      logger.warn(`Attempt to delete non-existent image with id: ${id}`);
       return res.status(404).json({ error: 'Image not found' });
     }
 
@@ -126,20 +135,20 @@ export const deleteImage = (req: Request, res: Response) => {
     // Delete the file from the filesystem
     fs.unlink(filePath, (unlinkErr) => {
       if (unlinkErr) {
-        console.error('Error deleting file:', unlinkErr);
-        // Continue with DB deletion even if file deletion fails
+        logger.error(`Error deleting file from filesystem: ${unlinkErr.message}`);
       }
 
       // Delete the image record from DB
       db.run('DELETE FROM images WHERE id = ?', [id], function(deleteErr) {
         if (deleteErr) {
+          logger.error(`Database error while deleting image: ${deleteErr.message}`);
           return res.status(500).json({ error: deleteErr.message });
         }
 
         // If this is an article image, update the blog_posts table
         db.run('UPDATE blog_posts SET article_img = NULL WHERE article_img = ?', [filename], function(updateErr) {
           if (updateErr) {
-            console.error('Error updating blog_posts:', updateErr);
+            logger.error(`Error updating blog_posts after image deletion: ${updateErr.message}`);
           }
 
           res.json({ 
@@ -147,6 +156,7 @@ export const deleteImage = (req: Request, res: Response) => {
             changes: this.changes,
             fileDeleted: !unlinkErr
           });
+          logger.info(`Image deleted successfully: ${filename}`);
         });
       });
     });

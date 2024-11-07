@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import postsRouter from './routes/posts';
 import authRouter from './routes/auth';
 import imagesRouter from './routes/images';
+import logsRouter from './routes/logs';
 import { initializeSchema } from './models/schema';
 import cookieParser from 'cookie-parser';
 import path from 'path';
@@ -30,6 +31,7 @@ initializeSchema();
 app.use('/api/posts', postsRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/images', imagesRouter);
+app.use('/api/logs', logsRouter);
 
 app.get("/", (req, res) => {
   res.send("Welcome to the Blog API");

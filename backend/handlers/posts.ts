@@ -1,9 +1,11 @@
 import { Request, Response } from 'express';
 import { db } from '../models/db';
+import logger from '../utils/logger';
 
 export const getAllPosts = (req: Request, res: Response) => {
   db.all('SELECT * FROM blog_posts WHERE is_deleted = 0 ORDER BY created_at DESC', (err, rows) => {
     if (err) {
+      logger.error(`Failed to get all blog posts: ${err.message}`);
       res.status(500).json({ error: err.message });
       return;
     }
@@ -15,6 +17,7 @@ export const getPost = (req: Request, res: Response) => {
   const title = req.params.title;
   db.get('SELECT * FROM blog_posts WHERE title = ? AND is_deleted = 0', [title], (err, row) => {
     if (err) {
+      logger.error(`Failed to get blog post: ${err.message}`);
       res.status(500).json({ error: err.message });
       return;
     }
@@ -32,9 +35,11 @@ export const createPost = (req: Request, res: Response) => {
     [title, description, content, author_id],
     function(err) {
       if (err) {
+        logger.error(`Failed to create blog post: ${err.message}`);
         res.status(500).json({ error: err.message });
         return;
       }
+      logger.info(`Blog post created: ${title}`);
       res.status(201).json({ id: this.lastID });
     }
   );
@@ -47,6 +52,7 @@ export const updatePost = (req: Request, res: Response) => {
     [title, description, content, oldTitle],
     function(err) {
       if (err) {
+        logger.error(`Failed to update blog post: ${err.message}`);
         res.status(500).json({ error: err.message });
         return;
       }
@@ -97,6 +103,7 @@ export const deletePost = (req: Request, res: Response) => {
       res.status(500).json({ error: err.message });
       return;
     }
+    logger.info(`Blog post deleted: ${title}`);
     res.json({ changes: this.changes });
   });
 };
@@ -105,9 +112,11 @@ export const permanentDeletePost = (req: Request, res: Response) => {
   const { title } = req.body;
   db.run('DELETE FROM blog_posts WHERE title = ?', [title], function(err) {
     if (err) {
+      logger.error(`Failed to permanently delete blog post: ${err.message}`);
       res.status(500).json({ error: err.message });
       return;
     }
+    logger.info(`Blog post permanently deleted: ${title}`);
     res.json({ changes: this.changes });
   });
 };
