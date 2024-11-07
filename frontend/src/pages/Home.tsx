@@ -83,12 +83,6 @@ const Home: React.FC = () => {
           )}
         </div>
       )}
-
-      {isAuthenticated && (
-        <div>
-          <Link to="/dashboard" className="btn btn-primary">Go to Dashboard</Link>
-        </div>
-      )}
     </Layout>
   );
 };
