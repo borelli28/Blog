@@ -8,24 +8,23 @@
 
 .blog {
   width: 75%;
-  margin-bottom: 20px; /* Add some space between blog cards */
+  margin-bottom: 20px;
 }
 
 .btn-group {
   display: flex;
   width: 100%;
-  justify-content: space-between; /* Distribute space evenly */
+  justify-content: space-between;
 }
 
 .btn-group button {
-  width: 48%; /* Slightly less than 50% to account for margin */
+  width: 48%;
   margin: 0;
-  white-space: nowrap; /* Prevent text from wrapping */
-  overflow: hidden; /* Hide overflowing text */
+  white-space: nowrap;
+  overflow: hidden;  
   text-overflow: ellipsis; /* Add ellipsis for overflowing text */
 }
 
-/* Adjust font size for smaller screens */
 @media (max-width: 768px) {
   .btn-group button {
     font-size: 0.8rem;
