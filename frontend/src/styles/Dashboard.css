@@ -1,0 +1,45 @@
+#blogs {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
+  height: 100%;
+}
+
+.blog {
+  width: 75%;
+  margin-bottom: 20px; /* Add some space between blog cards */
+}
+
+.btn-group {
+  display: flex;
+  width: 100%;
+  justify-content: space-between; /* Distribute space evenly */
+}
+
+.btn-group button {
+  width: 48%; /* Slightly less than 50% to account for margin */
+  margin: 0;
+  white-space: nowrap; /* Prevent text from wrapping */
+  overflow: hidden; /* Hide overflowing text */
+  text-overflow: ellipsis; /* Add ellipsis for overflowing text */
+}
+
+/* Adjust font size for smaller screens */
+@media (max-width: 768px) {
+  .btn-group button {
+    font-size: 0.8rem;
+  }
+}
+
+/* For even smaller screens, stack the buttons vertically */
+@media (max-width: 480px) {
+  .btn-group {
+    flex-direction: column;
+  }
+  
+  .btn-group button {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}
