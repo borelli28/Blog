@@ -82,7 +82,7 @@ const CreatePost: React.FC = () => {
             <label htmlFor="content">Content</label>
             <textarea id="editor" name="content" ref={editorRef}></textarea>
 
-            <button type="submit" className="btn light-blue">Submit</button>
+            <button type="submit" className="btn btn-primary">Submit</button>
           </div>
         </form>
       </main>
