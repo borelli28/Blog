@@ -180,7 +180,6 @@ return (
               </div>
             ))}
           </div>
-          <Link to="/blogs" className="btn btn-primary mb-4">Go to Blogs Page</Link>
         </main>
 
         <div id="deleted-blogs" className="container mb-4">
