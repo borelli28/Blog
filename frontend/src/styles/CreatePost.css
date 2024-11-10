@@ -1,0 +1,31 @@
+main {
+	display: flex;
+	justify-content: center;
+	text-align: center;
+	flex-wrap: wrap;
+}
+
+h2 {
+	width: 100%;
+}
+
+#images {
+	margin: 2%;
+}
+
+#img-upload-container {
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	text-align: center;
+	margin: 5% 0;
+	outline: 2px solid blue;
+}
+
+#img-upload-container form {
+	margin-bottom: 2%;
+}
+
+#img-upload-container label, input, button {
+	margin: 1% 2.5%;
+}

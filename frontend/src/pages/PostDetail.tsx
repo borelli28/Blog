@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Layout from '../components/Layout';
+import '../styles/Blog.css';
 
 interface Blog {
   title: string;
@@ -70,7 +71,7 @@ const PostDetail: React.FC = () => {
         <div id="content" dangerouslySetInnerHTML={{ __html: blog.content }} />
       </article>
       {isAuthenticated && (
-        <Link to={`/blog/edit/${encodeURIComponent(blog.title)}`} className="btn light-blue">Edit Post</Link>
+        <Link to={`/blog/edit/${encodeURIComponent(blog.title)}`} className="btn btn-warning">Edit Post</Link>
       )}
     </Layout>
   );

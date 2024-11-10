@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
+import '../styles/Dashboard.css';
 
 interface Blog {
   id: number;
@@ -132,7 +133,7 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  return (
+return (
     <Layout isAuthenticated={true}>
       <div className="container-fluid">
         <main className="container">
@@ -148,7 +149,7 @@ const Dashboard: React.FC = () => {
 
           <div id="blogs" className="row">
             {blogs.map(blog => (
-              <div key={blog.id} id="blog" className="col-md-6 mb-4">
+              <div key={blog.id} className="col-md-6 mb-4">
                 <div className="card">
                   <div className="card-body">
                     <h4 className="card-title">{blog.title}</h4>

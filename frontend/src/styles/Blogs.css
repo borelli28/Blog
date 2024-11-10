@@ -1,0 +1,12 @@
+#cards {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.row {
+    width: 75%;
+    margin: 1%;
+}

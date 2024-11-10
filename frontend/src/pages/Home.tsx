@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
+import '../styles/Home.css';
 
 interface Blog {
   title: string;
@@ -53,42 +54,39 @@ const Home: React.FC = () => {
 
   return (
     <Layout isAuthenticated={isAuthenticated}>
-      <div id="intro">
-        <h2>Welcome</h2>
-        <p>Some description here...</p>
-      </div>
+      <main>
+        <div id="intro">
+          <h2>Welcome</h2>
+          <p>Some description here...</p>
+        </div>
 
-      {isLoading ? (
-        <p>Loading blogs...</p>
-      ) : error ? (
-        <p className="error">{error}</p>
-      ) : (
-        <div id="cards">
-          {blogs.length > 0 ? (
-            blogs.map((blog) => (
-              <div className="row" key={blog.title}>
-                <div className="card hoverable">
-                  <Link to={`/blog/${encodeURIComponent(blog.title)}`}>
-                    <div className="card-content grey darken-3">
-                      <span className="card-title">{blog.title}</span>
-                      <p>{blog.description}</p>
-                      {blog.is_favorite && <span className="badge">Favorite</span>}
+        {isLoading ? (
+          <p>Loading blogs...</p>
+        ) : error ? (
+          <p className="error">{error}</p>
+        ) : (
+          <div id="cards">
+            <div className="card-container">
+              {blogs.length > 0 ? (
+                blogs.map((blog) => (
+                  <div className="row" key={blog.title}>
+                    <div className="card hoverable">
+                      <Link to={`/blog/${encodeURIComponent(blog.title)}`}>
+                        <div className="card-content grey darken-3">
+                          <span className="card-title">{blog.title}</span>
+                          <p>{blog.description}</p>
+                        </div>
+                      </Link>
                     </div>
-                  </Link>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p>No featured blogs available.</p>
-          )}
-        </div>
-      )}
-
-      {isAuthenticated && (
-        <div>
-          <Link to="/dashboard" className="btn btn-primary">Go to Dashboard</Link>
-        </div>
-      )}
+                  </div>
+                ))
+              ) : (
+                <p>No featured blogs available.</p>
+              )}
+            </div>
+          </div>
+        )}
+      </main>
     </Layout>
   );
 };
