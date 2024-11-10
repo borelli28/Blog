@@ -61,6 +61,18 @@ export const updatePost = (req: Request, res: Response) => {
   );
 };
 
+export const recoverPost = (req: Request, res: Response) => {
+  const { title } = req.params;
+  db.run('UPDATE blog_posts SET is_deleted = 0 WHERE title = ?', [title], function(err) {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    logger.info(`Blog post recovered: ${title}`);
+    res.json({ changes: this.changes });
+  });
+};
+
 export const updatePostStatus = (req: Request, res: Response) => {
   const { is_favorite, is_public } = req.body;
   const title = req.params.title;
