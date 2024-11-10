@@ -71,7 +71,7 @@ const PostDetail: React.FC = () => {
         <div id="content" dangerouslySetInnerHTML={{ __html: blog.content }} />
       </article>
       {isAuthenticated && (
-        <Link to={`/blog/edit/${encodeURIComponent(blog.title)}`} className="btn light-blue">Edit Post</Link>
+        <Link to={`/blog/edit/${encodeURIComponent(blog.title)}`} className="btn btn-warning">Edit Post</Link>
       )}
     </Layout>
   );
