@@ -148,7 +148,7 @@ return (
           )}
 
           <div id="blogs" className="row">
-            {blogs.map(blog => (
+            {blogs.filter(blog => !blog.is_deleted).map(blog => (
               <div key={blog.id} className="col-md-6 mb-4">
                 <div className="card">
                   <div className="card-body">
