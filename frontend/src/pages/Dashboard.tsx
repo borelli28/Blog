@@ -110,6 +110,29 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleRecoverBlog = async (blogTitle: string) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(blogTitle)}/recover`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title: blogTitle }),
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        fetchBlogs();
+        console.log(response);
+        setMessages(['Blog recovered']);
+      } else {
+        setMessages(['Failed to recover delete blog']);
+      }
+    } catch (error) {
+      setMessages(['An error occurred while recovering the blog']);
+    }
+  };
+
   const handlePasswordUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -191,6 +214,9 @@ return (
                 <p className="card-text">Last update: {blog.updated_at}</p>
                 <button onClick={() => handlePermanentDelete(blog.title)} className="btn btn-danger">
                   Permanently Delete
+                </button>
+                <button onClick={() => handleRecoverBlog(blog.title)} className="btn btn-primary">
+                  Recover
                 </button>
               </div>
             </div>
