@@ -198,7 +198,7 @@ return (
           ))}
         </div>
 
-        <footer className="container mb-4">
+        <div className="container mb-4">
           <div id="update-password" className="card">
             <div className="card-body">
               <h6 className="card-title">Update Password</h6>
@@ -218,7 +218,7 @@ return (
               </form>
             </div>
           </div>
-        </footer>
+        </div>
       </div>
     </Layout>
   );
