@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import EasyMDE from 'easymde';
 import 'easymde/dist/easymde.min.css';
+import '../styles/CreatePost.css';
 
 const CreatePost: React.FC = () => {
   const navigate = useNavigate();
@@ -68,7 +69,7 @@ const CreatePost: React.FC = () => {
 
   return (
     <Layout isAuthenticated={isAuthenticated}>
-      <div>
+      <main>
         <h2>Create Blog</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -84,7 +85,7 @@ const CreatePost: React.FC = () => {
             <button type="submit" className="btn light-blue">Submit</button>
           </div>
         </form>
-      </div>
+      </main>
     </Layout>
   );
 };
