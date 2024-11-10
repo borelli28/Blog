@@ -122,7 +122,7 @@ const EditPost: React.FC = () => {
       });
 
       if (response.ok) {
-        navigate('/blogs');
+        navigate('/dashboard');
       } else {
         setMessages(['Failed to delete blog']);
       }

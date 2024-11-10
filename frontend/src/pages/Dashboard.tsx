@@ -110,6 +110,29 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleRecoverBlog = async (blogTitle: string) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(blogTitle)}/recover`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title: blogTitle }),
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        fetchBlogs();
+        console.log(response);
+        setMessages(['Blog recovered']);
+      } else {
+        setMessages(['Failed to recover delete blog']);
+      }
+    } catch (error) {
+      setMessages(['An error occurred while recovering the blog']);
+    }
+  };
+
   const handlePasswordUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -148,7 +171,7 @@ return (
           )}
 
           <div id="blogs" className="row">
-            {blogs.map(blog => (
+            {blogs.filter(blog => !blog.is_deleted).map(blog => (
               <div key={blog.id} className="col-md-6 mb-4">
                 <div className="card">
                   <div className="card-body">
@@ -180,7 +203,6 @@ return (
               </div>
             ))}
           </div>
-          <Link to="/blogs" className="btn btn-primary mb-4">Go to Blogs Page</Link>
         </main>
 
         <div id="deleted-blogs" className="container mb-4">
@@ -193,12 +215,15 @@ return (
                 <button onClick={() => handlePermanentDelete(blog.title)} className="btn btn-danger">
                   Permanently Delete
                 </button>
+                <button onClick={() => handleRecoverBlog(blog.title)} className="btn btn-primary">
+                  Recover
+                </button>
               </div>
             </div>
           ))}
         </div>
 
-        <footer className="container mb-4">
+        <div className="container mb-4">
           <div id="update-password" className="card">
             <div className="card-body">
               <h6 className="card-title">Update Password</h6>
@@ -218,7 +243,7 @@ return (
               </form>
             </div>
           </div>
-        </footer>
+        </div>
       </div>
     </Layout>
   );
