@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import EditPost from './pages/EditPost';
 import Logs from './pages/Logs';
+import Logout from './components/Logout';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/blog/edit/:title" element={<ProtectedRoute><EditPost /></ProtectedRoute>} />
         <Route path="/logs" element={<Logs />} />
+        <Route path="/logout" element={<Logout />} />
       </Routes>
     </Router>
   );

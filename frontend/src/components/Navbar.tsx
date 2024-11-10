@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import Logout from './Logout';
 
 interface NavbarProps {
   isAuthenticated: boolean;
@@ -46,6 +47,9 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
                 </li>
                 <li className="nav-item">
                   <Link to="/logs" className="nav-link btn btn-outline-secondary mx-1">Logs</Link>
+                </li>
+                <li className="nav-item">
+                  <Logout />
                 </li>
               </>
             )}

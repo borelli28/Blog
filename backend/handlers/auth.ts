@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import { userRegisterValidator, userLoginValidator, passwordValidator } from '../utils/validators';
 import jwt from 'jsonwebtoken';
 import logger from '../utils/logger';
+import { addToken, removeToken, isTokenValid } from '../utils/tokenWhitelist';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -56,6 +57,9 @@ export const login = async (req: Request, res: Response) => {
         { expiresIn: '1h' }
       );
 
+      // Add token to whitelist
+      addToken(token);
+
       res.cookie('token', token, {
         httpOnly: true,
         secure: true,
@@ -95,8 +99,18 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
 };
 
 export const logout = (req: Request, res: Response) => {
-  // TODO: Invalidate auth JWT token
-  //
+  const token = req.cookies.token;
+
+  if (token) {
+    removeToken(token);  // Remove token from whitelist
+
+    res.clearCookie('token', { 
+      httpOnly: true, 
+      secure: process.env.NODE_ENV === 'production', 
+      sameSite: 'strict' 
+    });
+  }
+
   logger.info(`User logged out: ${req.user?.username}`);
   res.json({ message: 'Logged out successfully' });
 };
