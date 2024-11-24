@@ -121,8 +121,8 @@ export const updatePassword = async (req: Request, res: Response) => {
     return res.status(400).json({ errors });
   }
 
-  const { username, newPassword } = req.body;
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  const { username, password } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 10);
 
   db.run('UPDATE users SET password = ? WHERE username = ?', [hashedPassword, username], function(err) {
     if (err) {
