@@ -5,5 +5,6 @@ import { authenticateToken } from '../handlers/auth';
 const router = express.Router();
 
 router.get('/', authenticateToken, logHandlers.getLogs);
+router.delete('/:timestamp', authenticateToken, logHandlers.removeLog); 
 
 export default router;
