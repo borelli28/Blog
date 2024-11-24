@@ -24,7 +24,7 @@ const Logout: React.FC = () => {
   };
 
   return (
-    <button onClick={handleLogout} className="btn btn-link nav-link">
+    <button onClick={handleLogout} className="nav-link btn btn-outline-danger mx-1">
       Logout
     </button>
   );
