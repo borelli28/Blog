@@ -45,34 +45,22 @@ const Logs: React.FC = () => {
     checkAuth();
   }, []);
 
-  // const handleRemoveLog = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   setErrors({});
+  const handleRemoveLog = async (timestamp: string) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/logs/${encodeURIComponent(timestamp)}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
 
-  //   try {
-  //     const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/register`, {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ username, password, confirm_password: confirmPassword }),
-  //     });
-
-  //     const data = await response.json();
-
-  //     if (response.ok) {
-  //       navigate('/login');
-  //     } else {
-  //       if (data.errors) {
-  //         setErrors(data.errors);
-  //       } else {
-  //         setErrors({ general: data.error || 'Registration failed' });
-  //       }
-  //     }
-  //   } catch (error) {
-  //     setErrors({ general: 'An error occurred. Please try again.' });
-  //   }
-  // };
+      if (response.ok) {
+        console.log('Log successfuly removed!');
+      } else {
+        console.error('Failed to remove log');
+      }
+    } catch (error) {
+      console.error('Error removing log:', error);
+    }
+  };
 
   return (
     <Layout isAuthenticated={isAuthenticated}>
@@ -94,7 +82,7 @@ const Logs: React.FC = () => {
                 <td>{log.level}</td>
                 <td>{log.message}</td>
                 <td>
-                  <button className="btn btn-danger" onClick={ handleRemoveLog(log.index) }>Remove</button>
+                  <button className="btn btn-danger" onClick={() => handleRemoveLog(log.timestamp)}>Remove</button>
                 </td>
               </tr>
             ))}
