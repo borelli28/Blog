@@ -133,3 +133,33 @@ export const updatePassword = async (req: Request, res: Response) => {
     res.json({ changes: this.changes });
   });
 };
+
+export const getUsername = (req: Request, res: Response) => {
+  const token = req.cookies.token;
+
+  if (!token) {
+    logger.warn('Attempt to fetch username without token');
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  jwt.verify(token, JWT_SECRET, (err: any, decoded: any) => {
+    if (err) {
+      logger.warn(`Token verification failed: ${err.message}`);
+      return res.status(403).json({ error: 'Invalid or expired token' });
+    }
+
+    const userId = decoded.userId;
+    db.get('SELECT username FROM users WHERE id = ?', [userId], (dbErr, row) => {
+      if (dbErr) {
+        logger.error(`Database error fetching username: ${dbErr.message}`);
+        return res.status(500).json({ error: 'Failed to retrieve username' });
+      }
+      if (!row) {
+        logger.warn(`User not found for ID: ${userId}`);
+        return res.status(404).json({ error: 'User not found' });
+      }
+      logger.info(`Fetched username: ${row.username}`);
+      res.json({ username: row.username });
+    });
+  });
+};
