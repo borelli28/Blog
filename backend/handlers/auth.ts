@@ -116,20 +116,69 @@ export const logout = (req: Request, res: Response) => {
 };
 
 export const updatePassword = async (req: Request, res: Response) => {
+  const { username, password } = req.body;
+
+  if (!username || username.trim() === '') {
+    return res.status(400).json({ error: 'Username is required' });
+  }
+
   const errors = passwordValidator(req.body);
   if (Object.keys(errors).length > 0) {
     return res.status(400).json({ errors });
   }
 
-  const { username, newPassword } = req.body;
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-  db.run('UPDATE users SET password = ? WHERE username = ?', [hashedPassword, username], function(err) {
+    db.run(
+      'UPDATE users SET password = ? WHERE username = ?',
+      [hashedPassword, username],
+      function (err) {
+        if (err) {
+          logger.error(`Error updating password for user ${username}: ${err.message}`);
+          return res.status(500).json({ error: err.message });
+        }
+        if (this.changes === 0) {
+          logger.warn(`No user found with username: ${username}`);
+          return res.status(404).json({ error: 'User not found' });
+        }
+
+        logger.info(`Password updated for user: ${username}`);
+        res.json({ changes: this.changes });
+      }
+    );
+  } catch (error) {
+    logger.error(`Unexpected error updating password for user ${username}: ${error}`);
+    res.status(500).json({ error: 'An unexpected error occurred' });
+  }
+};
+
+
+export const getUsername = (req: Request, res: Response) => {
+  const token = req.cookies.token;
+
+  if (!token) {
+    logger.warn('Attempt to fetch username without token');
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  jwt.verify(token, JWT_SECRET, (err: any, decoded: any) => {
     if (err) {
-      logger.error(`Error updating password for user ${username}: ${err.message}`);
-      return res.status(500).json({ error: err.message });
+      logger.warn(`Token verification failed: ${err.message}`);
+      return res.status(403).json({ error: 'Invalid or expired token' });
     }
-    logger.info(`Password updated for user: ${username}`);
-    res.json({ changes: this.changes });
+
+    const userId = decoded.userId;
+    db.get('SELECT username FROM users WHERE id = ?', [userId], (dbErr, row) => {
+      if (dbErr) {
+        logger.error(`Database error fetching username: ${dbErr.message}`);
+        return res.status(500).json({ error: 'Failed to retrieve username' });
+      }
+      if (!row) {
+        logger.warn(`User not found for ID: ${userId}`);
+        return res.status(404).json({ error: 'User not found' });
+      }
+      res.json({ username: row.username });
+    });
   });
 };

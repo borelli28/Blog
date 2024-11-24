@@ -11,5 +11,6 @@ router.put('/password', authenticateToken, authHandlers.updatePassword);
 router.get('/check', authenticateToken, (req, res) => {
   res.status(200).json({ authenticated: true });
 });
+router.get('/getUsername', authenticateToken, authHandlers.getUsername);
 
 export default router;
