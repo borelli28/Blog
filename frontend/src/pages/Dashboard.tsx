@@ -16,12 +16,29 @@ interface Blog {
 
 const Dashboard: React.FC = () => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [newPassword, setNewPassword] = useState('');
+  const [password, setPassword] = useState('');
   const [messages, setMessages] = useState<string[]>([]);
+  const [username, setUsername] = useState('');
 
   useEffect(() => {
     fetchBlogs();
   }, []);
+
+  const fetchUsername = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/getUsername`, {
+        credentials: 'include',
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setUsername(data.username);
+      } else {
+        console.error('Failed to fetch username');
+      }
+    } catch (error) {
+      console.error('Error fetching username:', error);
+    }
+  };
 
   const fetchBlogs = async () => {
     try {
@@ -135,13 +152,15 @@ const Dashboard: React.FC = () => {
 
   const handlePasswordUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
+    fetchUsername();
+
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/update-password`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ newPassword }),
+        body: JSON.stringify({ username, password }),
         credentials: 'include',
       });
 
@@ -235,8 +254,8 @@ return (
                     className="form-control"
                     id="password"
                     name="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
                 <button type="submit" className="btn btn-primary">Change Password</button>
