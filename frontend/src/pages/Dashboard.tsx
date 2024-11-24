@@ -22,6 +22,7 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     fetchBlogs();
+    fetchUsername();
   }, []);
 
   const fetchUsername = async () => {
@@ -152,7 +153,6 @@ const Dashboard: React.FC = () => {
 
   const handlePasswordUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    fetchUsername();
 
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/password`, {
@@ -166,12 +166,14 @@ const Dashboard: React.FC = () => {
 
       if (response.ok) {
         setMessages(['Password updated successfully']);
-        setNewPassword('');
+        setPassword('');
       } else {
-        setMessages(['Failed to update password']);
+        const errorData = await response.json(); 
+        const errorMessage = errorData.error || 'Failed to update password';
+        setMessages([errorMessage]);
       }
-    } catch (error) {
-      setMessages(['An error occurred while updating the password']);
+    } catch (error: any) {
+      setMessages([error.message || 'An error occurred while updating the password']);
     }
   };
 
