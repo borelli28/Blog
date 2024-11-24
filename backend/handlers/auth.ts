@@ -116,23 +116,43 @@ export const logout = (req: Request, res: Response) => {
 };
 
 export const updatePassword = async (req: Request, res: Response) => {
+  const { username, password } = req.body;
+
+  if (!username || username.trim() === '') {
+    return res.status(400).json({ error: 'Username is required' });
+  }
+
   const errors = passwordValidator(req.body);
   if (Object.keys(errors).length > 0) {
     return res.status(400).json({ errors });
   }
 
-  const { username, password } = req.body;
-  const hashedPassword = await bcrypt.hash(password, 10);
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-  db.run('UPDATE users SET password = ? WHERE username = ?', [hashedPassword, username], function(err) {
-    if (err) {
-      logger.error(`Error updating password for user ${username}: ${err.message}`);
-      return res.status(500).json({ error: err.message });
-    }
-    logger.info(`Password updated for user: ${username}`);
-    res.json({ changes: this.changes });
-  });
+    db.run(
+      'UPDATE users SET password = ? WHERE username = ?',
+      [hashedPassword, username],
+      function (err) {
+        if (err) {
+          logger.error(`Error updating password for user ${username}: ${err.message}`);
+          return res.status(500).json({ error: err.message });
+        }
+        if (this.changes === 0) {
+          logger.warn(`No user found with username: ${username}`);
+          return res.status(404).json({ error: 'User not found' });
+        }
+
+        logger.info(`Password updated for user: ${username}`);
+        res.json({ changes: this.changes });
+      }
+    );
+  } catch (error) {
+    logger.error(`Unexpected error updating password for user ${username}: ${error}`);
+    res.status(500).json({ error: 'An unexpected error occurred' });
+  }
 };
+
 
 export const getUsername = (req: Request, res: Response) => {
   const token = req.cookies.token;
