@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Logout from './Logout';
+import '../styles/Navbar.css';
 
 interface NavbarProps {
   isAuthenticated: boolean;
@@ -12,7 +13,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
   const handleNavCollapse = () => setIsNavCollapsed(!isNavCollapsed);
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light mb-4">
+    <nav className={`navbar navbar-expand-lg navbar-light mb-4 ${isNavCollapsed ? 'navbar-collapsed' : ''}`}>
       <div className="container">
         <Link to="/" className="navbar-brand">
           <h5 className="mb-0">Title Here</h5>
@@ -48,9 +49,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
                 <li className="nav-item">
                   <Link to="/logs" className="nav-link btn btn-outline-secondary mx-1">Logs</Link>
                 </li>
-                <li className="nav-item">
-                  <Logout />
-                </li>
+                <Logout />
               </>
             )}
           </ul>
