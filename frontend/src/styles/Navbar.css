@@ -1,0 +1,42 @@
+nav {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  text-align: center;
+  width: 100%;
+}
+
+nav h5 {
+  width: 50%;
+}
+
+ul {
+  width: 100%;
+}
+
+ul li {
+  width: 100%;
+}
+
+ul #logout-btn {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  text-align: center;
+  width: 100%;
+}
+
+@media (max-width: 991px) {
+  .navbar-collapsed .navbar-nav {
+    text-align: center;
+  }
+
+  .navbar-collapsed .nav-link {
+    display: inline-block;
+    width: 80%;
+  }
+
+  .navbar-collapsed #logout-btn {
+    width: 100%;
+  }
+}
