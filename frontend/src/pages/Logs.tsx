@@ -45,24 +45,57 @@ const Logs: React.FC = () => {
     checkAuth();
   }, []);
 
+  // const handleRemoveLog = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setErrors({});
+
+  //   try {
+  //     const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/register`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ username, password, confirm_password: confirmPassword }),
+  //     });
+
+  //     const data = await response.json();
+
+  //     if (response.ok) {
+  //       navigate('/login');
+  //     } else {
+  //       if (data.errors) {
+  //         setErrors(data.errors);
+  //       } else {
+  //         setErrors({ general: data.error || 'Registration failed' });
+  //       }
+  //     }
+  //   } catch (error) {
+  //     setErrors({ general: 'An error occurred. Please try again.' });
+  //   }
+  // };
+
   return (
     <Layout isAuthenticated={isAuthenticated}>
       <div className="container">
         <h1>Logs</h1>
-        <table className="table">
-          <thead>
+        <table className="table table-bordered table-striped-columns table-hover">
+          <thead className="table-light">
             <tr>
-              <th>Timestamp</th>
-              <th>Level</th>
-              <th>Message</th>
+              <th scope="col">Timestamp</th>
+              <th scope="col">Level</th>
+              <th scope="col">Message</th>
+              <th scope="col">Actions</th>
             </tr>
           </thead>
           <tbody>
             {logs.map((log, index) => (
               <tr key={index}>
-                <td>{log.timestamp}</td>
+                <td >{log.timestamp}</td>
                 <td>{log.level}</td>
                 <td>{log.message}</td>
+                <td>
+                  <button className="btn btn-danger" onClick={ handleRemoveLog(log.index) }>Remove</button>
+                </td>
               </tr>
             ))}
           </tbody>
