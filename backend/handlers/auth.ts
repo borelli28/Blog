@@ -178,7 +178,6 @@ export const getUsername = (req: Request, res: Response) => {
         logger.warn(`User not found for ID: ${userId}`);
         return res.status(404).json({ error: 'User not found' });
       }
-      logger.info(`Fetched username: ${row.username}`);
       res.json({ username: row.username });
     });
   });
