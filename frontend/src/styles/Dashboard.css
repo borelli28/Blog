@@ -36,6 +36,10 @@ main #deleted-blogs h5 {
   width: 100%;
 }
 
+main #deleted-blogs .card {
+  width: 100%;
+}
+
 main #deleted-blogs button {
   margin-bottom: 2%;
 }
