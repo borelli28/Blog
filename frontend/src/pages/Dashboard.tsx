@@ -20,7 +20,7 @@ const Dashboard: React.FC = () => {
   const [messages, setMessages] = useState<string[]>([]);
   const [username, setUsername] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [blogsPerPage] = useState(5);
+  const [blogsPerPage] = useState(4);
 
   const indexOfLastBlog = currentPage * blogsPerPage;
   const indexOfFirstBlog = indexOfLastBlog - blogsPerPage;
