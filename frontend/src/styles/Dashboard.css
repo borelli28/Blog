@@ -25,6 +25,21 @@
   text-overflow: ellipsis; /* Add ellipsis for overflowing text */
 }
 
+main #deleted-blogs {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+main #deleted-blogs h5 {
+  width: 100%;
+}
+
+main #deleted-blogs button {
+  margin-bottom: 2%;
+}
+
 @media (max-width: 768px) {
   .btn-group button {
     font-size: 0.8rem;
