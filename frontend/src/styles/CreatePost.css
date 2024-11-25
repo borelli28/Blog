@@ -3,6 +3,7 @@ main {
 	justify-content: center;
 	text-align: center;
 	flex-wrap: wrap;
+	width: 100%;
 }
 
 h2 {
@@ -18,8 +19,6 @@ h2 {
 	justify-content: center;
 	flex-wrap: wrap;
 	text-align: center;
-	margin: 5% 0;
-	outline: 2px solid blue;
 }
 
 #img-upload-container form {
@@ -27,5 +26,15 @@ h2 {
 }
 
 #img-upload-container label, input, button {
-	margin: 1% 2.5%;
+	margin: 1% 0;
+}
+
+.editor-toolbar {
+  display: flex;
+  justify-content: center;
+}
+
+.editor-toolbar a {
+  display: inline-block;
+  margin-right: 5%;
 }
