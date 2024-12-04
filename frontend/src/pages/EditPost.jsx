@@ -5,41 +5,26 @@ import EasyMDE from 'easymde';
 import 'easymde/dist/easymde.min.css';
 import '../styles/CreatePost.css';
 
-interface Blog {
-  id: number;
-  title: string;
-  description: string;
-  content: string;
-  article_img?: string;
-  created_at: string;
-}
-
-interface Image {
-  id: number;
-  image: string;
-  description: string;
-}
-
-const EditPost: React.FC = () => {
-  const { title } = useParams<{ title: string }>();
+const EditPost = () => {
+  const { title } = useParams();
   const navigate = useNavigate();
-  const [blog, setBlog] = useState<Blog | null>(null);
-  const [images, setImages] = useState<Image[]>([]);
-  const [messages, setMessages] = useState<string[]>([]);
+  const [blog, setBlog] = useState(null);
+  const [images, setImages] = useState([]);
+  const [messages, setMessages] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const editorRef = useRef<HTMLTextAreaElement>(null);
+  const editorRef = useRef(null);
 
   useEffect(() => {
     const fetchBlogAndImages = async () => {
       try {
-        const blogResponse = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(title!)}`, {
+        const blogResponse = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(title)}`, {
           credentials: 'include',
         });
         if (blogResponse.ok) {
           const blogData = await blogResponse.json();
           setBlog(blogData);
 
-          const imagesResponse = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(title!)}/images`, {
+          const imagesResponse = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(title)}/images`, {
             credentials: 'include',
           });
           if (imagesResponse.ok) {
@@ -84,7 +69,7 @@ const EditPost: React.FC = () => {
     }
   }, [blog]);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const blogData = {
@@ -95,7 +80,7 @@ const EditPost: React.FC = () => {
     };
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(title!)}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(title)}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -116,7 +101,7 @@ const EditPost: React.FC = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(title!)}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(title)}`, {
         method: 'DELETE',
         credentials: 'include',
       });
@@ -131,7 +116,7 @@ const EditPost: React.FC = () => {
     }
   };
 
-  const handleArticleImageUpload = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleArticleImageUpload = async (event) => {
     event.preventDefault();
     
     if (!blog) {
@@ -167,7 +152,7 @@ const EditPost: React.FC = () => {
     }
   };
 
-  const handleBlogImageUpload = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleBlogImageUpload = async (event) => {
     event.preventDefault();
     
     if (!blog) {
@@ -192,7 +177,7 @@ const EditPost: React.FC = () => {
       if (response.ok) {
         const result = await response.json();
         setMessages(['Blog image uploaded successfully']);
-        setImages(prevImages => [...prevImages, {id: result.id, image: result.filename, description: formData.get('description') as string}]);
+        setImages(prevImages => [...prevImages, {id: result.id, image: result.filename, description: formData.get('description')}]);
       } else {
         const errorData = await response.json();
         setMessages([errorData.error || 'Failed to upload blog image']);
@@ -203,7 +188,7 @@ const EditPost: React.FC = () => {
     }
   };
 
-  const handleImageDelete = async (imageId: number) => {
+  const handleImageDelete = async (imageId) => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/images`, {
         method: 'DELETE',
@@ -227,7 +212,7 @@ const EditPost: React.FC = () => {
     }
   };
 
-  const handleImageDescriptionUpdate = async (imageId: number, newDescription: string) => {
+  const handleImageDescriptionUpdate = async (imageId, newDescription) => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/images/alt`, {
         method: 'PUT',
@@ -240,7 +225,6 @@ const EditPost: React.FC = () => {
 
       if (response.ok) {
         setMessages(['Image description updated successfully']);
-        // Update the images state with the new description
         setImages(prevImages =>
           prevImages.map(img =>
             img.id === imageId ? { ...img, description: newDescription } : img
@@ -255,7 +239,6 @@ const EditPost: React.FC = () => {
       setMessages(['An error occurred while updating the image description']);
     }
   };
-
 
   if (!blog) return <div>Loading...</div>;
 
