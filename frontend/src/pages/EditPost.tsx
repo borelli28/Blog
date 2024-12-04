@@ -295,7 +295,12 @@ const EditPost: React.FC = () => {
           </form>
 
           <div id="actions">
-            <Link to={`/blog/${encodeURIComponent(blog.title)}`} className="btn btn-info">See Preview</Link>
+            <button
+              onClick={() => navigate(`/blog/${encodeURIComponent(blog.title)}`)}
+              className="btn btn-info"
+            >
+              See Preview
+            </button>
             <button onClick={handleDelete} className="btn btn-danger">Delete Post</button>
           </div>
 
