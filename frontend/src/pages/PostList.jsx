@@ -3,14 +3,8 @@ import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import '../styles/Blogs.css';
 
-interface Blog {
-  title: string;
-  description: string;
-  is_public: boolean;
-}
-
-const PostList: React.FC = () => {
-  const [blogs, setBlogs] = useState<Blog[]>([]);
+const PostList = () => {
+  const [blogs, setBlogs] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
