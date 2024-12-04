@@ -3,18 +3,11 @@ import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import '../styles/Home.css';
 
-interface Blog {
-  title: string;
-  description: string;
-  is_favorite: boolean;
-  is_public: boolean;
-}
-
-const Home: React.FC = () => {
-  const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+const Home = () => {
+  const [blogs, setBlogs] = useState([]);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchBlogs = async () => {
