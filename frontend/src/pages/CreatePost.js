@@ -5,9 +5,9 @@ import EasyMDE from 'easymde';
 import 'easymde/dist/easymde.min.css';
 import '../styles/CreatePost.css';
 
-const CreatePost: React.FC = () => {
+const CreatePost = () => {
   const navigate = useNavigate();
-  const editorRef = useRef<HTMLTextAreaElement>(null);
+  const editorRef = useRef(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ const CreatePost: React.FC = () => {
     }
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const blogData = {
