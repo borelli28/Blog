@@ -3,27 +3,14 @@ import { useParams, Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import '../styles/Blog.css';
 
-interface Blog {
-  title: string;
-  description: string;
-  content: string;
-  created_at: string;
-  updated_at: string;
-  article_img?: string;
-  is_public: boolean;
-  author: {
-    username: string;
-  };
-}
-
-const PostDetail: React.FC = () => {
-  const [blog, setBlog] = useState<Blog | null>(null);
-  const { title } = useParams<{ title: string }>();
+const PostDetail = () => {
+  const [blog, setBlog] = useState(null);
+  const { title } = useParams();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const fetchBlog = async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(title!)}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(title)}`, {
         credentials: 'include',
       });
       const data = await response.json();
