@@ -1,8 +1,7 @@
-import { Request, Response } from 'express';
-import { db } from '../models/db';
-import logger from '../utils/logger';
+import { db } from '../models/db.js';
+import logger from '../utils/logger.js';
 
-export const getAllPosts = (req: Request, res: Response) => {
+export const getAllPosts = (req, res) => {
   db.all('SELECT * FROM blog_posts WHERE is_deleted = 0 ORDER BY created_at DESC', (err, rows) => {
     if (err) {
       logger.error(`Failed to get all blog posts: ${err.message}`);
@@ -13,7 +12,7 @@ export const getAllPosts = (req: Request, res: Response) => {
   });
 };
 
-export const getPost = (req: Request, res: Response) => {
+export const getPost = (req, res) => {
   const title = req.params.title;
   db.get('SELECT * FROM blog_posts WHERE title = ? AND is_deleted = 0', [title], (err, row) => {
     if (err) {
@@ -29,7 +28,7 @@ export const getPost = (req: Request, res: Response) => {
   });
 };
 
-export const createPost = (req: Request, res: Response) => {
+export const createPost = (req, res) => {
   const { title, description, content, author_id } = req.body;
   db.run('INSERT INTO blog_posts (title, description, content, author_id) VALUES (?, ?, ?, ?)',
     [title, description, content, author_id],
@@ -45,7 +44,7 @@ export const createPost = (req: Request, res: Response) => {
   );
 };
 
-export const updatePost = (req: Request, res: Response) => {
+export const updatePost = (req, res) => {
   const { title, description, content } = req.body;
   const oldTitle = req.params.title;
   db.run('UPDATE blog_posts SET title = ?, description = ?, content = ? WHERE title = ?',
@@ -61,7 +60,7 @@ export const updatePost = (req: Request, res: Response) => {
   );
 };
 
-export const recoverPost = (req: Request, res: Response) => {
+export const recoverPost = (req, res) => {
   const { title } = req.params;
   db.run('UPDATE blog_posts SET is_deleted = 0 WHERE title = ?', [title], function(err) {
     if (err) {
@@ -73,7 +72,7 @@ export const recoverPost = (req: Request, res: Response) => {
   });
 };
 
-export const updatePostStatus = (req: Request, res: Response) => {
+export const updatePostStatus = (req, res) => {
   const { is_favorite, is_public } = req.body;
   const title = req.params.title;
 
@@ -108,7 +107,7 @@ export const updatePostStatus = (req: Request, res: Response) => {
   });
 };
 
-export const deletePost = (req: Request, res: Response) => {
+export const deletePost = (req, res) => {
   const { title } = req.params;
   db.run('UPDATE blog_posts SET is_deleted = 1 WHERE title = ?', [title], function(err) {
     if (err) {
@@ -120,7 +119,7 @@ export const deletePost = (req: Request, res: Response) => {
   });
 };
 
-export const permanentDeletePost = (req: Request, res: Response) => {
+export const permanentDeletePost = (req, res) => {
   const { title } = req.body;
   db.run('DELETE FROM blog_posts WHERE title = ?', [title], function(err) {
     if (err) {
@@ -133,7 +132,7 @@ export const permanentDeletePost = (req: Request, res: Response) => {
   });
 };
 
-export const getPostImages = (req: Request, res: Response) => {
+export const getPostImages = (req, res) => {
   const title = req.params.title;
   db.get('SELECT id FROM blog_posts WHERE title = ? AND is_deleted = 0', [title], (err, row) => {
     if (err) {
@@ -152,7 +151,7 @@ export const getPostImages = (req: Request, res: Response) => {
   });
 };
 
-export const getFeaturedPosts = (req: Request, res: Response) => {
+export const getFeaturedPosts = (req, res) => {
   db.all('SELECT * FROM blog_posts WHERE is_favorite = 1 AND is_public = 1 AND is_deleted = 0 ORDER BY created_at DESC', (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
@@ -162,7 +161,7 @@ export const getFeaturedPosts = (req: Request, res: Response) => {
   });
 };
 
-export const getPublishedPosts = (req: Request, res: Response) => {
+export const getPublishedPosts = (req, res) => {
   db.all('SELECT * FROM blog_posts WHERE is_public = 1 AND is_deleted = 0 ORDER BY created_at DESC', (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
@@ -172,7 +171,7 @@ export const getPublishedPosts = (req: Request, res: Response) => {
   });
 };
 
-export const getAllPostsIncludingDeleted = (req: Request, res: Response) => {
+export const getAllPostsIncludingDeleted = (req, res) => {
   db.all('SELECT * FROM blog_posts ORDER BY created_at DESC', (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });

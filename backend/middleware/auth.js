@@ -1,8 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { isTokenValid } from '../utils/tokenWhitelist';
+import { isTokenValid } from '../utils/tokenWhitelist.js';
 
-export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+export const authMiddleware = (req, res, next) => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
 
   if (!token) {
@@ -10,14 +9,13 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Check if token is in whitelist
     if (!isTokenValid(token)) {
       return res.status(401).json({ message: 'Token is not valid' });
     }
 
-    (req as any).user = decoded;
+    req.user = decoded;
     next();
   } catch (err) {
     res.status(401).json({ error: 'Token is not valid' });

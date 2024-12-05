@@ -1,7 +1,7 @@
 import { db } from '../models/db';
 
-export const userRegisterValidator = (postData: any) => {
-  const errors: { [key: string]: string } = {};
+export const userRegisterValidator = (postData) => {
+  const errors = {};
 
   if (postData.username.length < 3) {
     errors.username = "Username should be at least 3 characters long";
@@ -38,8 +38,8 @@ export const userRegisterValidator = (postData: any) => {
   });
 };
 
-export const userLoginValidator = (postData: any) => {
-  const errors: { [key: string]: string } = {};
+export const userLoginValidator = (postData) => {
+  const errors = {};
 
   if (postData.password.length < 11) {
     errors.password = "Password should be at least 11 characters";
@@ -63,8 +63,8 @@ export const userLoginValidator = (postData: any) => {
   });
 };
 
-export const passwordValidator = (postData: any) => {
-  const errors: { [key: string]: string } = {};
+export const passwordValidator = (postData) => {
+  const errors = {};
 
   if (postData.password.length < 11) {
     errors.password = "Password should be at least 11 characters";

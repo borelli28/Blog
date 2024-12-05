@@ -3,21 +3,10 @@ import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import '../styles/Dashboard.css';
 
-interface Blog {
-  id: number;
-  title: string;
-  created_at: string;
-  updated_at: string;
-  is_favorite: boolean;
-  is_public: boolean;
-  is_deleted: boolean;
-  article_img?: string;
-}
-
-const Dashboard: React.FC = () => {
-  const [blogs, setBlogs] = useState<Blog[]>([]);
+const Dashboard = () => {
+  const [blogs, setBlogs] = useState([]);
   const [password, setPassword] = useState('');
-  const [messages, setMessages] = useState<string[]>([]);
+  const [messages, setMessages] = useState([]);
   const [username, setUsername] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [blogsPerPage] = useState(4);
@@ -63,7 +52,7 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleFavoriteToggle = async (blogTitle: string, isFavorite: boolean) => {
+  const handleFavoriteToggle = async (blogTitle, isFavorite) => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(blogTitle)}/status`, {
         method: 'PATCH',
@@ -73,7 +62,6 @@ const Dashboard: React.FC = () => {
         body: JSON.stringify({ is_favorite: isFavorite }),
         credentials: 'include',
       });
-
       if (response.ok) {
         fetchBlogs();
         setMessages([`Blog ${isFavorite ? 'marked as favorite' : 'removed from favorites'}`]);
@@ -87,7 +75,7 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handlePublishToggle = async (blogTitle: string, isPublic: boolean) => {
+  const handlePublishToggle = async (blogTitle, isPublic) => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(blogTitle)}/status`, {
         method: 'PATCH',
@@ -97,7 +85,6 @@ const Dashboard: React.FC = () => {
         body: JSON.stringify({ is_public: isPublic }),
         credentials: 'include',
       });
-
       if (response.ok) {
         fetchBlogs();
         setMessages([`Blog ${isPublic ? 'published' : 'unpublished'}`]);
@@ -111,7 +98,7 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handlePermanentDelete = async (blogTitle: string) => {
+  const handlePermanentDelete = async (blogTitle) => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/permanent`, {
         method: 'DELETE',
@@ -121,7 +108,6 @@ const Dashboard: React.FC = () => {
         body: JSON.stringify({ title: blogTitle }),
         credentials: 'include',
       });
-
       if (response.ok) {
         fetchBlogs();
         console.log(response);
@@ -134,7 +120,7 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleRecoverBlog = async (blogTitle: string) => {
+  const handleRecoverBlog = async (blogTitle) => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(blogTitle)}/recover`, {
         method: 'PATCH',
@@ -144,7 +130,6 @@ const Dashboard: React.FC = () => {
         body: JSON.stringify({ title: blogTitle }),
         credentials: 'include',
       });
-
       if (response.ok) {
         fetchBlogs();
         console.log(response);
@@ -157,9 +142,8 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handlePasswordUpdate = async (e: React.FormEvent) => {
+  const handlePasswordUpdate = async (e) => {
     e.preventDefault();
-
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/password`, {
         method: 'PUT',
@@ -169,16 +153,15 @@ const Dashboard: React.FC = () => {
         body: JSON.stringify({ username, password }),
         credentials: 'include',
       });
-
       if (response.ok) {
         setMessages(['Password updated successfully']);
         setPassword('');
       } else {
-        const errorData = await response.json(); 
+        const errorData = await response.json();
         const errorMessage = errorData.error || 'Failed to update password';
         setMessages([errorMessage]);
       }
-    } catch (error: any) {
+    } catch (error) {
       setMessages([error.message || 'An error occurred while updating the password']);
     }
   };
@@ -187,11 +170,9 @@ const Dashboard: React.FC = () => {
 
   const Pagination = ({ blogsPerPage, totalBlogs, paginate, currentPage }) => {
     const pageNumbers = [];
-
     for (let i = 1; i <= Math.ceil(totalBlogs / blogsPerPage); i++) {
       pageNumbers.push(i);
     }
-
     return (
       <nav>
         <ul className="pagination">
@@ -207,62 +188,55 @@ const Dashboard: React.FC = () => {
     );
   };
 
-return (
+  return (
     <Layout isAuthenticated={true}>
       <div className="container-fluid">
-      <main className="container">
-        {messages.length > 0 && (
-          <div className="alert alert-danger">
-            <ul className="mb-0">
-              {messages.map((message, index) => (
-                <li key={index}>{message}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        <div id="blogs" className="row">
-          {currentBlogs.map(blog => (
-            <div key={blog.id} className="col-md-6 mb-4">
-              <div className="card">
-                <div className="card-body">
-                  <h4 className="card-title">{blog.title}</h4>
-                  <h6 className="card-subtitle mb-2 text-muted">Created: {blog.created_at}</h6>
-                  <h6 className="card-subtitle mb-2 text-muted">Last update: {blog.updated_at}</h6>
-
-                  <div className="btn-group mt-3" role="group">
-                    <button
-                      onClick={() => handleFavoriteToggle(blog.title, !blog.is_favorite)}
-                      className={`btn ${blog.is_favorite ? 'btn-success' : 'btn-outline-success'}`}
-                    >
-                      {blog.is_favorite ? 'Unfavorite' : 'Mark as Favorite'}
-                    </button>
-                    <button
-                      onClick={() => handlePublishToggle(blog.title, !blog.is_public)}
-                      className={`btn ${blog.is_public ? 'btn-primary' : 'btn-outline-primary'}`}
-                    >
-                      {blog.is_public ? 'Unpublish' : 'Publish'}
-                    </button>
-                  </div>
-
-                  <div className="mt-3">
-                    <Link to={`/blog/edit/${blog.title}`} className="btn btn-warning me-2">Edit</Link>
-                    <Link to={`/blog/${blog.title}`} className="btn btn-info">See Preview</Link>
+        <main className="container">
+          {messages.length > 0 && (
+            <div className="alert alert-danger">
+              <ul className="mb-0">
+                {messages.map((message, index) => (
+                  <li key={index}>{message}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <div id="blogs" className="row">
+            {currentBlogs.map(blog => (
+              <div key={blog.id} className="col-md-6 mb-4">
+                <div className="card">
+                  <div className="card-body">
+                    <h4 className="card-title">{blog.title}</h4>
+                    <h6 className="card-subtitle mb-2 text-muted">Created: {blog.created_at}</h6>
+                    <h6 className="card-subtitle mb-2 text-muted">Last update: {blog.updated_at}</h6>
+                    <div className="btn-group mt-3" role="group">
+                      <button onClick={() => handleFavoriteToggle(blog.title, !blog.is_favorite)}
+                        className={`btn ${blog.is_favorite ? 'btn-success' : 'btn-outline-success'}`}
+                      >
+                        {blog.is_favorite ? 'Unfavorite' : 'Mark as Favorite'}
+                      </button>
+                      <button onClick={() => handlePublishToggle(blog.title, !blog.is_public)}
+                        className={`btn ${blog.is_public ? 'btn-primary' : 'btn-outline-primary'}`}
+                      >
+                        {blog.is_public ? 'Unpublish' : 'Publish'}
+                      </button>
+                    </div>
+                    <div className="mt-3">
+                      <Link to={`/blog/edit/${blog.title}`} className="btn btn-warning me-2">Edit</Link>
+                      <Link to={`/blog/${blog.title}`} className="btn btn-info">See Preview</Link>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-
-        <Pagination
-          blogsPerPage={blogsPerPage}
-          totalBlogs={blogs.filter(blog => !blog.is_deleted).length}
-          paginate={paginate}
-          currentPage={currentPage}
-        />
-      </main>
-
+            ))}
+          </div>
+          <Pagination
+            blogsPerPage={blogsPerPage}
+            totalBlogs={blogs.filter(blog => !blog.is_deleted).length}
+            paginate={paginate}
+            currentPage={currentPage}
+          />
+        </main>
         <div id="deleted-blogs" className="container mb-4">
           <h5>Deleted Blogs</h5>
           {blogs.filter(blog => blog.is_deleted).map(blog => (
@@ -280,7 +254,6 @@ return (
             </div>
           ))}
         </div>
-
         <div className="container mb-4">
           <div id="update-password" className="card">
             <div className="card-body">

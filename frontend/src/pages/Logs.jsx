@@ -1,14 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 
-interface Log {
-  timestamp: string;
-  level: string;
-  message: string;
-}
-
-const Logs: React.FC = () => {
-  const [logs, setLogs] = useState<Log[]>([]);
+const Logs = () => {
+  const [logs, setLogs] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [alert, setAlert] = useState({ show: false, message: '', type: '' });
 
@@ -46,7 +40,7 @@ const Logs: React.FC = () => {
     }
   };
 
-  const handleRemoveLog = async (timestamp: string) => {
+  const handleRemoveLog = async (timestamp) => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/logs/${encodeURIComponent(timestamp)}`, {
         method: 'DELETE',
@@ -56,7 +50,7 @@ const Logs: React.FC = () => {
       if (response.ok) {
         setLogs(prevLogs => prevLogs.filter(log => log.timestamp !== timestamp));
         setAlert({ show: true, message: 'Log successfully removed!', type: 'success' });
-        setTimeout(() => setAlert({ show: false, message: '', type: '' }), 3000); // Hide alert after 3 seconds
+        setTimeout(() => setAlert({ show: false, message: '', type: '' }), 3000);
       } else {
         setAlert({ show: true, message: 'Failed to remove log', type: 'danger' });
         setTimeout(() => setAlert({ show: false, message: '', type: '' }), 3000);

@@ -1,11 +1,10 @@
-import { Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
-import logger from '../utils/logger';
+import logger from '../utils/logger.js';
 
 const logFile = path.join(__dirname, '..', 'logs', 'app.csv');
 
-export const getLogs = (req: Request, res: Response) => {
+export const getLogs = (req, res) => {
   try {
     fs.readFile(logFile, 'utf8', (err, data) => {
       if (err) {
@@ -28,7 +27,7 @@ export const getLogs = (req: Request, res: Response) => {
   }
 };
 
-export const removeLog = (req: Request, res: Response) => {
+export const removeLog = (req, res) => {
   try {
     const { timestamp } = req.params;
     fs.readFile(logFile, 'utf8', (err, data) => {

@@ -1,14 +1,13 @@
-import { Request, Response } from 'express';
-import { db } from '../models/db';
+import { db } from '../models/db.js';
 import bcrypt from 'bcrypt';
-import { userRegisterValidator, userLoginValidator, passwordValidator } from '../utils/validators';
+import { userRegisterValidator, userLoginValidator, passwordValidator } from '../utils/validators.js';
 import jwt from 'jsonwebtoken';
-import logger from '../utils/logger';
-import { addToken, removeToken, isTokenValid } from '../utils/tokenWhitelist';
+import logger from '../utils/logger.js';
+import { addToken, removeToken, isTokenValid } from '../utils/tokenWhitelist.js';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-export const register = async (req: Request, res: Response) => {
+export const register = async (req, res) => {
   try {
     const errors = await userRegisterValidator(req.body);
     if (Object.keys(errors).length > 0) {
@@ -32,7 +31,7 @@ export const register = async (req: Request, res: Response) => {
   }
 };
 
-export const login = async (req: Request, res: Response) => {
+export const login = async (req, res) => {
   const errors = await userLoginValidator(req.body);
   if (Object.keys(errors).length > 0) {
     return res.status(400).json({ errors });
@@ -50,14 +49,12 @@ export const login = async (req: Request, res: Response) => {
     }
     const match = await bcrypt.compare(password, user.password);
     if (match) {
-      // Create JWT token
       const token = jwt.sign(
         { userId: user.id, username: user.username },
         JWT_SECRET,
         { expiresIn: '1h' }
       );
 
-      // Add token to whitelist
       addToken(token);
 
       res.cookie('token', token, {
@@ -79,7 +76,7 @@ export const login = async (req: Request, res: Response) => {
   });
 };
 
-export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
+export const authenticateToken = (req, res, next) => {
   const token = req.cookies.token;
 
   if (!token) {
@@ -87,7 +84,7 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
     return res.status(401).json({ error: 'Authentication required' });
   }
 
-  jwt.verify(token, JWT_SECRET, (err: any, user: any) => {
+  jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
       logger.warn(`Failed token authentication: ${err.message}`);
       return res.status(403).json({ error: 'Invalid or expired token' });
@@ -98,11 +95,11 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
   });
 };
 
-export const logout = (req: Request, res: Response) => {
+export const logout = (req, res) => {
   const token = req.cookies.token;
 
   if (token) {
-    removeToken(token);  // Remove token from whitelist
+    removeToken(token);
 
     res.clearCookie('token', { 
       httpOnly: true, 
@@ -115,7 +112,7 @@ export const logout = (req: Request, res: Response) => {
   res.json({ message: 'Logged out successfully' });
 };
 
-export const updatePassword = async (req: Request, res: Response) => {
+export const updatePassword = async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || username.trim() === '') {
@@ -153,8 +150,7 @@ export const updatePassword = async (req: Request, res: Response) => {
   }
 };
 
-
-export const getUsername = (req: Request, res: Response) => {
+export const getUsername = (req, res) => {
   const token = req.cookies.token;
 
   if (!token) {
@@ -162,7 +158,7 @@ export const getUsername = (req: Request, res: Response) => {
     return res.status(401).json({ error: 'Authentication required' });
   }
 
-  jwt.verify(token, JWT_SECRET, (err: any, decoded: any) => {
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) {
       logger.warn(`Token verification failed: ${err.message}`);
       return res.status(403).json({ error: 'Invalid or expired token' });

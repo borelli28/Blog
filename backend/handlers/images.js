@@ -1,9 +1,8 @@
-import { Request, Response } from 'express';
-import { db } from '../models/db';
+import { db } from '../models/db.js';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
-import logger from '../utils/logger';
+import logger from '../utils/logger.js';
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -16,7 +15,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-export const uploadArticleImage = (req: Request, res: Response) => {
+export const uploadArticleImage = (req, res) => {
   upload.single('image')(req, res, function (err) {
     if (err instanceof multer.MulterError) {
       logger.error(`Multer error during article image upload: ${err.message}`);
@@ -70,7 +69,7 @@ export const uploadArticleImage = (req: Request, res: Response) => {
   });
 };
 
-export const uploadImage = (req: Request, res: Response) => {
+export const uploadImage = (req, res) => {
   upload.single('image')(req, res, function (err) {
     if (err instanceof multer.MulterError) {
       logger.error(`Multer error during image upload: ${err.message}`);
@@ -104,7 +103,7 @@ export const uploadImage = (req: Request, res: Response) => {
   });
 };
 
-export const updateAltValues = (req: Request, res: Response) => {
+export const updateAltValues = (req, res) => {
   const { id, description } = req.body;
   db.run('UPDATE images SET description = ? WHERE id = ?', [description, id], function(err) {
     if (err) {
@@ -115,10 +114,9 @@ export const updateAltValues = (req: Request, res: Response) => {
   });
 };
 
-export const deleteImage = (req: Request, res: Response) => {
+export const deleteImage = (req, res) => {
   const { id } = req.body;
 
-  // Get the image filename from DB
   db.get('SELECT image FROM images WHERE id = ?', [id], (err, row) => {
     if (err) {
       logger.error(`Database error while fetching image for deletion: ${err.message}`);
@@ -132,20 +130,17 @@ export const deleteImage = (req: Request, res: Response) => {
     const filename = row.image;
     const filePath = path.join(__dirname, '..', 'uploads', filename);
 
-    // Delete the file from the filesystem
     fs.unlink(filePath, (unlinkErr) => {
       if (unlinkErr) {
         logger.error(`Error deleting file from filesystem: ${unlinkErr.message}`);
       }
 
-      // Delete the image record from DB
       db.run('DELETE FROM images WHERE id = ?', [id], function(deleteErr) {
         if (deleteErr) {
           logger.error(`Database error while deleting image: ${deleteErr.message}`);
           return res.status(500).json({ error: deleteErr.message });
         }
 
-        // If this is an article image, update the blog_posts table
         db.run('UPDATE blog_posts SET article_img = NULL WHERE article_img = ?', [filename], function(updateErr) {
           if (updateErr) {
             logger.error(`Error updating blog_posts after image deletion: ${updateErr.message}`);
