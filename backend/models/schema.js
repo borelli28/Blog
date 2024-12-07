@@ -1,5 +1,4 @@
 import { db } from './db';
-import { v4 as uuidv4 } from 'uuid';
 
 export const initializeSchema = () => {
   db.serialize(() => {
@@ -36,18 +35,4 @@ export const initializeSchema = () => {
       FOREIGN KEY (blog_id) REFERENCES blog_posts(id)
     )`);
   });
-};
-
-
-export const createBlogPost = (title, articleImg, description, content, authorId, isFavorite = false, isPublic = false) => {
-  const id = uuidv4();
-  db.run(`INSERT INTO blog_posts (id, title, article_img, description, content, author_id, is_favorite, is_public) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, 
-    [id, title, articleImg, description, content, authorId, isFavorite, isPublic], 
-    (err) => {
-      if (err) {
-        console.error('Error inserting blog post:', err.message);
-      } else {
-        console.log('Blog post created successfully with ID:', id);
-      }
-    });
 };
