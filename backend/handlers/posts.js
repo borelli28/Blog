@@ -13,8 +13,8 @@ export const getAllPosts = (req, res) => {
 };
 
 export const getPost = (req, res) => {
-  const title = req.params.title;
-  db.get('SELECT * FROM blog_posts WHERE title = ? AND is_deleted = 0', [title], (err, row) => {
+  const id = req.params.id;
+  db.get('SELECT * FROM blog_posts WHERE id = ? AND is_deleted = 0', [id], (err, row) => {
     if (err) {
       logger.error(`Failed to get blog post: ${err.message}`);
       res.status(500).json({ error: err.message });
@@ -46,14 +46,17 @@ export const createPost = (req, res) => {
 
 export const updatePost = (req, res) => {
   const { title, description, content } = req.body;
-  const oldTitle = req.params.title;
-  db.run('UPDATE blog_posts SET title = ?, description = ?, content = ? WHERE title = ?',
-    [title, description, content, oldTitle],
+  const id = req.params.id;
+  db.run('UPDATE blog_posts SET title = ?, description = ?, content = ? WHERE id = ?',
+    [title, description, content, id],
     function(err) {
       if (err) {
         logger.error(`Failed to update blog post: ${err.message}`);
         res.status(500).json({ error: err.message });
         return;
+      }
+      if (this.changes === 0) {
+        return res.status(404).json({ message: 'Post not found' });
       }
       res.json({ changes: this.changes });
     }
@@ -61,20 +64,20 @@ export const updatePost = (req, res) => {
 };
 
 export const recoverPost = (req, res) => {
-  const { title } = req.params;
-  db.run('UPDATE blog_posts SET is_deleted = 0 WHERE title = ?', [title], function(err) {
+  const { id } = req.params;
+  db.run('UPDATE blog_posts SET is_deleted = 0 WHERE id = ?', [id], function(err) {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
     }
-    logger.info(`Blog post recovered: ${title}`);
+    logger.info(`Blog post recovered: ${id}`);
     res.json({ changes: this.changes });
   });
 };
 
 export const updatePostStatus = (req, res) => {
   const { is_favorite, is_public } = req.body;
-  const title = req.params.title;
+  const id = req.params.id;
 
   let updateFields = [];
   let params = [];
@@ -91,8 +94,8 @@ export const updatePostStatus = (req, res) => {
     return res.status(400).json({ error: 'No valid fields to update' });
   }
 
-  const sql = `UPDATE blog_posts SET ${updateFields.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE title = ?`;
-  params.push(title);
+  const sql = `UPDATE blog_posts SET ${updateFields.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`;
+  params.push(id);
 
   db.run(sql, params, function(err) {
     if (err) {
@@ -108,13 +111,13 @@ export const updatePostStatus = (req, res) => {
 };
 
 export const deletePost = (req, res) => {
-  const { title } = req.params;
-  db.run('UPDATE blog_posts SET is_deleted = 1 WHERE title = ?', [title], function(err) {
+  const { id } = req.params;
+  db.run('UPDATE blog_posts SET is_deleted = 1 WHERE id = ?', [id], function(err) {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
     }
-    logger.info(`Blog post deleted: ${title}`);
+    logger.info(`Blog post deleted: ${id}`);
     res.json({ changes: this.changes });
   });
 };
@@ -133,8 +136,8 @@ export const permanentDeletePost = (req, res) => {
 };
 
 export const getPostImages = (req, res) => {
-  const title = req.params.title;
-  db.get('SELECT id FROM blog_posts WHERE title = ? AND is_deleted = 0', [title], (err, row) => {
+  const id = req.params.id;
+  db.get('SELECT id FROM blog_posts WHERE id = ? AND is_deleted = 0', [id], (err, row) => {
     if (err) {
       return res.status(500).json({ error: err.message });
     }
