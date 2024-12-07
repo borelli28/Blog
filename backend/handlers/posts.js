@@ -30,18 +30,17 @@ export const getPost = (req, res) => {
 };
 
 export const createPost = (req, res) => {
-  const { title, description, content, author_id, article_img, is_favorite, is_public } = req.body;
+  const { title, description, content, author_id } = req.body;
   const id = uuidv4();
-  db.run(`INSERT INTO blog_posts (id, title, article_img, description, content, author_id, is_favorite, is_public) 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [id, title, article_img, description, content, author_id, is_favorite || false, is_public || false],
+  db.run('INSERT INTO blog_posts (id, title, description, content, author_id) VALUES (?, ?, ?, ?, ?)',
+    [id, title, description, content, author_id],
     function(err) {
       if (err) {
         logger.error(`Failed to create blog post: ${err.message}`);
         res.status(500).json({ error: err.message });
         return;
       }
-      logger.info(`Blog post created successfully with ID: ${id}`);
+      logger.info(`Blog post created: ${title}`);
       res.status(201).json({ id: id });
     }
   );
