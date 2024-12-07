@@ -1,5 +1,6 @@
 import { db } from '../models/db.js';
 import logger from '../utils/logger.js';
+import { v4 as uuidv4 } from 'uuid';
 
 export const getAllPosts = (req, res) => {
   db.all('SELECT * FROM blog_posts WHERE is_deleted = 0 ORDER BY created_at DESC', (err, rows) => {
@@ -29,17 +30,19 @@ export const getPost = (req, res) => {
 };
 
 export const createPost = (req, res) => {
-  const { title, description, content, author_id } = req.body;
-  db.run('INSERT INTO blog_posts (title, description, content, author_id) VALUES (?, ?, ?, ?)',
-    [title, description, content, author_id],
+  const { title, description, content, author_id, article_img, is_favorite, is_public } = req.body;
+  const id = uuidv4();
+  db.run(`INSERT INTO blog_posts (id, title, article_img, description, content, author_id, is_favorite, is_public) 
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [id, title, article_img, description, content, author_id, is_favorite || false, is_public || false],
     function(err) {
       if (err) {
         logger.error(`Failed to create blog post: ${err.message}`);
         res.status(500).json({ error: err.message });
         return;
       }
-      logger.info(`Blog post created: ${title}`);
-      res.status(201).json({ id: this.lastID });
+      logger.info(`Blog post created successfully with ID: ${id}`);
+      res.status(201).json({ id: id });
     }
   );
 };
