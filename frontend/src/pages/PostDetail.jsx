@@ -5,12 +5,12 @@ import '../styles/Blog.css';
 
 const PostDetail = () => {
   const [blog, setBlog] = useState(null);
-  const { title } = useParams();
+  const { id } = useParams();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const fetchBlog = async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(title)}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(id)}`, {
         credentials: 'include',
       });
       const data = await response.json();
@@ -30,7 +30,7 @@ const PostDetail = () => {
     };
     fetchBlog();
     checkAuth();
-  }, [title]);
+  }, [id]);
 
   if (!blog) return <div>Loading...</div>;
 
@@ -58,7 +58,7 @@ const PostDetail = () => {
         <div id="content" dangerouslySetInnerHTML={{ __html: blog.content }} />
       </article>
       {isAuthenticated && (
-        <Link to={`/blog/edit/${encodeURIComponent(blog.title)}`} className="btn btn-warning">Edit Post</Link>
+        <Link to={`/blog/edit/${encodeURIComponent(blog.id)}`} className="btn btn-warning">Edit Post</Link>
       )}
     </Layout>
   );

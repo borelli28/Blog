@@ -64,7 +64,7 @@ const Home = () => {
                 blogs.map((blog) => (
                   <div className="row" key={blog.title}>
                     <div className="card hoverable">
-                      <Link to={`/blog/${encodeURIComponent(blog.title)}`}>
+                      <Link to={`/blog/${encodeURIComponent(blog.id)}`}>
                         <div className="card-content grey darken-3">
                           <span className="card-title">{blog.title}</span>
                           <p>{blog.description}</p>
