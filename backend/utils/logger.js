@@ -76,7 +76,7 @@ const cefFormat = winston.format.printf(({ level, message, timestamp, ...meta })
 const logger = winston.createLogger({
   level: 'info',
   format: winston.format.combine(
-    winston.format.timestamp({ format: 'yyyy-MM-ddTHH:mm:ss.SSSZ' }),
+    winston.format.timestamp({ format: 'YYYY-MM-DDTHH:mm:ss.SSSZ' }),
     cefFormat
   ),
   transports: [
