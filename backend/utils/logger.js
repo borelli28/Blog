@@ -9,9 +9,20 @@ const DEVICE_VERSION = '1.0';
 
 const EVENT_SIGNATURES = {
   'Blog post created': { signatureId: '1001', severity: '3' },
-  'User logged in': { signatureId: '1002', severity: '5' },
-  'User logged out': { signatureId: '1003', severity: '3' },
-  'Authentication attempt with no token': { signatureId: '1004', severity: '4' },
+  'Blog post recovered': { signatureId: '1002', severity: '3' },
+  'Blog post deleted': { signatureId: '1003', severity: '3' },
+  'User logged in': { signatureId: '1004', severity: '5' },
+  'User logged out': { signatureId: '1005', severity: '3' },
+  'Authentication attempt with no token': { signatureId: '1006', severity: '4' },
+  'Blog post updated': { signatureId: '1007', severity: '3' },
+  'Blog post status updated': { signatureId: '1008', severity: '3' },
+  'Blog post permanently deleted': { signatureId: '1009', severity: '4' },
+  'Blog post retrieved': { signatureId: '1010', severity: '1' },
+  'All blog posts retrieved': { signatureId: '1011', severity: '1' },
+  'Post images retrieved': { signatureId: '1012', severity: '1' },
+  'Featured posts retrieved': { signatureId: '1013', severity: '1' },
+  'Published posts retrieved': { signatureId: '1014', severity: '1' },
+  'All posts including deleted retrieved': { signatureId: '1015', severity: '2' },
 };
 
 // Create logs directory if it doesn't exist
