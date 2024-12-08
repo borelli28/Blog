@@ -3,6 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import logger from '../utils/logger.js';
+import { getUsernameFromToken } from '../utils/getUsernameFromToken.js';
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -15,23 +16,43 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-export const uploadArticleImage = (req, res) => {
+const getUsername = async (req, res, next) => {
+  const token = req.cookies.token;
+  try {
+    req.username = await getUsernameFromToken(token);
+  } catch (error) {
+    req.username = 'anonymous';
+  }
+  next();
+};
+
+export const uploadArticleImage = [getUsername, (req, res) => {
   upload.single('image')(req, res, function (err) {
     if (err instanceof multer.MulterError) {
-      logger.error(`Multer error during article image upload: ${err.message}`);
+      logger.error(`Failed to upload article image`, {
+        error: err.message,
+        stack: err.stack,
+        username: req.username,
+      });
       return res.status(500).json({ error: err.message });
     } else if (err) {
-      logger.error(`Error during article image upload: ${err.message}`);
+      logger.error(`Failed to upload article image`, {
+        error: err.message,
+        stack: err.stack,
+        username: req.username,
+      });
       return res.status(500).json({ error: err.message });
     }
 
     const file = req.file;
     if (!file) {
+      logger.infoWithMeta('Article image upload failed', 'No file uploaded', { username: req.username });
       return res.status(400).json({ error: 'Please upload a file' });
     }
 
     const { description, blog_id } = req.body;
     if (!description || !blog_id) {
+      logger.infoWithMeta('Article image upload failed', 'Missing description or blog_id', { username: req.username });
       return res.status(400).json({ error: 'Missing description or blog_id' });
     }
 
@@ -42,7 +63,11 @@ export const uploadArticleImage = (req, res) => {
         [file.filename, description, blog_id],
         function(err) {
           if (err) {
-            logger.error(`Database error during article image upload: ${err.message}`);
+            logger.error(`Failed to insert article image`, {
+              error: err.message,
+              stack: err.stack,
+              username: req.username,
+            });
             db.run('ROLLBACK');
             return res.status(500).json({ error: err.message });
           }
@@ -53,39 +78,53 @@ export const uploadArticleImage = (req, res) => {
             [file.filename, blog_id],
             function(err) {
               if (err) {
-                logger.error(`Database error updating blog_posts during article image upload: ${err.message}`);
+                logger.error(`Failed to update blog post with article image`, {
+                  error: err.message,
+                  stack: err.stack,
+                  username: req.username,
+                });
                 db.run('ROLLBACK');
                 return res.status(500).json({ error: err.message });
               }
 
               db.run('COMMIT');
+              logger.infoWithMeta('Article image uploaded', file.filename, { username: req.username, imageId, blogId: blog_id });
               res.status(201).json({ id: imageId, filename: file.filename });
-              logger.info(`Article image uploaded successfully: ${file.filename}`);
             }
           );
         }
       );
     });
   });
-};
+}];
 
-export const uploadImage = (req, res) => {
+export const uploadImage = [getUsername, (req, res) => {
   upload.single('image')(req, res, function (err) {
     if (err instanceof multer.MulterError) {
-      logger.error(`Multer error during image upload: ${err.message}`);
+      logger.error(`Failed to upload image`, {
+        error: err.message,
+        stack: err.stack,
+        username: req.username,
+      });
       return res.status(500).json({ error: err.message });
     } else if (err) {
-      logger.error(`Error during image upload: ${err.message}`);
+      logger.error(`Failed to upload image`, {
+        error: err.message,
+        stack: err.stack,
+        username: req.username,
+      });
       return res.status(500).json({ error: err.message });
     }
 
     const file = req.file;
     if (!file) {
+      logger.infoWithMeta('Image upload failed', 'No file uploaded', { username: req.username });
       return res.status(400).json({ error: 'Please upload a file' });
     }
 
     const { description, blog_id } = req.body;
     if (!description || !blog_id) {
+      logger.infoWithMeta('Image upload failed', 'Missing description or blog_id', { username: req.username });
       return res.status(400).json({ error: 'Missing description or blog_id' });
     }
 
@@ -93,37 +132,50 @@ export const uploadImage = (req, res) => {
       [file.filename, description, blog_id],
       function(err) {
         if (err) {
-          logger.error(`Database error during image upload: ${err.message}`);
+          logger.error(`Failed to insert image`, {
+            error: err.message,
+            stack: err.stack,
+            username: req.username,
+          });
           return res.status(500).json({ error: err.message });
         }
+        logger.infoWithMeta('Image uploaded', file.filename, { username: req.username, imageId: this.lastID, blogId: blog_id });
         res.status(201).json({ id: this.lastID, filename: file.filename });
-        logger.info(`Image uploaded successfully: ${file.filename}`);
       }
     );
   });
-};
+}];
 
-export const updateAltValues = (req, res) => {
+export const updateAltValues = [getUsername, (req, res) => {
   const { id, description } = req.body;
   db.run('UPDATE images SET description = ? WHERE id = ?', [description, id], function(err) {
     if (err) {
-      logger.error(`Error updating image alt text: ${err.message}`);
+      logger.error(`Failed to update image alt text`, {
+        error: err.message,
+        stack: err.stack,
+        username: req.username,
+      });
       return res.status(500).json({ error: err.message });
     }
+    logger.infoWithMeta('Image alt text updated', id, { username: req.username });
     res.json({ changes: this.changes });
   });
-};
+}];
 
-export const deleteImage = (req, res) => {
+export const deleteImage = [getUsername, (req, res) => {
   const { id } = req.body;
 
   db.get('SELECT image FROM images WHERE id = ?', [id], (err, row) => {
     if (err) {
-      logger.error(`Database error while fetching image for deletion: ${err.message}`);
+      logger.error(`Failed to fetch image for deletion`, {
+        error: err.message,
+        stack: err.stack,
+        username: req.username,
+      });
       return res.status(500).json({ error: err.message });
     }
     if (!row) {
-      logger.warn(`Attempt to delete non-existent image with id: ${id}`);
+      logger.infoWithMeta('Image not found for deletion', id, { username: req.username });
       return res.status(404).json({ error: 'Image not found' });
     }
 
@@ -132,28 +184,44 @@ export const deleteImage = (req, res) => {
 
     fs.unlink(filePath, (unlinkErr) => {
       if (unlinkErr) {
-        logger.error(`Error deleting file from filesystem: ${unlinkErr.message}`);
+        logger.error(`Failed to delete file from filesystem`, {
+          error: unlinkErr.message,
+          stack: unlinkErr.stack,
+          username: req.username,
+        });
       }
 
       db.run('DELETE FROM images WHERE id = ?', [id], function(deleteErr) {
         if (deleteErr) {
-          logger.error(`Database error while deleting image: ${deleteErr.message}`);
+          logger.error(`Failed to delete image from database`, {
+            error: deleteErr.message,
+            stack: deleteErr.stack,
+            username: req.username,
+          });
           return res.status(500).json({ error: deleteErr.message });
         }
 
         db.run('UPDATE blog_posts SET article_img = NULL WHERE article_img = ?', [filename], function(updateErr) {
           if (updateErr) {
-            logger.error(`Error updating blog_posts after image deletion: ${updateErr.message}`);
+            logger.error(`Failed to update blog posts after image deletion`, {
+              error: updateErr.message,
+              stack: updateErr.stack,
+              username: req.username,
+            });
           }
 
+          logger.infoWithMeta('Image deleted', filename, { 
+            username: req.username, 
+            imageId: id, 
+            fileDeleted: !unlinkErr 
+          });
           res.json({ 
             message: 'Image deleted successfully', 
             changes: this.changes,
             fileDeleted: !unlinkErr
           });
-          logger.info(`Image deleted successfully: ${filename}`);
         });
       });
     });
   });
-};
+}];
