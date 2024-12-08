@@ -4,10 +4,11 @@ import { userRegisterValidator, userLoginValidator, passwordValidator } from '..
 import jwt from 'jsonwebtoken';
 import logger from '../utils/logger.js';
 import { addToken, removeToken, isTokenValid } from '../utils/tokenWhitelist.js';
+import { getUsernameFromToken } from '../utils/getUsernameFromToken.js';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-const getUsername = async (req, res, next) => {
+const getUserUsername = async (req, res, next) => {
   const token = req.cookies.token;
   try {
     req.username = await getUsernameFromToken(token);
@@ -37,7 +38,7 @@ export const register = async (req, res) => {
         });
         return res.status(500).json({ error: err.message });
       }
-      logger.infoWithMeta('User registered', username, { userId: this.lastID });
+      logger.infoWithMeta('User registered', this.lastID, { username: username });
       res.status(201).json({ id: this.lastID });
     });
   } catch (error) {
@@ -67,7 +68,7 @@ export const login = async (req, res) => {
       return res.status(500).json({ error: err.message });
     }
     if (!user) {
-      logger.infoWithMeta('Login failed', 'User not found', { username });
+      logger.infoWithMeta('Login failed', 'User not found', { username: username });
       return res.status(400).json({ error: 'Invalid username or password' });
     }
     const match = await bcrypt.compare(password, user.password);
@@ -87,13 +88,13 @@ export const login = async (req, res) => {
         maxAge: 3600000 // 1 hour
       });
 
-      logger.infoWithMeta('User logged in', { username });
+      logger.infoWithMeta('User logged in', '', { username: username });
       res.json({ 
         message: 'Logged in successfully', 
         userId: user.id
       });
     } else {
-      logger.infoWithMeta('Login failed', 'Invalid password', { username });
+      logger.infoWithMeta('Login failed', 'Invalid password', { username: username });
       res.status(400).json({ error: 'Invalid username or password' });
     }
   });
@@ -118,28 +119,28 @@ export const authenticateToken = (req, res, next) => {
   });
 };
 
-export const logout = (req, res) => {
+export const logout = [getUserUsername, (req, res) => {
   const token = req.cookies.token;
+  const username = req.username;
 
   if (token) {
     removeToken(token);
-
-    res.clearCookie('token', { 
-      httpOnly: true, 
+    res.clearCookie('token', {
+      httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict' 
+      sameSite: 'strict'
     });
   }
 
-  logger.infoWithMeta('User logged out', req.user?.username);
+  logger.infoWithMeta('User logged out', '', { username: username });
   res.json({ message: 'Logged out successfully' });
-};
+}];
 
 export const updatePassword = async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || username.trim() === '') {
-    logger.infoWithMeta('Password update failed', 'Username is required');
+    logger.infoWithMeta('Password update failed', 'Username is required', { username: username });
     return res.status(400).json({ error: 'Username is required' });
   }
 
