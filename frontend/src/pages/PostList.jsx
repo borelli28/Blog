@@ -39,7 +39,7 @@ const PostList = () => {
         {blogs.map((blog) => (
           <div className="row" key={blog.title}>
             <div className="card hoverable grey darken-3">
-              <Link to={`/blog/${encodeURIComponent(blog.title)}`} className="card-content white-text">
+              <Link to={`/blog/${encodeURIComponent(blog.id)}`} className="card-content white-text">
                 <span className="card-title">{blog.title}</span>
                 <p>{blog.description}</p>
               </Link>

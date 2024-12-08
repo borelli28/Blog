@@ -6,7 +6,7 @@ import 'easymde/dist/easymde.min.css';
 import '../styles/CreatePost.css';
 
 const EditPost = () => {
-  const { title } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const [blog, setBlog] = useState(null);
   const [images, setImages] = useState([]);
@@ -17,14 +17,14 @@ const EditPost = () => {
   useEffect(() => {
     const fetchBlogAndImages = async () => {
       try {
-        const blogResponse = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(title)}`, {
+        const blogResponse = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(id)}`, {
           credentials: 'include',
         });
         if (blogResponse.ok) {
           const blogData = await blogResponse.json();
           setBlog(blogData);
 
-          const imagesResponse = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(title)}/images`, {
+          const imagesResponse = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(id)}/images`, {
             credentials: 'include',
           });
           if (imagesResponse.ok) {
@@ -57,7 +57,7 @@ const EditPost = () => {
 
     fetchBlogAndImages();
     checkAuth();
-  }, [title]);
+  }, [id]);
 
   useEffect(() => {
     if (editorRef.current) {
@@ -80,7 +80,7 @@ const EditPost = () => {
     };
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(title)}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(id)}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -101,7 +101,7 @@ const EditPost = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(title)}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(id)}`, {
         method: 'DELETE',
         credentials: 'include',
       });
@@ -279,7 +279,7 @@ const EditPost = () => {
 
           <div id="actions">
             <button
-              onClick={() => navigate(`/blog/${encodeURIComponent(blog.title)}`)}
+              onClick={() => navigate(`/blog/${encodeURIComponent(blog.id)}`)}
               className="btn btn-info"
             >
               See Preview

@@ -11,7 +11,7 @@ export const initializeSchema = () => {
     )`);
 
     db.run(`CREATE TABLE IF NOT EXISTS blog_posts (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id TEXT PRIMARY KEY NOT NULL,
       title TEXT NOT NULL,
       article_img TEXT,
       description TEXT,
@@ -29,7 +29,7 @@ export const initializeSchema = () => {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       image TEXT NOT NULL,
       description TEXT,
-      blog_id INTEGER,
+      blog_id TEXT,
       uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (blog_id) REFERENCES blog_posts(id)
