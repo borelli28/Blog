@@ -23,6 +23,13 @@ const EVENT_SIGNATURES = {
   'Featured posts retrieved': { signatureId: '1013', severity: '1' },
   'Published posts retrieved': { signatureId: '1014', severity: '1' },
   'All posts including deleted retrieved': { signatureId: '1015', severity: '2' },
+  'Article image uploaded': { signatureId: '2001', severity: '3' },
+  'Image uploaded': { signatureId: '2002', severity: '3' },
+  'Image alt text updated': { signatureId: '2003', severity: '2' },
+  'Image deleted': { signatureId: '2004', severity: '3' },
+  'Article image upload failed': { signatureId: '2005', severity: '4' },
+  'Image upload failed': { signatureId: '2006', severity: '4' },
+  'Image not found for deletion': { signatureId: '2007', severity: '4' },
 };
 
 // Create logs directory if it doesn't exist
