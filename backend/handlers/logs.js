@@ -15,6 +15,16 @@ const getUsername = async (req, res, next) => {
   next();
 };
 
+// FORMAT OF LOGS:
+//
+// CEF Version: 0
+// Device Vendor: Borelli28
+// Device Product: Blog
+// Device Version: 1.0
+// Signature ID: 4001
+// Name: Logs retrieved
+// Severity: 1
+// Extension: rt=yyyy-12-06T21:35:00.650-05:00 level=info username="admin"
 export const getLogs = [getUsername, (req, res) => {
   try {
     fs.readFile(logFile, 'utf8', (err, data) => {
@@ -29,26 +39,35 @@ export const getLogs = [getUsername, (req, res) => {
 
       // Parse CEF log data
       const logs = data.split('\n').filter(Boolean).map(line => {
-        const [header, extension] = line.split('|');
-        const [, , , , signatureId, name, severity] = header.split(':')[1].split('|');
-        
-        const extensionParts = extension.split(' ');
-        const extensionObj = {};
-        extensionParts.forEach(part => {
-          const [key, value] = part.split('=');
-          extensionObj[key] = value;
-        });
+        // Split the line into parts
+        const parts = line.split('|');
+        // Destructure the first 7 parts of the CEF log
+        const [cefVersion, vendor, product, productVersion, signatureId, name, severity] = parts;
+        // The extension is the 8th part (index 7)
+        const extension = parts[7];
+        const extensionObjects = {};
+
+        if (extension) {
+          // Split the extension by spaces and process each part
+          extension.trim().split(' ').forEach(part => {
+            // Split each part into key value pars
+            const [key, value] = part.split('=');
+            // Remove surrounding quotes from value if present
+            extensionObjects[key] = value.replace(/^"(.*)"$/, '$1');
+          });
+        }
 
         return {
-          timestamp: extensionObj.rt,
-          level: extensionObj.level,
-          name,
-          signatureId,
-          severity,
-          ...extensionObj
+          timestamp: extensionObjects.rt || '',
+          level: extensionObjects.level || '',
+          name: name || '',
+          signatureId: signatureId || '',
+          severity: severity || '',
+          username: extensionObjects.username || 'None'
         };
       });
 
+      logger.infoWithMeta('Logs retrieved', '', { username: req.username });
       res.json(logs);
     });
   } catch (error) {
