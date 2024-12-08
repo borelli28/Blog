@@ -7,6 +7,16 @@ import { addToken, removeToken, isTokenValid } from '../utils/tokenWhitelist.js'
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
+const getUsername = async (req, res, next) => {
+  const token = req.cookies.token;
+  try {
+    req.username = await getUsernameFromToken(token);
+  } catch (error) {
+    req.username = 'anonymous';
+  }
+  next();
+};
+
 export const register = async (req, res) => {
   try {
     const errors = await userRegisterValidator(req.body);
