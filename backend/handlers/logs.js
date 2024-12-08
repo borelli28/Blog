@@ -52,8 +52,13 @@ export const getLogs = [getUsername, (req, res) => {
           extension.trim().split(' ').forEach(part => {
             // Split each part into key value pars
             const [key, value] = part.split('=');
-            // Remove surrounding quotes from value if present
-            extensionObjects[key] = value.replace(/^"(.*)"$/, '$1');
+            if (value) {
+              if (value.startsWith('"') && value.endsWith('"')) { // Remove surrounding quotes from value
+                  extensionObjects[key] = value.slice(1, -1);
+              } else {
+                  extensionObjects[key] = value;
+              }
+            }
           });
         }
 
