@@ -30,6 +30,15 @@ const EVENT_SIGNATURES = {
   'Article image upload failed': { signatureId: '2005', severity: '4' },
   'Image upload failed': { signatureId: '2006', severity: '4' },
   'Image not found for deletion': { signatureId: '2007', severity: '4' },
+  'User registered': { signatureId: '3001', severity: '3' },
+  'User logged in': { signatureId: '3002', severity: '3' },
+  'User logged out': { signatureId: '3003', severity: '3' },
+  'Password updated': { signatureId: '3004', severity: '3' },
+  'Username fetched': { signatureId: '3005', severity: '1' },
+  'Login failed': { signatureId: '3006', severity: '4' },
+  'Authentication failed': { signatureId: '3007', severity: '4' },
+  'Password update failed': { signatureId: '3008', severity: '4' },
+  'Username fetch failed': { signatureId: '3009', severity: '4' },
 };
 
 // Create logs directory if it doesn't exist
