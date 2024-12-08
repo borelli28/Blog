@@ -76,7 +76,10 @@ const Logs = () => {
             <tr>
               <th scope="col">Timestamp</th>
               <th scope="col">Level</th>
-              <th scope="col">Message</th>
+              <th scope="col">Event Name</th>
+              <th scope="col">Signature ID</th>
+              <th scope="col">Severity</th>
+              <th scope="col">Details</th>
               <th scope="col">Actions</th>
             </tr>
           </thead>
@@ -85,7 +88,18 @@ const Logs = () => {
               <tr key={index}>
                 <td>{log.timestamp}</td>
                 <td>{log.level}</td>
-                <td>{log.message}</td>
+                <td>{log.name}</td>
+                <td>{log.signatureId}</td>
+                <td>{log.severity}</td>
+                <td>
+                  {Object.entries(log)
+                    .filter(([key]) => !['timestamp', 'level', 'name', 'signatureId', 'severity', 'rt'].includes(key))
+                    .map(([key, value]) => (
+                      <div key={key}>
+                        <strong>{key}:</strong> {value}
+                      </div>
+                    ))}
+                </td>
                 <td>
                   <button className="btn btn-danger" onClick={() => handleRemoveLog(log.timestamp)}>Remove</button>
                 </td>
