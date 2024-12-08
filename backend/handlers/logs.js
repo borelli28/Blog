@@ -105,7 +105,6 @@ export const removeLog = [getUsername, (req, res) => {
           });
           return res.status(500).json({ error: 'Failed to remove log entry' });
         }
-        logger.infoWithMeta('Log entry removed', timestamp, { username: req.username });
         res.json({ message: 'Log entry removed successfully' });
       });
     });
