@@ -77,7 +77,7 @@ export const login = async (req, res) => {
         maxAge: 3600000 // 1 hour
       });
 
-      logger.infoWithMeta('User logged in', username, { userId: user.id });
+      logger.infoWithMeta('User logged in', { username });
       res.json({ 
         message: 'Logged in successfully', 
         userId: user.id
@@ -116,7 +116,7 @@ export const logout = (req, res) => {
 
     res.clearCookie('token', { 
       httpOnly: true, 
-      secure: process.env.NODE_ENV === 'production', 
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict' 
     });
   }
