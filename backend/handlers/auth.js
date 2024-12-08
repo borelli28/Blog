@@ -11,6 +11,7 @@ export const register = async (req, res) => {
   try {
     const errors = await userRegisterValidator(req.body);
     if (Object.keys(errors).length > 0) {
+      logger.infoWithMeta('User registration failed', 'Validation errors', { errors });
       return res.status(400).json({ errors });
     }
 
@@ -19,14 +20,21 @@ export const register = async (req, res) => {
 
     db.run('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword], function(err) {
       if (err) {
-        logger.error(`Error registering new user: ${err.message}`);
+        logger.error(`Failed to register new user`, {
+          error: err.message,
+          stack: err.stack,
+          username,
+        });
         return res.status(500).json({ error: err.message });
       }
-      logger.info(`New user registered: ${username}`);
+      logger.infoWithMeta('User registered', username, { userId: this.lastID });
       res.status(201).json({ id: this.lastID });
     });
   } catch (error) {
-    logger.error(`Unexpected error during user registration: ${error}`);
+    logger.error(`Unexpected error during user registration`, {
+      error: error.message,
+      stack: error.stack,
+    });
     res.status(500).json({ error: 'An unexpected error occurred' });
   }
 };
@@ -34,17 +42,22 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   const errors = await userLoginValidator(req.body);
   if (Object.keys(errors).length > 0) {
+    logger.infoWithMeta('Login failed', 'Validation errors', { errors });
     return res.status(400).json({ errors });
   }
 
   const { username, password } = req.body;
   db.get('SELECT * FROM users WHERE username = ?', [username], async (err, user) => {
     if (err) {
-      logger.error(`Database error during login: ${err.message}`);
+      logger.error(`Failed to login user`, {
+        error: err.message,
+        stack: err.stack,
+        username,
+      });
       return res.status(500).json({ error: err.message });
     }
     if (!user) {
-      logger.warn(`Failed login attempt for non-existent user: ${username}`);
+      logger.infoWithMeta('Login failed', 'User not found', { username });
       return res.status(400).json({ error: 'Invalid username or password' });
     }
     const match = await bcrypt.compare(password, user.password);
@@ -64,13 +77,13 @@ export const login = async (req, res) => {
         maxAge: 3600000 // 1 hour
       });
 
-      logger.info(`User logged in: ${username}`);
+      logger.infoWithMeta('User logged in', username, { userId: user.id });
       res.json({ 
         message: 'Logged in successfully', 
         userId: user.id
       });
     } else {
-      logger.warn(`Failed login attempt for user: ${username}`);
+      logger.infoWithMeta('Login failed', 'Invalid password', { username });
       res.status(400).json({ error: 'Invalid username or password' });
     }
   });
@@ -80,13 +93,13 @@ export const authenticateToken = (req, res, next) => {
   const token = req.cookies.token;
 
   if (!token) {
-    logger.warn('Authentication attempt with no token');
+    logger.infoWithMeta('Authentication failed', 'No token provided');
     return res.status(401).json({ error: 'Authentication required' });
   }
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
-      logger.warn(`Failed token authentication: ${err.message}`);
+      logger.infoWithMeta('Authentication failed', 'Invalid or expired token', { error: err.message });
       return res.status(403).json({ error: 'Invalid or expired token' });
     }
 
@@ -108,7 +121,7 @@ export const logout = (req, res) => {
     });
   }
 
-  logger.info(`User logged out: ${req.user?.username}`);
+  logger.infoWithMeta('User logged out', req.user?.username);
   res.json({ message: 'Logged out successfully' });
 };
 
@@ -116,11 +129,13 @@ export const updatePassword = async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || username.trim() === '') {
+    logger.infoWithMeta('Password update failed', 'Username is required');
     return res.status(400).json({ error: 'Username is required' });
   }
 
   const errors = passwordValidator(req.body);
   if (Object.keys(errors).length > 0) {
+    logger.infoWithMeta('Password update failed', 'Validation errors', { errors });
     return res.status(400).json({ errors });
   }
 
@@ -132,20 +147,28 @@ export const updatePassword = async (req, res) => {
       [hashedPassword, username],
       function (err) {
         if (err) {
-          logger.error(`Error updating password for user ${username}: ${err.message}`);
+          logger.error(`Failed to update password`, {
+            error: err.message,
+            stack: err.stack,
+            username,
+          });
           return res.status(500).json({ error: err.message });
         }
         if (this.changes === 0) {
-          logger.warn(`No user found with username: ${username}`);
+          logger.infoWithMeta('Password update failed', 'User not found', { username });
           return res.status(404).json({ error: 'User not found' });
         }
 
-        logger.info(`Password updated for user: ${username}`);
+        logger.infoWithMeta('Password updated', username);
         res.json({ changes: this.changes });
       }
     );
   } catch (error) {
-    logger.error(`Unexpected error updating password for user ${username}: ${error}`);
+    logger.error(`Unexpected error updating password`, {
+      error: error.message,
+      stack: error.stack,
+      username,
+    });
     res.status(500).json({ error: 'An unexpected error occurred' });
   }
 };
@@ -154,26 +177,31 @@ export const getUsername = (req, res) => {
   const token = req.cookies.token;
 
   if (!token) {
-    logger.warn('Attempt to fetch username without token');
+    logger.infoWithMeta('Username fetch failed', 'No token provided');
     return res.status(401).json({ error: 'Authentication required' });
   }
 
   jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) {
-      logger.warn(`Token verification failed: ${err.message}`);
+      logger.infoWithMeta('Username fetch failed', 'Invalid or expired token', { error: err.message });
       return res.status(403).json({ error: 'Invalid or expired token' });
     }
 
     const userId = decoded.userId;
     db.get('SELECT username FROM users WHERE id = ?', [userId], (dbErr, row) => {
       if (dbErr) {
-        logger.error(`Database error fetching username: ${dbErr.message}`);
+        logger.error(`Failed to fetch username`, {
+          error: dbErr.message,
+          stack: dbErr.stack,
+          userId,
+        });
         return res.status(500).json({ error: 'Failed to retrieve username' });
       }
       if (!row) {
-        logger.warn(`User not found for ID: ${userId}`);
+        logger.infoWithMeta('Username fetch failed', 'User not found', { userId });
         return res.status(404).json({ error: 'User not found' });
       }
+      logger.infoWithMeta('Username fetched', row.username, { userId });
       res.json({ username: row.username });
     });
   });
