@@ -39,8 +39,6 @@ const EVENT_SIGNATURES = {
   'Authentication failed': { signatureId: '3007', severity: 'Medium' },
   'Password update failed': { signatureId: '3008', severity: 'Medium' },
   'Username fetch failed': { signatureId: '3009', severity: 'Medium' },
-  'Logs retrieved': { signatureId: '4001', severity: 'Low' },
-  'Log entry removed': { signatureId: '4002', severity: 'Medium' },
 };
 
 // Create logs directory if it doesn't exist

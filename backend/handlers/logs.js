@@ -72,7 +72,6 @@ export const getLogs = [getUsername, (req, res) => {
         };
       });
 
-      logger.infoWithMeta('Logs retrieved', '', { username: req.username });
       res.json(logs);
     });
   } catch (error) {
