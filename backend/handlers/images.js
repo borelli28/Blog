@@ -146,7 +146,7 @@ export const uploadImage = [getUsername, (req, res) => {
         logger.infoWithMeta('Image uploaded', 'Image uploaded', {
           username: req.username,
           image_id: this.lastID,
-          file.filename,
+          filename: file.filename,
           blog_id: blog_id
         });
         res.status(201).json({ id: this.lastID, filename: file.filename });
@@ -166,7 +166,7 @@ export const updateAltValues = [getUsername, (req, res) => {
       });
       return res.status(500).json({ error: err.message });
     }
-    logger.infoWithMeta('Image alt text updated', Image alt text updated, {
+    logger.infoWithMeta('Image alt text updated', 'Image alt text updated', {
       username: req.username,
       image_id: id
     });
