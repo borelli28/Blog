@@ -16,14 +16,16 @@ const getUsername = async (req, res, next) => {
 export const getAllPosts = [getUsername, (req, res) => {
   db.all('SELECT * FROM blog_posts WHERE is_deleted = 0 ORDER BY created_at DESC', (err, rows) => {
     if (err) {
-      logger.error(`Failed to get all blog posts`, {
+      logger.error('Failed to get all blog posts', {
         error: err.message,
         stack: err.stack,
         username: req.username,
       });
       return res.status(500).json({ error: err.message });
     }
-    logger.infoWithMeta('All blog posts retrieved', '', { username: req.username });
+    logger.infoWithMeta('All blog posts retrieved', 'All blog posts retrieved', { 
+      username: req.username, blog_count: rows.length 
+    });
     res.json(rows);
   });
 }];
@@ -32,18 +34,28 @@ export const getPost = [getUsername, (req, res) => {
   const id = req.params.id;
   db.get('SELECT * FROM blog_posts WHERE id = ? AND is_deleted = 0', [id], (err, row) => {
     if (err) {
-      logger.error(`Failed to get blog post`, {
+      logger.error('Failed to get blog post', {
         error: err.message,
         stack: err.stack,
         username: req.username,
       });
       return res.status(500).json({ error: err.message });
     }
+
     if (!row) {
-      logger.infoWithMeta('Blog post not found', id, { username: req.username });
+      logger.infoWithMeta('Blog post not found', 'Blog post not found', {
+        blog_id: id,
+        username: req.username
+      });
       return res.status(404).json({ error: 'Post not found' });
     }
-    logger.infoWithMeta('Blog post retrieved', id, { username: req.username });
+
+    logger.infoWithMeta('Blog post retrieved', 'Blog post retrieved', {
+      blog_id: id,
+      blog_title: row.title,
+      username: req.username
+    });
+
     res.json(row);
   });
 }];
@@ -53,17 +65,21 @@ export const createPost = [getUsername, (req, res) => {
   const id = uuidv4();
   db.run('INSERT INTO blog_posts (id, title, description, content, author_id) VALUES (?, ?, ?, ?, ?)',
     [id, title, description, content, author_id],
-    function(err) {
+    function (err) {
       if (err) {
-        logger.error(`Failed to create blog post`, {
+        logger.error('Failed to create blog post', {
           error: err.message,
           stack: err.stack,
           username: req.username,
-          postTitle: title
+          postTitle: title,
         });
         return res.status(500).json({ error: err.message });
       }
-      logger.infoWithMeta('Blog post created', title, { username: req.username, postId: id });
+      logger.infoWithMeta('Blog post created', 'Blog post created', { 
+        username: req.username,
+        blog_id: id,
+        blog_title: title
+      });
       res.status(201).json({ id: id });
     }
   );
@@ -74,9 +90,9 @@ export const updatePost = [getUsername, (req, res) => {
   const id = req.params.id;
   db.run('UPDATE blog_posts SET title = ?, description = ?, content = ? WHERE id = ?',
     [title, description, content, id],
-    function(err) {
+    function (err) {
       if (err) {
-        logger.error(`Failed to update blog post`, {
+        logger.error('Failed to update blog post', {
           error: err.message,
           stack: err.stack,
           username: req.username,
@@ -84,10 +100,18 @@ export const updatePost = [getUsername, (req, res) => {
         return res.status(500).json({ error: err.message });
       }
       if (this.changes === 0) {
-        logger.infoWithMeta('Blog post not found for update', id, { username: req.username });
+        logger.infoWithMeta('Blog post not found for update', 'Blog post not found for update', { 
+          username: req.username,
+          blog_id: id,
+          blog_title: title,
+        });
         return res.status(404).json({ message: 'Post not found' });
       }
-      logger.infoWithMeta('Blog post updated', id, { username: req.username });
+      logger.infoWithMeta('Blog post updated', 'Blog post updated', { 
+          username: req.username,
+          blog_id: id,
+          blog_title: title,
+      });
       res.json({ changes: this.changes });
     }
   );
@@ -95,16 +119,19 @@ export const updatePost = [getUsername, (req, res) => {
 
 export const recoverPost = [getUsername, (req, res) => {
   const { id } = req.params;
-  db.run('UPDATE blog_posts SET is_deleted = 0 WHERE id = ?', [id], function(err) {
+  db.run('UPDATE blog_posts SET is_deleted = 0 WHERE id = ?', [id], function (err) {
     if (err) {
-      logger.error(`Failed to recover blog post`, {
+      logger.error('Failed to recover blog post', {
         error: err.message,
         stack: err.stack,
         username: req.username,
       });
       return res.status(500).json({ error: err.message });
     }
-    logger.infoWithMeta('Blog post recovered', id, { username: req.username, postId: id });
+    logger.infoWithMeta('Blog post recovered', 'Blog post recovered', { 
+      username: req.username,
+      blog_id: id
+    });
     res.json({ changes: this.changes });
   });
 }];
@@ -125,16 +152,19 @@ export const updatePostStatus = [getUsername, (req, res) => {
   }
 
   if (updateFields.length === 0) {
-    logger.infoWithMeta('No valid fields to update', id, { username: req.username });
+    logger.infoWithMeta('No valid fields to update', 'No valid fields to update', { 
+      username: req.username,
+      blog_id: id
+    });
     return res.status(400).json({ error: 'No valid fields to update' });
   }
 
   const sql = `UPDATE blog_posts SET ${updateFields.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`;
   params.push(id);
 
-  db.run(sql, params, function(err) {
+  db.run(sql, params, function (err) {
     if (err) {
-      logger.error(`Failed to update blog post status`, {
+      logger.error('Failed to update blog post status', {
         error: err.message,
         stack: err.stack,
         username: req.username,
@@ -142,42 +172,54 @@ export const updatePostStatus = [getUsername, (req, res) => {
       return res.status(500).json({ error: err.message });
     }
     if (this.changes === 0) {
-      logger.infoWithMeta('Blog post not found for status update', id, { username: req.username });
+      logger.infoWithMeta('Blog post not found for status update', 'Blog post not found for status update', { 
+        username: req.username, 
+        blog_id: id
+      });
       return res.status(404).json({ error: 'Post not found' });
     }
-    logger.infoWithMeta('Blog post status updated', id, { username: req.username });
+    logger.infoWithMeta('Blog post status updated', 'Blog post status updated', { 
+      username: req.username,
+      blog_id: id
+    });
     res.json({ changes: this.changes });
   });
 }];
 
 export const deletePost = [getUsername, (req, res) => {
   const { id } = req.params;
-  db.run('UPDATE blog_posts SET is_deleted = 1 WHERE id = ?', [id], function(err) {
+  db.run('UPDATE blog_posts SET is_deleted = 1 WHERE id = ?', [id], function (err) {
     if (err) {
-      logger.error(`Failed to delete blog post`, {
+      logger.error('Failed to delete blog post', {
         error: err.message,
         stack: err.stack,
         username: req.username,
       });
       return res.status(500).json({ error: err.message });
     }
-    logger.infoWithMeta('Blog post deleted', id, { username: req.username, postId: id });
+    logger.infoWithMeta('Blog post deleted', 'Blog post deleted', { 
+      username: req.username,
+      blog_id: id
+    });
     res.json({ changes: this.changes });
   });
 }];
 
 export const permanentDeletePost = [getUsername, (req, res) => {
   const { id } = req.body;
-  db.run('DELETE FROM blog_posts WHERE id = ?', [id], function(err) {
+  db.run('DELETE FROM blog_posts WHERE id = ?', [id], function (err) {
     if (err) {
-      logger.error(`Failed to permanently delete blog post`, {
+      logger.error('Failed to permanently delete blog post', {
         error: err.message,
         stack: err.stack,
         username: req.username,
       });
       return res.status(500).json({ error: err.message });
     }
-    logger.infoWithMeta('Blog post permanently deleted', id, { username: req.username, postId: id });
+    logger.infoWithMeta('Blog post permanently deleted', 'Blog post permanently deleted', { 
+      username: req.username,
+      blog_id: id
+    });
     res.json({ changes: this.changes });
   });
 }];
@@ -186,7 +228,7 @@ export const getPostImages = [getUsername, (req, res) => {
   const id = req.params.id;
   db.get('SELECT id FROM blog_posts WHERE id = ? AND is_deleted = 0', [id], (err, row) => {
     if (err) {
-      logger.error(`Failed to get post for images`, {
+      logger.error('Failed to get post for images', {
         error: err.message,
         stack: err.stack,
         username: req.username,
@@ -194,20 +236,28 @@ export const getPostImages = [getUsername, (req, res) => {
       return res.status(500).json({ error: err.message });
     }
     if (!row) {
-      logger.infoWithMeta('Post not found for image retrieval', id, { username: req.username });
+      logger.infoWithMeta('Post not found for image retrieval', 'Post not found for image retrieval', { 
+        username: req.username,
+        blog_id: id
+      });
       return res.status(404).json({ error: 'Post not found' });
     }
 
     db.all('SELECT * FROM images WHERE blog_id = ?', [row.id], (err, images) => {
       if (err) {
-        logger.error(`Failed to get images for post`, {
+        logger.error('Failed to get images for post', {
           error: err.message,
           stack: err.stack,
           username: req.username,
         });
         return res.status(500).json({ error: err.message });
       }
-      logger.infoWithMeta('Post images retrieved', id, { username: req.username });
+      logger.infoWithMeta('Post images retrieved', 'Post images retrieved', { 
+        username: req.username,
+        blog_id: id,
+        blog_title: row.title,
+        images_count: images.length
+      });
       res.json(images);
     });
   });
@@ -216,14 +266,17 @@ export const getPostImages = [getUsername, (req, res) => {
 export const getFeaturedPosts = [getUsername, (req, res) => {
   db.all('SELECT * FROM blog_posts WHERE is_favorite = 1 AND is_public = 1 AND is_deleted = 0 ORDER BY created_at DESC', (err, rows) => {
     if (err) {
-      logger.error(`Failed to get featured posts`, {
+      logger.error('Failed to get featured posts', {
         error: err.message,
         stack: err.stack,
         username: req.username,
       });
       return res.status(500).json({ error: err.message });
     }
-    logger.infoWithMeta('Featured posts retrieved', '', { username: req.username });
+    logger.infoWithMeta('Featured posts retrieved', 'Featured posts retrieved', { 
+      username: req.username,
+      blog_count: rows.length
+    });
     res.json(rows);
   });
 }];
@@ -231,14 +284,17 @@ export const getFeaturedPosts = [getUsername, (req, res) => {
 export const getPublishedPosts = [getUsername, (req, res) => {
   db.all('SELECT * FROM blog_posts WHERE is_public = 1 AND is_deleted = 0 ORDER BY created_at DESC', (err, rows) => {
     if (err) {
-      logger.error(`Failed to get published posts`, {
+      logger.error('Failed to get published posts', {
         error: err.message,
         stack: err.stack,
         username: req.username,
       });
       return res.status(500).json({ error: err.message });
     }
-    logger.infoWithMeta('Published posts retrieved', '', { username: req.username });
+    logger.infoWithMeta('Published posts retrieved', 'Published posts retrieved', { 
+      username: req.username,
+      blog_count: rows.length
+    });
     res.json(rows);
   });
 }];
@@ -246,14 +302,17 @@ export const getPublishedPosts = [getUsername, (req, res) => {
 export const getAllPostsIncludingDeleted = [getUsername, (req, res) => {
   db.all('SELECT * FROM blog_posts ORDER BY created_at DESC', (err, rows) => {
     if (err) {
-      logger.error(`Failed to get all posts including deleted`, {
+      logger.error('Failed to get all posts including deleted', {
         error: err.message,
         stack: err.stack,
         username: req.username,
       });
       return res.status(500).json({ error: err.message });
     }
-    logger.infoWithMeta('All posts including deleted retrieved', '', { username: req.username });
+    logger.infoWithMeta('All posts including deleted retrieved', 'All posts including deleted retrieved', {
+      username: req.username,
+      blog_count: rows.length
+    });
     res.json(rows);
   });
 }];

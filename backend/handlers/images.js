@@ -88,7 +88,11 @@ export const uploadArticleImage = [getUsername, (req, res) => {
               }
 
               db.run('COMMIT');
-              logger.infoWithMeta('Article image uploaded', file.filename, { username: req.username, imageId, blogId: blog_id });
+              logger.infoWithMeta('Article image uploaded', 'Article image uploaded', {
+                username: req.username,
+                filename: file.filename,
+                image_id, blogId: blog_id
+              });
               res.status(201).json({ id: imageId, filename: file.filename });
             }
           );
@@ -139,7 +143,12 @@ export const uploadImage = [getUsername, (req, res) => {
           });
           return res.status(500).json({ error: err.message });
         }
-        logger.infoWithMeta('Image uploaded', file.filename, { username: req.username, imageId: this.lastID, blogId: blog_id });
+        logger.infoWithMeta('Image uploaded', 'Image uploaded', {
+          username: req.username,
+          image_id: this.lastID,
+          filename: file.filename,
+          blog_id: blog_id
+        });
         res.status(201).json({ id: this.lastID, filename: file.filename });
       }
     );
@@ -157,7 +166,10 @@ export const updateAltValues = [getUsername, (req, res) => {
       });
       return res.status(500).json({ error: err.message });
     }
-    logger.infoWithMeta('Image alt text updated', id, { username: req.username });
+    logger.infoWithMeta('Image alt text updated', 'Image alt text updated', {
+      username: req.username,
+      image_id: id
+    });
     res.json({ changes: this.changes });
   });
 }];
@@ -175,7 +187,10 @@ export const deleteImage = [getUsername, (req, res) => {
       return res.status(500).json({ error: err.message });
     }
     if (!row) {
-      logger.infoWithMeta('Image not found for deletion', id, { username: req.username });
+      logger.infoWithMeta('Image not found for deletion', 'Image not found for deletion', {
+        username: req.username,
+        image_id: id
+      });
       return res.status(404).json({ error: 'Image not found' });
     }
 
@@ -210,15 +225,16 @@ export const deleteImage = [getUsername, (req, res) => {
             });
           }
 
-          logger.infoWithMeta('Image deleted', filename, { 
-            username: req.username, 
-            imageId: id, 
-            fileDeleted: !unlinkErr 
+          logger.infoWithMeta('Image deleted', 'Image deleted', { 
+            username: req.username,
+            image_id: id,
+            filename: filename,
+            file_deleted: !unlinkErr
           });
           res.json({ 
             message: 'Image deleted successfully', 
             changes: this.changes,
-            fileDeleted: !unlinkErr
+            file_deleted: !unlinkErr
           });
         });
       });
