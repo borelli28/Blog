@@ -38,7 +38,10 @@ export const register = async (req, res) => {
         });
         return res.status(500).json({ error: err.message });
       }
-      logger.infoWithMeta('User registered', this.lastID, { username: username });
+      logger.infoWithMeta('User registered', 'User registered', {
+        username: username,
+        user_id: this.lastID
+      });
       res.status(201).json({ id: this.lastID });
     });
   } catch (error) {
@@ -88,10 +91,10 @@ export const login = async (req, res) => {
         maxAge: 3600000 // 1 hour
       });
 
-      logger.infoWithMeta('User logged in', '', { username: username });
+      logger.infoWithMeta('User logged in', 'User logged in', { username: username });
       res.json({ 
         message: 'Logged in successfully', 
-        userId: user.id
+        user_id: user.id
       });
     } else {
       logger.infoWithMeta('Login failed', 'Invalid password', { username: username });
@@ -132,7 +135,7 @@ export const logout = [getUserUsername, (req, res) => {
     });
   }
 
-  logger.infoWithMeta('User logged out', '', { username: username });
+  logger.infoWithMeta('User logged out', 'User logged out', { username: username });
   res.json({ message: 'Logged out successfully' });
 }];
 
@@ -170,7 +173,9 @@ export const updatePassword = async (req, res) => {
           return res.status(404).json({ error: 'User not found' });
         }
 
-        logger.infoWithMeta('Password updated', username);
+        logger.infoWithMeta('Password updated', 'Password updated', {
+          username: username
+        });
         res.json({ changes: this.changes });
       }
     );
@@ -209,10 +214,10 @@ export const getUsername = (req, res) => {
         return res.status(500).json({ error: 'Failed to retrieve username' });
       }
       if (!row) {
-        logger.infoWithMeta('Username fetch failed', 'User not found', { userId });
+        logger.infoWithMeta('Username fetch failed', 'User not found', { user_id: userId });
         return res.status(404).json({ error: 'User not found' });
       }
-      logger.infoWithMeta('Username fetched', row.username, { userId });
+      logger.infoWithMeta('Username fetched', row.username, { user_id: userId });
       res.json({ username: row.username });
     });
   });
