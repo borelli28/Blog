@@ -39,11 +39,21 @@ export const getPost = [getUsername, (req, res) => {
       });
       return res.status(500).json({ error: err.message });
     }
+
     if (!row) {
-      logger.infoWithMeta('Blog post not found', id, { username: req.username });
+      logger.infoWithMeta('Blog post not found', 'Blog post not found', {
+        blog_id: id,
+        username: req.username
+      });
       return res.status(404).json({ error: 'Post not found' });
     }
-    logger.infoWithMeta('Blog post retrieved', id, { username: req.username });
+
+    logger.infoWithMeta('Blog post retrieved', 'Blog post retrieved', {
+      blog_id: id,
+      blog_title: row.title,
+      username: req.username
+    });
+
     res.json(row);
   });
 }];
