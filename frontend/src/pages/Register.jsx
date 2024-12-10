@@ -20,11 +20,9 @@ const Register = () => {
     setErrors({});
     
     const safeUsername = sanitizeInput(username);
-    const safePassword = sanitizeInput(password);
-    const safeConfirmPassword = sanitizeInput(confirmPassword);
 
-    if (safePassword !== safeConfirmPassword) {
-      setErrors({ confirm_password: 'Passwords do not match after sanitization.' });
+    if (password !== confirmPassword) {
+      setErrors({ confirm_password: 'Passwords do not match.' });
       return;
     }
 
@@ -34,7 +32,7 @@ const Register = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username: safeUsername, password: safePassword }),
+        body: JSON.stringify({ username: safeUsername, password: password }),
       });
 
       const data = await response.json();
