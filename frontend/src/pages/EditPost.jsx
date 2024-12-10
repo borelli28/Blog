@@ -4,7 +4,6 @@ import Layout from '../components/Layout';
 import EasyMDE from 'easymde';
 import 'easymde/dist/easymde.min.css';
 import '../styles/CreatePost.css';
-import DOMPurify from 'dompurify';
 
 const EditPost = () => {
   const { id } = useParams();
