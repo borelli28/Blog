@@ -74,20 +74,14 @@ const EditPost = () => {
     return input.replace(/[^\w\s]/gi, '');
   };
 
-  const sanitizeContent = (content) => {
-    return DOMPurify.sanitize(content, {
-      ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'ul', 'li', 'img'],
-      ALLOWED_ATTR: ['href', 'title', 'alt', 'src'],
-    });
-  };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const blogData = {
       title: sanitizeInput(formData.get('title')),
       description: sanitizeInput(formData.get('desc')),
-      content: sanitizeContent(formData.get('content')),
+      content: formData.get('content'),
+      article_img: formData.get('article_img'),
     };
 
     try {
