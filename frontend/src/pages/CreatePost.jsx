@@ -12,14 +12,10 @@ const CreatePost = () => {
 
   useEffect(() => {
     checkAuth();
-    // Check if the textarea reference is available
     if (editorRef.current) {
-      // Initialize EasyMDE on the textarea
       const easyMDE = new EasyMDE({ element: editorRef.current });
       return () => {
-        // Convert the EasyMDE instance back to a regular textarea
         easyMDE.toTextArea();
-        // Perform any necessary cleanup for the EasyMDE instance
         easyMDE.cleanup();
       };
     }
@@ -38,12 +34,16 @@ const CreatePost = () => {
     }
   };
 
+  const sanitizeInput = (input) => {
+    return input.replace(/[^\w\s]/gi, ''); // Allows only alphanumeric characters and whitespace
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const blogData = {
-      title: formData.get('title'),
-      description: formData.get('desc'),
+      title: sanitizeInput(formData.get('title')),
+      description: sanitizeInput(formData.get('desc')),
       content: formData.get('content'),
     };
 
@@ -74,13 +74,13 @@ const CreatePost = () => {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="title">Title</label>
-            <input type="text" className="form-control" name="title" />
-        
+            <input type="text" className="form-control" name="title" required />
+
             <label htmlFor="desc">Description</label>
-            <input type="text" className="form-control" name="desc" />
-        
+            <input type="text" className="form-control" name="desc" required />
+
             <label htmlFor="content">Content</label>
-            <textarea id="editor" name="content" ref={editorRef}></textarea>
+            <textarea id="editor" name="content" ref={editorRef} required></textarea>
 
             <button type="submit" className="btn btn-primary">Submit</button>
           </div>
