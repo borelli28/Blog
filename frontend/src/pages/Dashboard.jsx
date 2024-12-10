@@ -147,14 +147,13 @@ const Dashboard = () => {
   const handlePasswordUpdate = async (e) => {
     e.preventDefault();
     const safeUsername = sanitizeInput(username);
-    const safePassword = sanitizeInput(password);
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username: safeUsername, password: safePassword }),
+        body: JSON.stringify({ username: safeUsername, password: password }),
         credentials: 'include',
       });
       if (response.ok) {
