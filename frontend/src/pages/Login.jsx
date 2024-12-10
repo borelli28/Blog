@@ -18,7 +18,6 @@ const Login = () => {
     setError('');
 
     const safeUsername = sanitizeInput(username);
-    const safePassword = sanitizeInput(password);
 
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
@@ -26,7 +25,7 @@ const Login = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username: safeUsername, password: safePassword }),
+        body: JSON.stringify({ username: safeUsername, password: password }),
         credentials: 'include',
       });
 
