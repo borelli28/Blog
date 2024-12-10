@@ -4,19 +4,26 @@ import Layout from '../components/Layout';
 import EasyMDE from 'easymde';
 import 'easymde/dist/easymde.min.css';
 import '../styles/CreatePost.css';
-import DOMPurify from 'dompurify';
 
 const CreatePost = () => {
   const navigate = useNavigate();
   const editorRef = useRef(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  const sanitizeInput = (input) => {
+    return input.replace(/[^\w\s]/gi, '');
+  };
+
   useEffect(() => {
     checkAuth();
+    // Check if the textarea reference is available
     if (editorRef.current) {
+      // Initialize EasyMDE on the textarea
       const easyMDE = new EasyMDE({ element: editorRef.current });
       return () => {
+        // Convert the EasyMDE instance back to a regular textarea
         easyMDE.toTextArea();
+        // Perform any necessary cleanup for the EasyMDE instance
         easyMDE.cleanup();
       };
     }
@@ -35,24 +42,13 @@ const CreatePost = () => {
     }
   };
 
-  const sanitizeInput = (input) => {
-    return input.replace(/[^\w\s]/gi, ''); // Allows only alphanumeric characters and whitespace
-  };
-
-  const sanitizeContent = (content) => {
-    return DOMPurify.sanitize(content, {
-      ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'ul', 'li', 'img'],
-      ALLOWED_ATTR: ['href', 'title', 'alt', 'src'],
-    });
-  };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const blogData = {
       title: sanitizeInput(formData.get('title')),
       description: sanitizeInput(formData.get('desc')),
-      content: sanitizeContent(formData.get('content')),
+      content: formData.get('content'),
     };
 
     try {
@@ -82,13 +78,13 @@ const CreatePost = () => {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="title">Title</label>
-            <input type="text" className="form-control" name="title" required />
-
+            <input type="text" className="form-control" name="title" />
+        
             <label htmlFor="desc">Description</label>
-            <input type="text" className="form-control" name="desc" required />
-
+            <input type="text" className="form-control" name="desc" />
+        
             <label htmlFor="content">Content</label>
-            <textarea id="editor" name="content" ref={editorRef} required></textarea>
+            <textarea id="editor" name="content" ref={editorRef}></textarea>
 
             <button type="submit" className="btn btn-primary">Submit</button>
           </div>
