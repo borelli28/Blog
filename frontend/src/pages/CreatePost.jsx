@@ -4,6 +4,7 @@ import Layout from '../components/Layout';
 import EasyMDE from 'easymde';
 import 'easymde/dist/easymde.min.css';
 import '../styles/CreatePost.css';
+import DOMPurify from 'dompurify';
 
 const CreatePost = () => {
   const navigate = useNavigate();
@@ -38,13 +39,20 @@ const CreatePost = () => {
     return input.replace(/[^\w\s]/gi, ''); // Allows only alphanumeric characters and whitespace
   };
 
+  const sanitizeContent = (content) => {
+    return DOMPurify.sanitize(content, {
+      ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'ul', 'li', 'img'],
+      ALLOWED_ATTR: ['href', 'title', 'alt', 'src'],
+    });
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const blogData = {
       title: sanitizeInput(formData.get('title')),
       description: sanitizeInput(formData.get('desc')),
-      content: formData.get('content'),
+      content: sanitizeContent(formData.get('content')),
     };
 
     try {
