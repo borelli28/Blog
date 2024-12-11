@@ -160,7 +160,7 @@ export const updatePostStatus = [getUsername, (req, res) => {
     is_public: sanitizeInput(req.body.is_public)
   };
   const { is_favorite, is_public } = sanitizedBody;
-  const id: sanitizeInput(req.params.id);
+  const id = sanitizeInput(req.params.id);
 
   let updateFields = [];
   let params = [];
