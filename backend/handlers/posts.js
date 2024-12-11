@@ -3,6 +3,11 @@ import logger from '../utils/logger.js';
 import { v4 as uuidv4 } from 'uuid';
 import { getUsernameFromToken } from '../utils/getUsernameFromToken.js';
 
+const sanitizeInput = (input) => {
+  if (typeof input !== 'string') return input;
+  return input.replace(/[^a-zA-Z0-9]/g, ''); // Remove all non-alphanumeric characters
+};
+
 const getUsername = async (req, res, next) => {
   const token = req.cookies.token;
   try {
@@ -31,7 +36,7 @@ export const getAllPosts = [getUsername, (req, res) => {
 }];
 
 export const getPost = [getUsername, (req, res) => {
-  const id = req.params.id;
+  const id = sanitizeInput(req.params.id);
   db.get('SELECT * FROM blog_posts WHERE id = ? AND is_deleted = 0', [id], (err, row) => {
     if (err) {
       logger.error('Failed to get blog post', {
@@ -61,8 +66,15 @@ export const getPost = [getUsername, (req, res) => {
 }];
 
 export const createPost = [getUsername, (req, res) => {
-  const { title, description, content, author_id } = req.body;
+  const sanitizedBody = {
+    title: sanitizeInput(req.body.title),
+    description: sanitizeInput(req.body.description),
+    content: sanitizeInput(req.body.content),
+    author_id: sanitizeInput(req.body.author_id)
+  };
+  const { title, description, content, author_id } = sanitizedBody;
   const id = uuidv4();
+
   db.run('INSERT INTO blog_posts (id, title, description, content, author_id) VALUES (?, ?, ?, ?, ?)',
     [id, title, description, content, author_id],
     function (err) {
@@ -86,8 +98,14 @@ export const createPost = [getUsername, (req, res) => {
 }];
 
 export const updatePost = [getUsername, (req, res) => {
-  const { title, description, content } = req.body;
-  const id = req.params.id;
+  const sanitizedBody = {
+    title: sanitizeInput(req.body.title),
+    description: sanitizeInput(req.body.description),
+    content: sanitizeInput(req.body.content)
+  };
+  const { title, description, content } = sanitizedBody;
+  const id = sanitizeInput(req.params.id);
+
   db.run('UPDATE blog_posts SET title = ?, description = ?, content = ? WHERE id = ?',
     [title, description, content, id],
     function (err) {
@@ -118,7 +136,7 @@ export const updatePost = [getUsername, (req, res) => {
 }];
 
 export const recoverPost = [getUsername, (req, res) => {
-  const { id } = req.params;
+  const { id } = sanitizeInput(req.params.id);
   db.run('UPDATE blog_posts SET is_deleted = 0 WHERE id = ?', [id], function (err) {
     if (err) {
       logger.error('Failed to recover blog post', {
@@ -137,8 +155,12 @@ export const recoverPost = [getUsername, (req, res) => {
 }];
 
 export const updatePostStatus = [getUsername, (req, res) => {
-  const { is_favorite, is_public } = req.body;
-  const id = req.params.id;
+  const sanitizedBody = {
+    is_favorite: sanitizeInput(req.body.is_favorite),
+    is_public: sanitizeInput(req.body.is_public)
+  };
+  const { is_favorite, is_public } = sanitizedBody;
+  const id: sanitizeInput(req.params.id);
 
   let updateFields = [];
   let params = [];
@@ -187,7 +209,7 @@ export const updatePostStatus = [getUsername, (req, res) => {
 }];
 
 export const deletePost = [getUsername, (req, res) => {
-  const { id } = req.params;
+  const { id } = sanitizeInput(req.params.id);
   db.run('UPDATE blog_posts SET is_deleted = 1 WHERE id = ?', [id], function (err) {
     if (err) {
       logger.error('Failed to delete blog post', {
@@ -206,7 +228,7 @@ export const deletePost = [getUsername, (req, res) => {
 }];
 
 export const permanentDeletePost = [getUsername, (req, res) => {
-  const { id } = req.body;
+  const { id } = sanitizeInput(req.body.id);
   db.run('DELETE FROM blog_posts WHERE id = ?', [id], function (err) {
     if (err) {
       logger.error('Failed to permanently delete blog post', {
@@ -225,7 +247,7 @@ export const permanentDeletePost = [getUsername, (req, res) => {
 }];
 
 export const getPostImages = [getUsername, (req, res) => {
-  const id = req.params.id;
+  const id = sanitizeInput(req.params.id);
   db.get('SELECT id FROM blog_posts WHERE id = ? AND is_deleted = 0', [id], (err, row) => {
     if (err) {
       logger.error('Failed to get post for images', {
