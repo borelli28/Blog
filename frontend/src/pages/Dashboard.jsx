@@ -52,6 +52,10 @@ const Dashboard = () => {
     }
   };
 
+  const sanitizeInput = (input) => {
+    return input.replace(/[^\w\s]/gi, ''); // Allows only alphanumeric characters and whitespace
+  };
+
   const handleFavoriteToggle = async (blogId, isFavorite) => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(blogId)}/status`, {
@@ -105,12 +109,11 @@ const Dashboard = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ title: blogId }),
+        body: JSON.stringify({ title: sanitizeInput(blogId) }),
         credentials: 'include',
       });
       if (response.ok) {
         fetchBlogs();
-        console.log(response);
         setMessages(['Blog permanently deleted']);
       } else {
         setMessages(['Failed to permanently delete blog']);
@@ -127,15 +130,14 @@ const Dashboard = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ title: blogId }),
+        body: JSON.stringify({ title: sanitizeInput(blogId) }),
         credentials: 'include',
       });
       if (response.ok) {
         fetchBlogs();
-        console.log(response);
         setMessages(['Blog recovered']);
       } else {
-        setMessages(['Failed to recover delete blog']);
+        setMessages(['Failed to recover blog']);
       }
     } catch (error) {
       setMessages(['An error occurred while recovering the blog']);
@@ -144,13 +146,14 @@ const Dashboard = () => {
 
   const handlePasswordUpdate = async (e) => {
     e.preventDefault();
+    const safeUsername = sanitizeInput(username);
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username: safeUsername, password: password }),
         credentials: 'include',
       });
       if (response.ok) {

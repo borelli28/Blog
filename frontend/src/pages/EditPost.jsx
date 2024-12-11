@@ -69,12 +69,16 @@ const EditPost = () => {
     }
   }, [blog]);
 
+  const sanitizeInput = (input) => {
+    return input.replace(/[^\w\s]/gi, '');
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const blogData = {
-      title: formData.get('title'),
-      description: formData.get('desc'),
+      title: sanitizeInput(formData.get('title')),
+      description: sanitizeInput(formData.get('desc')),
       content: formData.get('content'),
       article_img: formData.get('article_img'),
     };

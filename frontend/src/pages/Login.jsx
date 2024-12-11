@@ -9,9 +9,15 @@ const Login = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  const sanitizeInput = (input) => {
+    return input.replace(/[^\w\s]/gi, ''); // Allows only alphanumeric characters and whitespace
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    const safeUsername = sanitizeInput(username);
 
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
@@ -19,7 +25,7 @@ const Login = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username: safeUsername, password: password }),
         credentials: 'include',
       });
 

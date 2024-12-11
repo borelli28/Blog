@@ -8,6 +8,11 @@ import { getUsernameFromToken } from '../utils/getUsernameFromToken.js';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
+const sanitizeInput = (input) => {
+  if (typeof input !== 'string') return input;
+  return input.replace(/[^a-zA-Z0-9-]/g, ''); // Remove all characters except alphanumeric and hyphens
+};
+
 const getUserUsername = async (req, res, next) => {
   const token = req.cookies.token;
   try {
@@ -26,7 +31,12 @@ export const register = async (req, res) => {
       return res.status(400).json({ errors });
     }
 
-    const { username, password } = req.body;
+    const sanitizedBody = {
+      username: sanitizeInput(req.body.username),
+      password: req.body.password
+    };
+
+    const { username, password } = sanitizedBody;
     const hashedPassword = await bcrypt.hash(password, 10);
 
     db.run('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword], function(err) {
@@ -60,7 +70,12 @@ export const login = async (req, res) => {
     return res.status(400).json({ errors });
   }
 
-  const { username, password } = req.body;
+  const sanitizedBody = {
+    username: sanitizeInput(req.body.username),
+    password: req.body.password
+  };
+
+  const { username, password } = sanitizedBody;
   db.get('SELECT * FROM users WHERE username = ?', [username], async (err, user) => {
     if (err) {
       logger.error(`Failed to login user`, {
@@ -140,7 +155,11 @@ export const logout = [getUserUsername, (req, res) => {
 }];
 
 export const updatePassword = async (req, res) => {
-  const { username, password } = req.body;
+  const sanitizedBody = {
+    username: sanitizeInput(req.body.username),
+    password: req.body.password
+  };
+  const { username, password } = sanitizedBody;
 
   if (!username || username.trim() === '') {
     logger.infoWithMeta('Password update failed', 'Username is required', { username: username });

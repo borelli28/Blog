@@ -10,9 +10,21 @@ const Register = () => {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
+
+  const sanitizeInput = (input) => {
+    return input.replace(/[^\w\s]/gi, ''); // Allows only alphanumeric characters and whitespace
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors({});
+    
+    const safeUsername = sanitizeInput(username);
+
+    if (password !== confirmPassword) {
+      setErrors({ confirm_password: 'Passwords do not match.' });
+      return;
+    }
 
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/register`, {
@@ -20,7 +32,7 @@ const Register = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password, confirm_password: confirmPassword }),
+        body: JSON.stringify({ username: safeUsername, password: password }),
       });
 
       const data = await response.json();
@@ -31,11 +43,11 @@ const Register = () => {
         if (data.errors) {
           setErrors(data.errors);
         } else {
-          setErrors({ general: data.error || 'Registration failed' });
+          setErrors({ general: 'Registration failed. Please try again.' });
         }
       }
     } catch (error) {
-      setErrors({ general: 'An error occurred. Please try again.' });
+      setErrors({ general: 'An unexpected error occurred. Please try again later.' });
     }
   };
 

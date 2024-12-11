@@ -10,6 +10,10 @@ const CreatePost = () => {
   const editorRef = useRef(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  const sanitizeInput = (input) => {
+    return input.replace(/[^\w\s]/gi, '');
+  };
+
   useEffect(() => {
     checkAuth();
     // Check if the textarea reference is available
@@ -42,8 +46,8 @@ const CreatePost = () => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const blogData = {
-      title: formData.get('title'),
-      description: formData.get('desc'),
+      title: sanitizeInput(formData.get('title')),
+      description: sanitizeInput(formData.get('desc')),
       content: formData.get('content'),
     };
 

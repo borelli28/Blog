@@ -5,16 +5,41 @@ import fs from 'fs';
 import logger from '../utils/logger.js';
 import { getUsernameFromToken } from '../utils/getUsernameFromToken.js';
 
+const sanitizeInput = (input) => {
+  if (typeof input !== 'string') return input;
+  return input.replace(/[^a-zA-Z0-9-]/g, ''); // Remove all characters except alphanumeric and hyphens
+};
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/')
+    cb(null, 'uploads/');
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname))
+    cb(null, Date.now() + path.extname(file.originalname));
   }
 });
 
-const upload = multer({ storage: storage });
+class InvalidFileTypeError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'InvalidFileTypeError';
+  }
+}
+
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = ['image/jpg','image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new InvalidFileTypeError('Invalid file type. Only JPG, JPEG, PNG, WebP, and GIF are allowed.'), false);
+  }
+};
+
+const upload = multer({ 
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
+});
 
 const getUsername = async (req, res, next) => {
   const token = req.cookies.token;
@@ -36,6 +61,14 @@ export const uploadArticleImage = [getUsername, (req, res) => {
       });
       return res.status(500).json({ error: err.message });
     } else if (err) {
+      if (err instanceof InvalidFileTypeError) {
+        logger.warn(`Attempted upload of invalid file type for image`, {
+          username: req.username,
+          originalname: req.file ? req.file.originalname : 'unknown',
+          mimetype: req.file ? req.file.mimetype : 'unknown'
+        });
+        return res.status(400).json({ error: err.message });
+      }
       logger.error(`Failed to upload article image`, {
         error: err.message,
         stack: err.stack,
@@ -50,7 +83,12 @@ export const uploadArticleImage = [getUsername, (req, res) => {
       return res.status(400).json({ error: 'Please upload a file' });
     }
 
-    const { description, blog_id } = req.body;
+    const sanitizedBody = {
+      description: sanitizeInput(req.body.description),
+      blog_id: sanitizeInput(req.body.blog_id)
+    };
+
+    const { description, blog_id } = sanitizedBody;
     if (!description || !blog_id) {
       logger.infoWithMeta('Article image upload failed', 'Missing description or blog_id', { username: req.username });
       return res.status(400).json({ error: 'Missing description or blog_id' });
@@ -91,7 +129,8 @@ export const uploadArticleImage = [getUsername, (req, res) => {
               logger.infoWithMeta('Article image uploaded', 'Article image uploaded', {
                 username: req.username,
                 filename: file.filename,
-                image_id, blogId: blog_id
+                image_id: imageId,
+                blog_id: blog_id
               });
               res.status(201).json({ id: imageId, filename: file.filename });
             }
@@ -112,6 +151,14 @@ export const uploadImage = [getUsername, (req, res) => {
       });
       return res.status(500).json({ error: err.message });
     } else if (err) {
+      if (err instanceof InvalidFileTypeError) {
+        logger.warn(`Attempted upload of invalid file type for image`, {
+          username: req.username,
+          originalname: req.file ? req.file.originalname : 'unknown',
+          mimetype: req.file ? req.file.mimetype : 'unknown'
+        });
+        return res.status(400).json({ error: err.message });
+      }
       logger.error(`Failed to upload image`, {
         error: err.message,
         stack: err.stack,
@@ -126,7 +173,12 @@ export const uploadImage = [getUsername, (req, res) => {
       return res.status(400).json({ error: 'Please upload a file' });
     }
 
-    const { description, blog_id } = req.body;
+    const sanitizedBody = {
+      description: sanitizeInput(req.body.description),
+      blog_id: sanitizeInput(req.body.blog_id)
+    };
+
+    const { description, blog_id } = sanitizedBody;
     if (!description || !blog_id) {
       logger.infoWithMeta('Image upload failed', 'Missing description or blog_id', { username: req.username });
       return res.status(400).json({ error: 'Missing description or blog_id' });
@@ -156,7 +208,12 @@ export const uploadImage = [getUsername, (req, res) => {
 }];
 
 export const updateAltValues = [getUsername, (req, res) => {
-  const { id, description } = req.body;
+    const sanitizedBody = {
+      description: sanitizeInput(req.body.description),
+      id: sanitizeInput(req.body.id)
+    };
+  const { id, description } = sanitizedBody;
+
   db.run('UPDATE images SET description = ? WHERE id = ?', [description, id], function(err) {
     if (err) {
       logger.error(`Failed to update image alt text`, {
@@ -175,7 +232,10 @@ export const updateAltValues = [getUsername, (req, res) => {
 }];
 
 export const deleteImage = [getUsername, (req, res) => {
-  const { id } = req.body;
+  const sanitizedBody = {
+    id: sanitizeInput(req.body.id)
+  };
+  const { id } = sanitizedBody;
 
   db.get('SELECT image FROM images WHERE id = ?', [id], (err, row) => {
     if (err) {
