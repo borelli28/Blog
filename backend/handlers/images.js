@@ -5,6 +5,11 @@ import fs from 'fs';
 import logger from '../utils/logger.js';
 import { getUsernameFromToken } from '../utils/getUsernameFromToken.js';
 
+const sanitizeInput = (input) => {
+  if (typeof input !== 'string') return input;
+  return input.replace(/[^a-zA-Z0-9]/g, ''); // Remove all non-alphanumeric characters
+};
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, 'uploads/')
@@ -50,7 +55,12 @@ export const uploadArticleImage = [getUsername, (req, res) => {
       return res.status(400).json({ error: 'Please upload a file' });
     }
 
-    const { description, blog_id } = req.body;
+    const sanitizedBody = {
+      description: sanitizeInput(req.body.description),
+      blog_id: req.body.blog_id
+    };
+
+    const { description, blog_id } = sanitizedBody;
     if (!description || !blog_id) {
       logger.infoWithMeta('Article image upload failed', 'Missing description or blog_id', { username: req.username });
       return res.status(400).json({ error: 'Missing description or blog_id' });
@@ -126,7 +136,12 @@ export const uploadImage = [getUsername, (req, res) => {
       return res.status(400).json({ error: 'Please upload a file' });
     }
 
-    const { description, blog_id } = req.body;
+    const sanitizedBody = {
+      description: sanitizeInput(req.body.description),
+      blog_id: req.body.blog_id
+    };
+
+    const { description, blog_id } = sanitizedBody;
     if (!description || !blog_id) {
       logger.infoWithMeta('Image upload failed', 'Missing description or blog_id', { username: req.username });
       return res.status(400).json({ error: 'Missing description or blog_id' });
@@ -156,7 +171,12 @@ export const uploadImage = [getUsername, (req, res) => {
 }];
 
 export const updateAltValues = [getUsername, (req, res) => {
-  const { id, description } = req.body;
+    const sanitizedBody = {
+      description: sanitizeInput(req.body.description),
+      id: req.body.id
+    };
+  const { id, description } = sanitizedBody;
+
   db.run('UPDATE images SET description = ? WHERE id = ?', [description, id], function(err) {
     if (err) {
       logger.error(`Failed to update image alt text`, {
@@ -175,7 +195,10 @@ export const updateAltValues = [getUsername, (req, res) => {
 }];
 
 export const deleteImage = [getUsername, (req, res) => {
-  const { id } = req.body;
+  const sanitizedBody = {
+    id: sanitizeInput(req.body.id)
+  };
+  const { id } = sanitizedBody;
 
   db.get('SELECT image FROM images WHERE id = ?', [id], (err, row) => {
     if (err) {
