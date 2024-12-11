@@ -62,7 +62,7 @@ export const uploadArticleImage = [getUsername, (req, res) => {
       return res.status(500).json({ error: err.message });
     } else if (err) {
       if (err instanceof InvalidFileTypeError) {
-        logger.warn(`Attempted upload of invalid file type for article image`, {
+        logger.warn(`Attempted upload of invalid file type for image`, {
           username: req.username,
           originalname: req.file ? req.file.originalname : 'unknown',
           mimetype: req.file ? req.file.mimetype : 'unknown'
@@ -152,7 +152,7 @@ export const uploadImage = [getUsername, (req, res) => {
       return res.status(500).json({ error: err.message });
     } else if (err) {
       if (err instanceof InvalidFileTypeError) {
-        logger.warn(`Attempted upload of invalid file type for blog image`, {
+        logger.warn(`Attempted upload of invalid file type for image`, {
           username: req.username,
           originalname: req.file ? req.file.originalname : 'unknown',
           mimetype: req.file ? req.file.mimetype : 'unknown'
