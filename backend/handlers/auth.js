@@ -10,7 +10,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 const sanitizeInput = (input) => {
   if (typeof input !== 'string') return input;
-  return input.replace(/[^a-zA-Z0-9]/g, ''); // Remove all non-alphanumeric characters
+  return input.replace(/[^a-zA-Z0-9-]/g, ''); // Remove all characters except alphanumeric and hyphens
 };
 
 const getUserUsername = async (req, res, next) => {

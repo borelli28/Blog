@@ -5,7 +5,7 @@ import { getUsernameFromToken } from '../utils/getUsernameFromToken.js';
 
 const sanitizeInput = (input) => {
   if (typeof input !== 'string') return input;
-  return input.replace(/[^a-zA-Z0-9]/g, ''); // Remove all non-alphanumeric characters
+  return input.replace(/[^a-zA-Z0-9-]/g, ''); // Remove all characters except alphanumeric and hyphens
 };
 
 const getUsername = async (req, res, next) => {
