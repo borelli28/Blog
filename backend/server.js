@@ -20,7 +20,34 @@ app.use(cors({
 }))
 app.use(express.json());
 
+const Tokens = require('csrf');
+const tokens = new Tokens();
+
 app.use(cookieParser());
+
+// Middleware to handle CSRF token
+app.use((req, res, next) => {
+  // Check if we need to issue a new token
+  if (!req.cookies['csrf-token']) {
+    const secret = tokens.secretSync();
+    const token = tokens.create(secret);
+    res.cookie('csrf-secret', secret, { httpOnly: true });
+    res.cookie('csrf-token', token);
+  }
+  next();
+});
+
+// Middleware to validate CSRF token
+app.use((req, res, next) => {
+  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
+    const secret = req.cookies['csrf-secret'];
+    const token = req.headers['x-csrf-token'];
+    if (!tokens.verify(secret, token)) {
+      return res.status(403).json({ error: 'Invalid CSRF token' });
+    }
+  }
+  next();
+});
 
 // Serve static files from the 'uploads' directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
