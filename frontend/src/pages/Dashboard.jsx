@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import '../styles/Dashboard.css';
+import { sanitizeUsername, validateUsername, validatePassword } from '../services/inputValidation';
 
 const Dashboard = () => {
   const [blogs, setBlogs] = useState([]);
@@ -10,6 +11,7 @@ const Dashboard = () => {
   const [username, setUsername] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [blogsPerPage] = useState(4);
+  const [errors, setErrors] = useState({});
 
   const indexOfLastBlog = currentPage * blogsPerPage;
   const indexOfFirstBlog = indexOfLastBlog - blogsPerPage;
@@ -146,7 +148,17 @@ const Dashboard = () => {
 
   const handlePasswordUpdate = async (e) => {
     e.preventDefault();
+
     const safeUsername = sanitizeInput(username);
+    const passwordError = validatePassword(password);
+
+    if (passwordError) {
+      setErrors(prev => ({ ...prev, password: passwordError }));
+    }
+    if (passwordError) {
+      return;
+    }
+
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/password`, {
         method: 'PUT',
