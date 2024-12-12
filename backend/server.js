@@ -25,24 +25,29 @@ const tokens = new Tokens();
 
 app.use(cookieParser());
 
-// Middleware to handle CSRF token
+// Middleware to issue and validate CSRF tokens
 app.use((req, res, next) => {
-  // Check if we need to issue a new token
-  if (!req.cookies['csrf-token']) {
-    const secret = tokens.secretSync();
-    const token = tokens.create(secret);
-    res.cookie('csrf-secret', secret, { httpOnly: true });
-    res.cookie('csrf-token', token);
+  // Retrieve or generate a CSRF secret
+  let csrfSecret = req.cookies['csrf-secret'];
+  if (!csrfSecret) {
+    csrfSecret = tokens.secretSync();
+    res.cookie('csrf-secret', csrfSecret, { httpOnly: true, secure: true, sameSite: 'Strict' });
   }
+
+  // Generate a new CSRF token for this request
+  const csrfToken = tokens.create(csrfSecret);
+  res.cookie('csrf-token', csrfToken, { secure: true, sameSite: 'Strict' });
+
+  req.csrfToken = csrfToken;
   next();
 });
 
-// Middleware to validate CSRF token
+// Middleware to validate CSRF tokens for state-changing requests
 app.use((req, res, next) => {
   if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
-    const secret = req.cookies['csrf-secret'];
-    const token = req.headers['x-csrf-token'];
-    if (!tokens.verify(secret, token)) {
+    const csrfSecret = req.cookies['csrf-secret'];
+    const csrfToken = req.headers['x-csrf-token'];
+    if (!tokens.verify(csrfSecret, csrfToken)) {
       return res.status(403).json({ error: 'Invalid CSRF token' });
     }
   }
