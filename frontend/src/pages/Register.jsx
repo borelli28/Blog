@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import '../styles/Auth.css';
+import { sanitizeUsername, validateUsername, validatePassword } from '../services/inputValidation';
 
 const Register = () => {
   const [username, setUsername] = useState('');
@@ -10,19 +11,24 @@ const Register = () => {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
-
-  const sanitizeInput = (input) => {
-    return input.replace(/[^\w\s]/gi, ''); // Allows only alphanumeric characters and whitespace
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors({});
-    
-    const safeUsername = sanitizeInput(username);
 
+    const safeUsername = sanitizeUsername(username);
+    const usernameError = validateUsername(safeUsername);
+    const passwordError = validatePassword(password);
+
+    if (usernameError) {
+      setErrors(prev => ({ ...prev, username: usernameError }));
+    }
+    if (passwordError) {
+      setErrors(prev => ({ ...prev, password: passwordError }));
+    }
     if (password !== confirmPassword) {
-      setErrors({ confirm_password: 'Passwords do not match.' });
+      setErrors(prev => ({ ...prev, confirm_password: 'Passwords do not match.' }));
+    }
+    if (usernameError || passwordError || password !== confirmPassword) {
       return;
     }
 
