@@ -262,17 +262,17 @@ const EditPost = () => {
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label htmlFor="title">Title</label>
-              <input type="text" className="form-control" name="title" defaultValue={blog.title} />
+              <input type="text" className="form-control" name="title" defaultValue={blog.title} required/>
               
               {blog.article_img && (
                 <>
                   <label htmlFor="article_img">Article Image</label>
-                  <input type="text" className="form-control" name="article_img" defaultValue={blog.article_img} />
+                  <input type="text" className="form-control" name="article_img" defaultValue={blog.article_img} required/>
                 </>
               )}
 
               <label htmlFor="desc">Description</label>
-              <input type="text" className="form-control" name="desc" defaultValue={blog.description} />
+              <input type="text" className="form-control" name="desc" defaultValue={blog.description} required/>
 
               <label htmlFor="content">Content</label>
               <textarea name="content" id="editor" ref={editorRef} defaultValue={blog.content}></textarea>
@@ -295,13 +295,13 @@ const EditPost = () => {
             <div id="img-upload-container">
               <form onSubmit={handleArticleImageUpload} encType="multipart/form-data">
                 <label htmlFor="article_image">Upload Article Image</label>
-                <input type="file" id="article_image" name="image" />
+                <input type="file" id="article_image" name="image" required/>
                 <button type="submit" className="btn btn-primary">Upload Article Image</button>
               </form>
 
               <form onSubmit={handleBlogImageUpload} encType="multipart/form-data">
                 <label htmlFor="blog_image">Upload a Blog Image</label>
-                <input type="file" id="blog_image" name="image" />
+                <input type="file" id="blog_image" name="image" required/>
                 <button type="submit" className="btn btn-primary">Upload Blog Image</button>
               </form>
             </div>
@@ -324,7 +324,8 @@ const EditPost = () => {
                         type="text" 
                         className="form-control" 
                         name="img_desc" 
-                        defaultValue={img.description} 
+                        defaultValue={img.description}
+                        required
                       />
                       <button type="submit" className="btn btn-secondary">Edit Description</button>
                     </form>

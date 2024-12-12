@@ -78,10 +78,10 @@ const CreatePost = () => {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="title">Title</label>
-            <input type="text" className="form-control" name="title" />
+            <input type="text" className="form-control" name="title" required/>
         
             <label htmlFor="desc">Description</label>
-            <input type="text" className="form-control" name="desc" />
+            <input type="text" className="form-control" name="desc" required/>
         
             <label htmlFor="content">Content</label>
             <textarea id="editor" name="content" ref={editorRef}></textarea>
