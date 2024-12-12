@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import { sanitizeUsername, validateUsername, validatePassword } from '../services/inputValidation';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
+import { getCSRFToken } from '../services/csrf';
+import React, { useState } from 'react';
 import '../styles/Auth.css';
-import { sanitizeUsername, validateUsername, validatePassword } from '../services/inputValidation';
 
 const Register = () => {
   const [username, setUsername] = useState('');
@@ -37,8 +38,10 @@ const Register = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-CSRF-Token': getCSRFToken(),
         },
         body: JSON.stringify({ username: safeUsername, password: password }),
+        credentials: 'include',
       });
 
       const data = await response.json();
