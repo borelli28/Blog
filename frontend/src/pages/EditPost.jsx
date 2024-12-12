@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { getCSRFToken } from '../services/csrf';
 import Layout from '../components/Layout';
 import EasyMDE from 'easymde';
 import 'easymde/dist/easymde.min.css';
@@ -88,6 +89,7 @@ const EditPost = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'X-CSRF-Token': getCSRFToken(),
         },
         body: JSON.stringify(blogData),
         credentials: 'include',
@@ -107,6 +109,9 @@ const EditPost = () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(id)}`, {
         method: 'DELETE',
+        headers: {
+          'X-CSRF-Token': getCSRFToken(),
+        },
         credentials: 'include',
       });
 
@@ -139,6 +144,9 @@ const EditPost = () => {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/images/upload-article`, {
         method: 'POST',
         body: formData,
+        headers: {
+          'X-CSRF-Token': getCSRFToken(),
+        },
         credentials: 'include',
       });
 
@@ -175,6 +183,9 @@ const EditPost = () => {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/images/upload`, {
         method: 'POST',
         body: formData,
+        headers: {
+          'X-CSRF-Token': getCSRFToken(),
+        },
         credentials: 'include',
       });
 
@@ -198,6 +209,7 @@ const EditPost = () => {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          'X-CSRF-Token': getCSRFToken(),
         },
         body: JSON.stringify({ id: imageId }),
         credentials: 'include',
@@ -222,6 +234,7 @@ const EditPost = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'X-CSRF-Token': getCSRFToken(),
         },
         body: JSON.stringify({ id: imageId, description: newDescription }),
         credentials: 'include',

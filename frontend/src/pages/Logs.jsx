@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { getCSRFToken } from '../services/csrf';
 import Layout from '../components/Layout';
 
 const Logs = () => {
@@ -44,6 +45,9 @@ const Logs = () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/logs/${encodeURIComponent(timestamp)}`, {
         method: 'DELETE',
+        headers: {
+          'X-CSRF-Token': getCSRFToken(),
+        },
         credentials: 'include',
       });
 
