@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import '../styles/Auth.css';
-import { sanitizeUsername, validateUsername, validatePassword } from '../utils/inputValidation';
+import { sanitizeUsername, validateUsername, validatePassword } from '../services/inputValidation';
 
 const Register = () => {
   const [username, setUsername] = useState('');
