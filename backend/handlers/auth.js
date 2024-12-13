@@ -5,7 +5,8 @@ import jwt from 'jsonwebtoken';
 import logger from '../utils/logger.js';
 import { addToken, removeToken, isTokenValid } from '../utils/tokenWhitelist.js';
 import { getUsernameFromToken } from '../utils/getUsernameFromToken.js';
-import { authenticateToken, refreshToken } from '../middleware/auth.js';
+import { authenticateToken } from '../middleware/auth.js';
+import { refreshToken as refreshTokenMiddleware } from '../middleware/auth.js';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -230,4 +231,22 @@ export const getUsername = (req, res) => {
       res.json({ username: row.username });
     });
   });
+};
+
+export const refreshToken = async (req, res) => {
+  try {
+    console.log('refreshToken handler method called!');
+    await new Promise((resolve, reject) => {
+      refreshTokenMiddleware(req, res, (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+  } catch (error) {
+    console.error('Error in refreshToken handler:', error);
+    // If the middleware didn't send a response, send one here
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Failed to refresh token' });
+    }
+  }
 };
