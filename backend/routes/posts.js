@@ -1,6 +1,6 @@
 import express from 'express';
 import * as postHandlers from '../handlers/posts';
-import { authenticateToken } from '../handlers/auth';
+import { authenticateToken } from '../middleware/auth';
 
 const router = express.Router();
 
