@@ -1,6 +1,6 @@
 import express from 'express';
 import * as imageHandlers from '../handlers/images';
-import { authenticateToken } from '../handlers/auth';
+import { authenticateToken } from '../middleware/auth';
 
 const router = express.Router();
 
