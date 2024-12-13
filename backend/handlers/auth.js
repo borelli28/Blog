@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import logger from '../utils/logger.js';
 import { addToken, removeToken, isTokenValid } from '../utils/tokenWhitelist.js';
 import { getUsernameFromToken } from '../utils/getUsernameFromToken.js';
-import { refreshToken } from '../middleware/auth.js';
+import { refreshToken, authenticateToken } from '../middleware/auth.js';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -116,30 +116,6 @@ export const login = async (req, res) => {
       logger.infoWithMeta('Login failed', 'Invalid password', { username: username });
       res.status(400).json({ error: 'Invalid username or password' });
     }
-  });
-};
-
-export const authenticateToken = (req, res, next) => {
-  const token = req.cookies.token;
-
-  if (!token) {
-    logger.infoWithMeta('Authentication failed', 'No token provided');
-    return res.status(401).json({ error: 'Authentication required' });
-  }
-
-  if (!isTokenValid(token)) {
-    logger.infoWithMeta('Authentication failed', 'Token not in whitelist');
-    return res.status(401).json({ error: 'Invalid or expired token' });
-  }
-
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) {
-      logger.infoWithMeta('Authentication failed', 'Invalid or expired token', { error: err.message });
-      return res.status(403).json({ error: 'Invalid or expired token' });
-    }
-
-    req.user = user;
-    next();
   });
 };
 

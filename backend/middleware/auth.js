@@ -22,6 +22,30 @@ export const authMiddleware = (req, res, next) => {
   }
 };
 
+export const authenticateToken = (req, res, next) => {
+  const token = req.cookies.token;
+
+  if (!token) {
+    logger.infoWithMeta('Authentication failed', 'No token provided');
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  if (!isTokenValid(token)) {
+    logger.infoWithMeta('Authentication failed', 'Token not in whitelist');
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      logger.infoWithMeta('Authentication failed', 'Invalid or expired token', { error: err.message });
+      return res.status(403).json({ error: 'Invalid or expired token' });
+    }
+
+    req.user = user;
+    next();
+  });
+};
+
 export const refreshToken = (req, res) => {
   const token = req.cookies.token;
 
