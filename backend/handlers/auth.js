@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import logger from '../utils/logger.js';
 import { addToken, removeToken, isTokenValid } from '../utils/tokenWhitelist.js';
 import { getUsernameFromToken } from '../utils/getUsernameFromToken.js';
-import { refreshToken, authenticateToken, refreshToken } from '../middleware/auth.js';
+import { authenticateToken, refreshToken } from '../middleware/auth.js';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
