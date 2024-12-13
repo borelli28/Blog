@@ -117,11 +117,51 @@ const Logs = () => {
         <table className="table table-bordered table-striped-columns table-hover">
           <thead className="table-light">
             <tr>
-              <th scope="col" onClick={() => requestSort('timestamp')}>Timestamp</th>
-              <th scope="col" onClick={() => requestSort('level')}>Level</th>
-              <th scope="col" onClick={() => requestSort('name')}>Event Name</th>
-              <th scope="col" onClick={() => requestSort('signatureId')}>Signature ID</th>
-              <th scope="col" onClick={() => requestSort('severity')}>Severity</th>
+              <th 
+                scope="col" 
+                onClick={() => requestSort('timestamp')} 
+                style={{ cursor: 'pointer' }}
+              >
+                Timestamp {sortConfig.key === 'timestamp' && (
+                  <span>{sortConfig.direction === 'ascending' ? '▲' : '▼'}</span>
+                )}
+              </th>
+              <th 
+                scope="col" 
+                onClick={() => requestSort('level')} 
+                style={{ cursor: 'pointer' }}
+              >
+                Level {sortConfig.key === 'level' && (
+                  <span>{sortConfig.direction === 'ascending' ? '▲' : '▼'}</span>
+                )}
+              </th>
+              <th 
+                scope="col" 
+                onClick={() => requestSort('name')} 
+                style={{ cursor: 'pointer' }}
+              >
+                Event Name {sortConfig.key === 'name' && (
+                  <span>{sortConfig.direction === 'ascending' ? '▲' : '▼'}</span>
+                )}
+              </th>
+              <th 
+                scope="col" 
+                onClick={() => requestSort('signatureId')} 
+                style={{ cursor: 'pointer' }}
+              >
+                Signature ID {sortConfig.key === 'signatureId' && (
+                  <span>{sortConfig.direction === 'ascending' ? '▲' : '▼'}</span>
+                )}
+              </th>
+              <th 
+                scope="col" 
+                onClick={() => requestSort('severity')} 
+                style={{ cursor: 'pointer' }}
+              >
+                Severity {sortConfig.key === 'severity' && (
+                  <span>{sortConfig.direction === 'ascending' ? '▲' : '▼'}</span>
+                )}
+              </th>
               <th scope="col">Details</th>
               <th scope="col">Actions</th>
             </tr>
