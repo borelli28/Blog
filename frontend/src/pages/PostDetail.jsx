@@ -5,16 +5,30 @@ import '../styles/Blog.css';
 
 const PostDetail = () => {
   const [blog, setBlog] = useState(null);
+  const [error, setError] = useState(null);
   const { id } = useParams();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const fetchBlog = async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(id)}/pub`, {
-        credentials: 'include',
-      });
-      const data = await response.json();
-      setBlog(data);
+    const fetchBlog = async (authStatus) => {
+      const endpoint = authStatus 
+        ? `${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(id)}`
+        : `${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(id)}/pub`;
+
+      try {
+        const response = await fetch(endpoint, {
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          throw new Error('Post not found');
+        }
+
+        const data = await response.json();
+        setBlog(data);
+      } catch (error) {
+        setError(error.message);
+      }
     };
 
     const checkAuth = async () => {
@@ -23,15 +37,19 @@ const PostDetail = () => {
           method: 'GET',
           credentials: 'include',
         });
-        setIsAuthenticated(response.ok);
+        const authStatus = response.ok;
+        setIsAuthenticated(authStatus);
+        fetchBlog(authStatus);
       } catch (error) {
         setIsAuthenticated(false);
+        setError('Failed to check authentication');
       }
     };
-    fetchBlog();
+
     checkAuth();
   }, [id]);
 
+  if (error) return <div className="error">{error}</div>;
   if (!blog) return <div>Loading...</div>;
 
   return (
@@ -54,7 +72,7 @@ const PostDetail = () => {
 
         <p className="date">Created: {new Date(blog.created_at).toLocaleDateString()}</p>
         <p className="date">Last Update: {new Date(blog.updated_at).toLocaleDateString()}</p>
-        
+
         <div id="content" dangerouslySetInnerHTML={{ __html: blog.content }} />
       </article>
       {isAuthenticated && (
