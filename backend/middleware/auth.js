@@ -2,6 +2,8 @@ import { addToken, removeToken, isTokenValid } from '../utils/tokenWhitelist.js'
 import logger from '../utils/logger.js';
 import jwt from 'jsonwebtoken';
 
+const JWT_SECRET = process.env.JWT_SECRET;
+
 export const authMiddleware = (req, res, next) => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
 
@@ -10,7 +12,7 @@ export const authMiddleware = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
 
     if (!isTokenValid(token)) {
       return res.status(401).json({ message: 'Token is not valid' });
