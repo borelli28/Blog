@@ -10,7 +10,7 @@ const PostDetail = () => {
 
   useEffect(() => {
     const fetchBlog = async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(id)}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${encodeURIComponent(id)}/pub`, {
         credentials: 'include',
       });
       const data = await response.json();
