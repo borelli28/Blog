@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import { AuthService } from '../services/AuthService';
+import { checkAuth, refreshToken } from '../services/AuthService';
+import useTokenRefresh from './TokenRefresh';
 
 interface ProtectedRouteProps {
   children: React.ReactElement;
@@ -8,10 +9,11 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  useTokenRefresh();
 
   useEffect(() => {
     const checkAuthentication = async () => {
-      const authStatus = await AuthService.checkAuth();
+      const authStatus = await checkAuth();
       setIsAuthenticated(authStatus);
     };
     checkAuthentication();
