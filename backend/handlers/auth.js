@@ -126,6 +126,11 @@ export const authenticateToken = (req, res, next) => {
     return res.status(401).json({ error: 'Authentication required' });
   }
 
+  if (!isTokenValid(token)) {
+    logger.infoWithMeta('Authentication failed', 'Token not in whitelist');
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
+
   jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
       logger.infoWithMeta('Authentication failed', 'Invalid or expired token', { error: err.message });
