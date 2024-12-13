@@ -1,3 +1,5 @@
+import { getCSRFToken } from './csrf';
+
 export const checkAuth = async () => {
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/check`, {
@@ -20,13 +22,12 @@ export const refreshToken = async () => {
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
+        'X-CSRF-Token': getCSRFToken(),
       },
     });
-
     if (!response.ok) {
       throw new Error('Failed to refresh token');
     }
-
     const data = await response.json();
     return data;
   } catch (error) {
