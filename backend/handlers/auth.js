@@ -221,6 +221,11 @@ export const getUsername = (req, res) => {
     return res.status(401).json({ error: 'Authentication required' });
   }
 
+  if (!isTokenValid(token)) {
+    logger.infoWithMeta('Username fetch failed', 'Token not in whitelist');
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
+
   jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) {
       logger.infoWithMeta('Username fetch failed', 'Invalid or expired token', { error: err.message });
@@ -230,7 +235,7 @@ export const getUsername = (req, res) => {
     const userId = decoded.userId;
     db.get('SELECT username FROM users WHERE id = ?', [userId], (dbErr, row) => {
       if (dbErr) {
-        logger.error(`Failed to fetch username`, {
+        logger.error('Failed to fetch username', {
           error: dbErr.message,
           stack: dbErr.stack,
           userId,
