@@ -6,6 +6,8 @@ const Logs = () => {
   const [logs, setLogs] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [alert, setAlert] = useState({ show: false, message: '', type: '' });
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetchLogs();
@@ -66,6 +68,36 @@ const Logs = () => {
     }
   };
 
+  const requestSort = (key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const sortedLogs = React.useMemo(() => {
+    let sortableLogs = [...logs];
+    if (sortConfig.key !== null) {
+      sortableLogs.sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+          return sortConfig.direction === 'ascending' ? -1 : 1;
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+          return sortConfig.direction === 'ascending' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sortableLogs;
+  }, [logs, sortConfig]);
+
+  const filteredLogs = sortedLogs.filter(log => 
+    Object.values(log).some(value => 
+      value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  );
+
   return (
     <Layout isAuthenticated={isAuthenticated}>
       <div className="container">
@@ -75,20 +107,67 @@ const Logs = () => {
             {alert.message}
           </div>
         )}
+        <input
+          type="text"
+          placeholder="Search logs..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="form-control mb-3"
+        />
         <table className="table table-bordered table-striped-columns table-hover">
           <thead className="table-light">
             <tr>
-              <th scope="col">Timestamp</th>
-              <th scope="col">Level</th>
-              <th scope="col">Event Name</th>
-              <th scope="col">Signature ID</th>
-              <th scope="col">Severity</th>
+              <th 
+                scope="col" 
+                onClick={() => requestSort('timestamp')} 
+                style={{ cursor: 'pointer' }}
+              >
+                Timestamp {sortConfig.key === 'timestamp' && (
+                  <span>{sortConfig.direction === 'ascending' ? '▲' : '▼'}</span>
+                )}
+              </th>
+              <th 
+                scope="col" 
+                onClick={() => requestSort('level')} 
+                style={{ cursor: 'pointer' }}
+              >
+                Level {sortConfig.key === 'level' && (
+                  <span>{sortConfig.direction === 'ascending' ? '▲' : '▼'}</span>
+                )}
+              </th>
+              <th 
+                scope="col" 
+                onClick={() => requestSort('name')} 
+                style={{ cursor: 'pointer' }}
+              >
+                Event Name {sortConfig.key === 'name' && (
+                  <span>{sortConfig.direction === 'ascending' ? '▲' : '▼'}</span>
+                )}
+              </th>
+              <th 
+                scope="col" 
+                onClick={() => requestSort('signatureId')} 
+                style={{ cursor: 'pointer' }}
+              >
+                Signature ID {sortConfig.key === 'signatureId' && (
+                  <span>{sortConfig.direction === 'ascending' ? '▲' : '▼'}</span>
+                )}
+              </th>
+              <th 
+                scope="col" 
+                onClick={() => requestSort('severity')} 
+                style={{ cursor: 'pointer' }}
+              >
+                Severity {sortConfig.key === 'severity' && (
+                  <span>{sortConfig.direction === 'ascending' ? '▲' : '▼'}</span>
+                )}
+              </th>
               <th scope="col">Details</th>
               <th scope="col">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {logs.map((log, index) => (
+            {filteredLogs.map((log, index) => (
               <tr key={index}>
                 <td>{log.timestamp}</td>
                 <td>{log.level}</td>
