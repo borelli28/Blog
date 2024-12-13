@@ -22,3 +22,12 @@ export const isTokenValid = (token) => {
 
   return true;
 };
+
+export const printWhitelist = () => {
+  console.log('Current Whitelist:');
+  tokens.forEach((expirationTime, token) => {
+    const remainingTime = Math.max(0, expirationTime - Date.now());
+    console.log(`Token: ${token.substring(0, 20)}... | Expires in: ${Math.floor(remainingTime / 1000)} seconds`);
+  });
+  console.log(`Total tokens: ${tokens.size}`);
+};
