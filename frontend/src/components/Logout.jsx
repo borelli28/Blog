@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import React from 'react';
 import '../styles/Logout.css';
 
-const Logout: React.FC = () => {
+const Logout = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
