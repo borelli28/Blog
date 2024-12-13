@@ -3,12 +3,8 @@ import { Navigate } from 'react-router-dom';
 import { checkAuth, refreshToken } from '../services/AuthService';
 import useTokenRefresh from './TokenRefresh';
 
-interface ProtectedRouteProps {
-  children: React.ReactElement;
-}
-
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+const ProtectedRoute = ({ children }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
   useTokenRefresh();
 
   useEffect(() => {

@@ -3,11 +3,7 @@ import { Link } from 'react-router-dom';
 import Logout from './Logout';
 import '../styles/Navbar.css';
 
-interface NavbarProps {
-  isAuthenticated: boolean;
-}
-
-const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
+const Navbar = ({ isAuthenticated }) => {
   const [isNavCollapsed, setIsNavCollapsed] = useState(true);
 
   const handleNavCollapse = () => setIsNavCollapsed(!isNavCollapsed);
