@@ -1,4 +1,4 @@
-const checkAuth = async () => {
+export const checkAuth = async () => {
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/check`, {
       method: 'GET',
