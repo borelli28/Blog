@@ -235,7 +235,6 @@ export const getUsername = (req, res) => {
 
 export const refreshToken = async (req, res) => {
   try {
-    console.log('refreshToken handler method called!');
     await new Promise((resolve, reject) => {
       refreshTokenMiddleware(req, res, (err) => {
         if (err) reject(err);
@@ -243,7 +242,6 @@ export const refreshToken = async (req, res) => {
       });
     });
   } catch (error) {
-    console.error('Error in refreshToken handler:', error);
     // If the middleware didn't send a response, send one here
     if (!res.headersSent) {
       res.status(500).json({ error: 'Failed to refresh token' });
