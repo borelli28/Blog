@@ -35,6 +35,36 @@ export const getAllPosts = [getUsername, (req, res) => {
   });
 }];
 
+export const getPubPost = [getUsername, (req, res) => {
+  const id = sanitizeInput(req.params.id);
+  db.get('SELECT * FROM blog_posts WHERE id = ? AND is_deleted = 0 AND is_public = 1', [id], (err, row) => {
+    if (err) {
+      logger.error('Failed to get blog post', {
+        error: err.message,
+        stack: err.stack,
+        username: req.username,
+      });
+      return res.status(500).json({ error: err.message });
+    }
+
+    if (!row) {
+      logger.infoWithMeta('Blog post not found', 'Blog post not found', {
+        blog_id: id,
+        username: req.username
+      });
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    logger.infoWithMeta('Blog post retrieved', 'Blog post retrieved', {
+      blog_id: id,
+      blog_title: row.title,
+      username: req.username
+    });
+
+    res.json(row);
+  });
+}];
+
 export const getPost = [getUsername, (req, res) => {
   const id = sanitizeInput(req.params.id);
   db.get('SELECT * FROM blog_posts WHERE id = ? AND is_deleted = 0', [id], (err, row) => {
