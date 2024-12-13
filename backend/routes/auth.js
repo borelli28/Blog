@@ -1,6 +1,6 @@
 import express from 'express';
 import * as authHandlers from '../handlers/auth';
-import { authenticateToken } from '../middleware/auth';
+import { authenticateToken, refreshToken } from '../middleware/auth';
 
 const router = express.Router();
 
@@ -12,5 +12,6 @@ router.get('/check', authenticateToken, (req, res) => {
   res.status(200).json({ authenticated: true });
 });
 router.get('/getUsername', authenticateToken, authHandlers.getUsername);
+router.post('/refreshToken', authenticateToken, refreshToken);
 
 export default router;
