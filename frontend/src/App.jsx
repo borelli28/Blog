@@ -24,7 +24,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/blog/edit/:id" element={<ProtectedRoute><EditPost /></ProtectedRoute>} />
-        <Route path="/logs" element={<Logs />} />
+        <Route path="/logs" element={<ProtectedRoute><Logs /></ProtectedRoute>} />
         <Route path="/logout" element={<Logout />} />
       </Routes>
     </Router>
