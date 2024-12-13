@@ -1,4 +1,5 @@
 import { addToken, removeToken, isTokenValid } from '../utils/tokenWhitelist.js';
+import logger from '../utils/logger.js';
 import jwt from 'jsonwebtoken';
 
 export const authMiddleware = (req, res, next) => {
