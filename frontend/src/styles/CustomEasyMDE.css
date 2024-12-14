@@ -1,0 +1,19 @@
+.EasyMDEContainer .editor-toolbar {
+    background-color: black;
+}
+
+/* Change the color of the toolbar icons */
+.EasyMDEContainer .editor-toolbar button {
+    color: white;
+}
+
+/* Change the hover and active state of toolbar buttons */
+.EasyMDEContainer .editor-toolbar button:hover,
+.EasyMDEContainer .editor-toolbar button.active {
+    background-color: black;
+}
+
+/* Optionally, change the separator color */
+.EasyMDEContainer .editor-toolbar i.separator {
+    border-left: 1px solid white;
+}
