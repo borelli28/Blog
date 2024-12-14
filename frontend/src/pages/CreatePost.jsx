@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import EasyMDE from 'easymde';
 import 'easymde/dist/easymde.min.css';
+import '../styles/CustomEasyMDE.css';
 import '../styles/CreatePost.css';
 
 const CreatePost = () => {
@@ -20,7 +21,12 @@ const CreatePost = () => {
     // Check if the textarea reference is available
     if (editorRef.current) {
       // Initialize EasyMDE on the textarea
-      const easyMDE = new EasyMDE({ element: editorRef.current });
+      const easyMDE = new EasyMDE({
+        element: editorRef.current,
+        autofocus: true,
+        spellChecker: true
+      });
+
       return () => {
         // Convert the EasyMDE instance back to a regular textarea
         easyMDE.toTextArea();
@@ -84,7 +90,7 @@ const CreatePost = () => {
         
             <label htmlFor="desc">Description</label>
             <input type="text" className="form-control" name="desc" required/>
-        
+            
             <label htmlFor="content">Content</label>
             <textarea id="editor" name="content" ref={editorRef}></textarea>
 
