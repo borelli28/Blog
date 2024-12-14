@@ -75,9 +75,11 @@ const PostDetail = () => {
 
         <div id="content" dangerouslySetInnerHTML={{ __html: blog.content }} />
       </article>
+      <div id="edit-link">
       {isAuthenticated && (
         <Link to={`/blog/edit/${encodeURIComponent(blog.id)}`} className="btn btn-warning">Edit Post</Link>
       )}
+      </div>
     </Layout>
   );
 };

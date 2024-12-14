@@ -4,6 +4,7 @@ Layout, article {
     text-align: center;
     flex-wrap: wrap;
     width: 100%;
+    background-color: white;
 }
 
 h1 {
@@ -24,4 +25,8 @@ img {
 #content {
     width: 90%;
     margin: 2% 0;
+}
+
+#edit-link {
+    margin-top: 2%;
 }
