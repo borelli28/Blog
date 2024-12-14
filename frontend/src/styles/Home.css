@@ -1,5 +1,8 @@
+body, #root {
+  background-color: #f0f0f0 !important;
+}
+
 body {
-    background-color: rgb(218, 218, 219);
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
@@ -7,11 +10,8 @@ body {
     font-family: Courier, 'Times New Roman', Times, serif;
     width: 100%;
     height: 100%;
+    outline: 1px solid green;
 }
-
-/** {
-    outline: 1px dashed red;
-}*/
 
 main {
     display: flex;
