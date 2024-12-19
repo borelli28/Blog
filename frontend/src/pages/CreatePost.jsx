@@ -12,8 +12,9 @@ const CreatePost = () => {
   const editorRef = useRef(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  // Removes any non-alphanumeric characters except whitespace
   const sanitizeInput = (input) => {
-    return input.replace(/[^\w\s]/gi, '');
+    return input.replace(/[^\w\s]/g, '');
   };
 
   useEffect(() => {
