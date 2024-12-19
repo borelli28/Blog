@@ -53,7 +53,7 @@ const getUsername = async (req, res, next) => {
 };
 
 export const uploadArticleImage = [getUsername, (req, res) => {
-  upload.single('image')(req, res, function (err) {
+  upload.single('image')(req, res, async function (err) {
     if (err instanceof multer.MulterError) {
       logger.error(`Failed to upload article image`, {
         error: err.message,
@@ -143,7 +143,7 @@ export const uploadArticleImage = [getUsername, (req, res) => {
 }];
 
 export const uploadImage = [getUsername, (req, res) => {
-  upload.single('image')(req, res, function (err) {
+  upload.single('image')(req, res, async function (err) {
     if (err instanceof multer.MulterError) {
       logger.error(`Failed to upload image`, {
         error: err.message,
