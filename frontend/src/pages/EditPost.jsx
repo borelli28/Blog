@@ -70,8 +70,9 @@ const EditPost = () => {
     }
   }, [blog]);
 
+  // Removes any non-alphanumeric characters except whitespace
   const sanitizeInput = (input) => {
-    return input.replace(/[^\w\s]/gi, '');
+    return input.replace(/[^\w\s]/g, '');
   };
 
   const handleSubmit = async (event) => {
