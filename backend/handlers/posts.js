@@ -9,6 +9,19 @@ const sanitizeInput = (input) => {
   return input.replace(/[^a-zA-Z0-9\s-]/g, '');
 };
 
+// Sanitizes HTML content, allowing only specific safe tags and removing potentially dangerous ones
+const sanitizeHtmlContent = (input) => {
+  if (typeof input !== 'string') return '';
+  const allowedTags = ['div', 'p', 'li', 'ul', 'ol', 'span', 'br', 'b', 'i', 'strong', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a', 'img'];
+  const tagPattern = /<\/?([a-z][a-z0-9]*)\b[^>]*>/gi;
+  return input.replace(tagPattern, (match, tag) => {
+    if (allowedTags.includes(tag.toLowerCase())) {
+      return match;
+    }
+    return '';
+  });
+};
+
 const getUsername = async (req, res, next) => {
   const token = req.cookies.token;
   try {
@@ -100,7 +113,7 @@ export const createPost = [getUsername, (req, res) => {
   const sanitizedBody = {
     title: sanitizeInput(req.body.title),
     description: sanitizeInput(req.body.description),
-    content: sanitizeInput(req.body.content),
+    content: sanitizeHtmlContent(req.body.content),
     author_id: sanitizeInput(req.body.author_id)
   };
   const { title, description, content, author_id } = sanitizedBody;
@@ -132,7 +145,7 @@ export const updatePost = [getUsername, (req, res) => {
   const sanitizedBody = {
     title: sanitizeInput(req.body.title),
     description: sanitizeInput(req.body.description),
-    content: sanitizeInput(req.body.content)
+    content: sanitizeHtmlContent(req.body.content)
   };
   const { title, description, content } = sanitizedBody;
   const id = sanitizeInput(req.params.id);
