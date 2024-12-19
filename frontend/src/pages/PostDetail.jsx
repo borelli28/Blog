@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import '../styles/Blog.css';
+import ReactMarkdown from 'react-markdown';
 
 const PostDetail = () => {
   const [blog, setBlog] = useState(null);
@@ -73,7 +74,9 @@ const PostDetail = () => {
         <p className="date">Created: {new Date(blog.created_at).toLocaleDateString()}</p>
         <p className="date">Last Update: {new Date(blog.updated_at).toLocaleDateString()}</p>
 
-        <div id="content" dangerouslySetInnerHTML={{ __html: blog.content }} />
+        <div id="content">
+          <ReactMarkdown>{blog.content}</ReactMarkdown>
+        </div>
       </article>
       <div id="edit-link">
       {isAuthenticated && (
