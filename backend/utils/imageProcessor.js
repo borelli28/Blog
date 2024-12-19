@@ -13,7 +13,7 @@ export const processUploadedImage = async (file, maxWidth = 1920) => {
       pipeline = pipeline.resize(maxWidth);
     }
 
-    const processedFilename = `processed_${file.filename}`;
+    const processedFilename = `stipespicturam_${file.filename}`;
     const outputPath = path.join(path.dirname(file.path), processedFilename);
     await pipeline.toFile(outputPath);
 
