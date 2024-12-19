@@ -154,7 +154,7 @@ const Dashboard = () => {
   const handlePasswordUpdate = async (e) => {
     e.preventDefault();
 
-    const safeUsername = sanitizeInput(username);
+    const safeUsername = sanitizeUsername(username);
     const passwordError = validatePassword(password);
 
     if (passwordError) {
