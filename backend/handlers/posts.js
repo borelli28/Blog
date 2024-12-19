@@ -9,17 +9,36 @@ const sanitizeInput = (input) => {
   return input.replace(/[^a-zA-Z0-9\s-]/g, '');
 };
 
-// Sanitizes HTML content, allowing only specific safe tags and removing potentially dangerous ones
+// Sanitizes HTML content and preserves markdown image syntax
 const sanitizeHtmlContent = (input) => {
   if (typeof input !== 'string') return '';
+
   const allowedTags = ['div', 'p', 'li', 'ul', 'ol', 'span', 'br', 'b', 'i', 'strong', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a', 'img'];
   const tagPattern = /<\/?([a-z][a-z0-9]*)\b[^>]*>/gi;
-  return input.replace(tagPattern, (match, tag) => {
+  
+  // Preserve markdown image syntax
+  const preserveMarkdownImage = input.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match) => {
+    return match.replace(/[<>]/g, (char) => char === '<' ? '&lt;' : '&gt;');
+  });
+
+  // Sanitize HTML tags
+  const sanitizedHtml = preserveMarkdownImage.replace(tagPattern, (match, tag) => {
     if (allowedTags.includes(tag.toLowerCase())) {
+      // For allowed tags, strip attributes except src, alt, and href
+      if (tag.toLowerCase() === 'img' || tag.toLowerCase() === 'a') {
+        return match.replace(/(\w+)\s*=\s*"[^"]*"/g, (attrMatch, attrName) => {
+          if (['src', 'alt', 'href'].includes(attrName.toLowerCase())) {
+            return attrMatch;
+          }
+          return '';
+        });
+      }
       return match;
     }
     return '';
   });
+
+  return sanitizedHtml;
 };
 
 const getUsername = async (req, res, next) => {
