@@ -3,9 +3,10 @@ import logger from '../utils/logger.js';
 import { v4 as uuidv4 } from 'uuid';
 import { getUsernameFromToken } from '../utils/getUsernameFromToken.js';
 
+// Removes all characters except alphanumeric, hyphens, and spaces
 const sanitizeInput = (input) => {
   if (typeof input !== 'string') return input;
-  return input.replace(/[^a-zA-Z0-9-]/g, ''); // Remove all characters except alphanumeric and hyphens
+  return input.replace(/[^a-zA-Z0-9\s-]/g, '');
 };
 
 const getUsername = async (req, res, next) => {
