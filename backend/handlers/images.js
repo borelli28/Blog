@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import logger from '../utils/logger.js';
 import { getUsernameFromToken } from '../utils/getUsernameFromToken.js';
+import { processUploadedImage } from '../utils/imageProcessor.js';
 
 const sanitizeInput = (input) => {
   if (typeof input !== 'string') return input;
@@ -52,7 +53,7 @@ const getUsername = async (req, res, next) => {
 };
 
 export const uploadArticleImage = [getUsername, (req, res) => {
-  upload.single('image')(req, res, function (err) {
+  upload.single('image')(req, res, async function (err) {
     if (err instanceof multer.MulterError) {
       logger.error(`Failed to upload article image`, {
         error: err.message,
@@ -77,7 +78,7 @@ export const uploadArticleImage = [getUsername, (req, res) => {
       return res.status(500).json({ error: err.message });
     }
 
-    const file = req.file;
+    const file = await processUploadedImage(req.file);  // Remove img metadata among other things...
     if (!file) {
       logger.infoWithMeta('Article image upload failed', 'No file uploaded', { username: req.username });
       return res.status(400).json({ error: 'Please upload a file' });
@@ -142,7 +143,7 @@ export const uploadArticleImage = [getUsername, (req, res) => {
 }];
 
 export const uploadImage = [getUsername, (req, res) => {
-  upload.single('image')(req, res, function (err) {
+  upload.single('image')(req, res, async function (err) {
     if (err instanceof multer.MulterError) {
       logger.error(`Failed to upload image`, {
         error: err.message,
@@ -167,7 +168,7 @@ export const uploadImage = [getUsername, (req, res) => {
       return res.status(500).json({ error: err.message });
     }
 
-    const file = req.file;
+    const file = await processUploadedImage(req.file);  // Remove img metadata among other things...
     if (!file) {
       logger.infoWithMeta('Image upload failed', 'No file uploaded', { username: req.username });
       return res.status(400).json({ error: 'Please upload a file' });
