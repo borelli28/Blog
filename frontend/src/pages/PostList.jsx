@@ -41,7 +41,7 @@ const PostList = () => {
             <div className="card hoverable grey darken-3">
               <Link to={`/blog/${encodeURIComponent(blog.id)}`} className="card-content white-text">
                 <span className="card-title">{blog.title}</span>
-                <p>{blog.description}</p>
+                <p className="card-description">{blog.description}</p>
               </Link>
             </div>
           </div>

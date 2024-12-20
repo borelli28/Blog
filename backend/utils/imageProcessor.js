@@ -2,16 +2,20 @@ import sharp from 'sharp';
 import fs from 'fs/promises';
 import path from 'path';
 
-export const processUploadedImage = async (file, maxWidth = 1920) => {
+export const processUploadedImage = async (file) => {
   try {
     const image = sharp(file.path);
     const metadata = await image.metadata();
     let pipeline = image.withMetadata(false);  // Remove all metadata
 
-    // Resize if width is larger than maxWidth
-    if (metadata.width > maxWidth) {
-      pipeline = pipeline.resize(maxWidth);
-    }
+    const targetWidth = 1780;
+    const targetHeight = 1370;
+
+    // Resize image to fit within target dimensions while maintaining aspect ratio
+    pipeline = pipeline.resize(targetWidth, targetHeight, {
+      fit: 'inside',  // Ensures the image fits inside the target dimensions
+      withoutEnlargement: true  // Prevents upscaling smaller images
+    });
 
     const processedFilename = `stipespicturam_${file.filename}`;
     const outputPath = path.join(path.dirname(file.path), processedFilename);
