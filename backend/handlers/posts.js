@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { getUsernameFromToken } from '../utils/getUsernameFromToken.js';
 import fs from 'fs';
 import path from 'path';
-import { deleteImage } from './images.js';
 
 // Removes all characters except alphanumeric, hyphens, and spaces
 const sanitizeInput = (input) => {
