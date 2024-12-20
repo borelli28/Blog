@@ -6,6 +6,10 @@
     width: 100%;
 }
 
+#cards a {
+    text-decoration: none;
+}
+
 .row {
     width: 75%;
     margin: 1%;
