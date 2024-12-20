@@ -49,3 +49,20 @@ h2 {
 	width: 100%;
 	margin-top: 1%;
 }
+
+#images-container img {
+	width: 65%;
+	height: 100%;
+}
+
+#images-container #images-containers-title {
+	margin-top: 5%;
+}
+
+#images-container #image {
+	padding: 5%;
+}
+
+#img-container form button {
+	margin: 2% 0;
+}
