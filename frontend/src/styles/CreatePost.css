@@ -54,3 +54,11 @@ h2 {
 	width: 65%;
 	height: 100%;
 }
+
+#images-container #images-containers-title {
+	margin-top: 5%;
+}
+
+#images-container #image {
+	padding: 5%;
+}

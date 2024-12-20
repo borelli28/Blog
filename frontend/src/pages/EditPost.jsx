@@ -320,7 +320,7 @@ const EditPost = () => {
               </form>
             </div>
             <div id="images-container">
-              <h6>Blog Images</h6>
+              <h4 id="images-containers-title">Blog Images</h4>
               {images.map((img) => (
                 <div key={img.id} id="image">
                   <p>{img.image}</p>
