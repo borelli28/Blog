@@ -201,7 +201,7 @@ export const updatePost = [getUsername, (req, res) => {
 }];
 
 export const recoverPost = [getUsername, (req, res) => {
-  const { id } = sanitizeInput(req.params.id);
+  const id = sanitizeInput(req.params.id);
   db.run('UPDATE blog_posts SET is_deleted = 0 WHERE id = ?', [id], function (err) {
     if (err) {
       logger.error('Failed to recover blog post', {
@@ -294,7 +294,7 @@ export const deletePost = [getUsername, (req, res) => {
 }];
 
 export const permanentDeletePost = [getUsername, (req, res) => {
-  const { id } = sanitizeInput(req.body.id);
+  const id = sanitizeInput(req.body.id);
 
   db.serialize(() => {
     db.run('BEGIN TRANSACTION');
