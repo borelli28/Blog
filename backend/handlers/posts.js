@@ -2,6 +2,9 @@ import { db } from '../models/db.js';
 import logger from '../utils/logger.js';
 import { v4 as uuidv4 } from 'uuid';
 import { getUsernameFromToken } from '../utils/getUsernameFromToken.js';
+import fs from 'fs';
+import path from 'path';
+import { deleteImage } from './images.js';
 
 // Removes all characters except alphanumeric, hyphens, and spaces
 const sanitizeInput = (input) => {
@@ -199,7 +202,7 @@ export const updatePost = [getUsername, (req, res) => {
 }];
 
 export const recoverPost = [getUsername, (req, res) => {
-  const { id } = sanitizeInput(req.params.id);
+  const id = sanitizeInput(req.params.id);
   db.run('UPDATE blog_posts SET is_deleted = 0 WHERE id = ?', [id], function (err) {
     if (err) {
       logger.error('Failed to recover blog post', {
@@ -272,7 +275,8 @@ export const updatePostStatus = [getUsername, (req, res) => {
 }];
 
 export const deletePost = [getUsername, (req, res) => {
-  const { id } = sanitizeInput(req.params.id);
+  const id = sanitizeInput(req.params.id);
+
   db.run('UPDATE blog_posts SET is_deleted = 1 WHERE id = ?', [id], function (err) {
     if (err) {
       logger.error('Failed to delete blog post', {
@@ -291,21 +295,79 @@ export const deletePost = [getUsername, (req, res) => {
 }];
 
 export const permanentDeletePost = [getUsername, (req, res) => {
-  const { id } = sanitizeInput(req.body.id);
-  db.run('DELETE FROM blog_posts WHERE id = ?', [id], function (err) {
-    if (err) {
-      logger.error('Failed to permanently delete blog post', {
-        error: err.message,
-        stack: err.stack,
-        username: req.username,
+  const id = sanitizeInput(req.body.id);
+
+  db.serialize(() => {
+    db.run('BEGIN TRANSACTION');
+
+    // Delete associated images from the filesystem
+    db.all('SELECT image FROM images WHERE blog_id = ?', [id], (err, rows) => {
+      if (err) {
+        db.run('ROLLBACK');
+        logger.error('Failed to fetch images for deletion', {
+          error: err.message,
+          stack: err.stack,
+          username: req.username,
+        });
+        return res.status(500).json({ error: err.message });
+      }
+
+      rows.forEach(row => {
+        const imagePath = path.join(__dirname, '..', 'uploads', row.image);
+        fs.unlink(imagePath, (unlinkErr) => {
+          if (unlinkErr) {
+            logger.error('Failed to delete image file', {
+              error: unlinkErr.message,
+              stack: unlinkErr.stack,
+              username: req.username,
+              imagePath: imagePath,
+            });
+          } else {
+            logger.infoWithMeta('Image deleted', 'Image deleted', {
+              username: req.username,
+              imagePath: imagePath,
+            });
+          }
+        });
       });
-      return res.status(500).json({ error: err.message });
-    }
-    logger.infoWithMeta('Blog post permanently deleted', 'Blog post permanently deleted', { 
-      username: req.username,
-      blog_id: id
     });
-    res.json({ changes: this.changes });
+
+    // Delete images from the database
+    db.run('DELETE FROM images WHERE blog_id = ?', [id], (err) => {
+      if (err) {
+        db.run('ROLLBACK');
+        logger.error('Failed to delete associated images from database', {
+          error: err.message,
+          stack: err.stack,
+          username: req.username,
+        });
+        return res.status(500).json({ error: err.message });
+      }
+      logger.infoWithMeta('Blog images deleted from database', 'Blog images deleted from database', {
+        username: req.username,
+        blog_id: id,
+      });
+    });
+
+    // Delete the blog post
+    db.run('DELETE FROM blog_posts WHERE id = ?', [id], function (err) {
+      if (err) {
+        db.run('ROLLBACK');
+        logger.error('Failed to permanently delete blog post', {
+          error: err.message,
+          stack: err.stack,
+          username: req.username,
+        });
+        return res.status(500).json({ error: err.message });
+      }
+
+      db.run('COMMIT');
+      logger.infoWithMeta('Blog post permanently deleted', 'Blog post permanently deleted', { 
+        username: req.username,
+        blog_id: id
+      });
+      res.json({ changes: this.changes });
+    });
   });
 }];
 
