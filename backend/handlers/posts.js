@@ -300,8 +300,8 @@ export const permanentDeletePost = [getUsername, (req, res) => {
   db.serialize(() => {
     db.run('BEGIN TRANSACTION');
 
-    // Fetch blog images
-    db.all('SELECT id FROM images WHERE blog_id = ?', [id], (err, rows) => {
+    // Delete associated images from the filesystem
+    db.all('SELECT image FROM images WHERE blog_id = ?', [id], (err, rows) => {
       if (err) {
         db.run('ROLLBACK');
         logger.error('Failed to fetch images for deletion', {
@@ -312,39 +312,61 @@ export const permanentDeletePost = [getUsername, (req, res) => {
         return res.status(500).json({ error: err.message });
       }
 
-      // Delete images by calling deleteImage handler method
-      const deletePromises = rows.map(row => {
-        return new Promise((resolve) => {
-          deleteImage[1]({ body: { id: row.id }, username: req.username }, {
-            status: () => ({ json: resolve })
-          });
-        });
-      });
-
-      Promise.all(deletePromises).then(() => {
-        // Delete the blog post
-        db.run('DELETE FROM blog_posts WHERE id = ?', [id], function (err) {
-          if (err) {
-            db.run('ROLLBACK');
-            logger.error('Failed to permanently delete blog post', {
-              error: err.message,
-              stack: err.stack,
+      rows.forEach(row => {
+        const imagePath = path.join(__dirname, '..', 'uploads', row.image);
+        fs.unlink(imagePath, (unlinkErr) => {
+          if (unlinkErr) {
+            logger.error('Failed to delete image file', {
+              error: unlinkErr.message,
+              stack: unlinkErr.stack,
               username: req.username,
+              imagePath: imagePath,
             });
-            return res.status(500).json({ error: err.message });
+          } else {
+            logger.infoWithMeta('Image deleted', 'Image deleted', {
+              username: req.username,
+              imagePath: imagePath,
+            });
           }
-
-          db.run('COMMIT');
-          logger.infoWithMeta('Blog post permanently deleted', 'Blog post permanently deleted', { 
-            username: req.username,
-            blog_id: id
-          });
-          res.json({ changes: this.changes });
         });
-      }).catch(error => {
-        db.run('ROLLBACK'); // Images were not deleted rollback
-        res.status(500).json({ error: error.message });
       });
+    });
+
+    // Delete images from the database
+    db.run('DELETE FROM images WHERE blog_id = ?', [id], (err) => {
+      if (err) {
+        db.run('ROLLBACK');
+        logger.error('Failed to delete associated images from database', {
+          error: err.message,
+          stack: err.stack,
+          username: req.username,
+        });
+        return res.status(500).json({ error: err.message });
+      }
+      logger.infoWithMeta('Blog images deleted from database', 'Blog images deleted from database', {
+        username: req.username,
+        blog_id: id,
+      });
+    });
+
+    // Delete the blog post
+    db.run('DELETE FROM blog_posts WHERE id = ?', [id], function (err) {
+      if (err) {
+        db.run('ROLLBACK');
+        logger.error('Failed to permanently delete blog post', {
+          error: err.message,
+          stack: err.stack,
+          username: req.username,
+        });
+        return res.status(500).json({ error: err.message });
+      }
+
+      db.run('COMMIT');
+      logger.infoWithMeta('Blog post permanently deleted', 'Blog post permanently deleted', { 
+        username: req.username,
+        blog_id: id
+      });
+      res.json({ changes: this.changes });
     });
   });
 }];
