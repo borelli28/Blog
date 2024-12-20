@@ -291,7 +291,7 @@ export const deletePost = [getUsername, (req, res) => {
 }];
 
 export const permanentDeletePost = [getUsername, (req, res) => {
-  const { id } = sanitizeInput(req.body.id);
+  const { id } = req.body.id;
   db.run('DELETE FROM blog_posts WHERE id = ?', [id], function (err) {
     if (err) {
       logger.error('Failed to permanently delete blog post', {
