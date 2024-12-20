@@ -308,7 +308,7 @@ export const permanentDeletePost = [getUsername, (req, res) => {
           stack: err.stack,
           username: req.username,
         });
-        return res.status(500).json({ error: 'Internal server error' });
+        return res.status(500).json({ error: err.message });
       }
 
       rows.forEach(row => {
@@ -318,6 +318,11 @@ export const permanentDeletePost = [getUsername, (req, res) => {
             logger.error('Failed to delete image file', {
               error: unlinkErr.message,
               stack: unlinkErr.stack,
+              username: req.username,
+              imagePath: imagePath,
+            });
+          } else {
+            logger.infoWithMeta('Image deleted', 'Image deleted', {
               username: req.username,
               imagePath: imagePath,
             });
@@ -335,8 +340,12 @@ export const permanentDeletePost = [getUsername, (req, res) => {
           stack: err.stack,
           username: req.username,
         });
-        return res.status(500).json({ error: 'Internal server error' });
+        return res.status(500).json({ error: err.message });
       }
+      logger.infoWithMeta('Associated images deleted from database', 'Associated images deleted from database', {
+        username: req.username,
+        blog_id: id,
+      });
     });
 
     // Delete the blog post
@@ -348,7 +357,7 @@ export const permanentDeletePost = [getUsername, (req, res) => {
           stack: err.stack,
           username: req.username,
         });
-        return res.status(500).json({ error: 'Internal server error' });
+        return res.status(500).json({ error: err.message });
       }
 
       db.run('COMMIT');
