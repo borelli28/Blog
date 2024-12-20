@@ -14,3 +14,11 @@
     width: 75%;
     margin: 1%;
 }
+
+a .card-title {
+    color: black;
+}
+
+.card-description {
+    margin-top: 1.5%;
+}

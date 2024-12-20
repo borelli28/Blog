@@ -67,7 +67,7 @@ const Home = () => {
                       <Link to={`/blog/${encodeURIComponent(blog.id)}`}>
                         <div className="card-content grey darken-3">
                           <span className="card-title">{blog.title}</span>
-                          <p>{blog.description}</p>
+                          <p className="card-description">{blog.description}</p>
                         </div>
                       </Link>
                     </div>
