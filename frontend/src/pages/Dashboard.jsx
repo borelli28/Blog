@@ -115,7 +115,7 @@ const Dashboard = () => {
           'Content-Type': 'application/json',
           'X-CSRF-Token': getCSRFToken(),
         },
-        body: JSON.stringify({ title: sanitizeInput(blogId) }),
+        body: JSON.stringify({ id: blogId }),
         credentials: 'include',
       });
       if (response.ok) {
