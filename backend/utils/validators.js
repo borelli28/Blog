@@ -23,7 +23,7 @@ export const userRegisterValidator = (postData) => {
     errors.password = "Password cannot be longer than 72 characters";
   }
 
-  if (postData.password !== postData.confirm_password) {
+  if (postData.password !== postData.confirmPassword) {
     errors.password = "Passwords do not match";
   }
 

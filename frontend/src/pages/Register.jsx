@@ -40,7 +40,7 @@ const Register = () => {
           'Content-Type': 'application/json',
           'X-CSRF-Token': getCSRFToken(),
         },
-        body: JSON.stringify({ username: safeUsername, password: password }),
+        body: JSON.stringify({ username: safeUsername, password: password, confirmPassword: confirmPassword }),
         credentials: 'include',
       });
 
