@@ -49,3 +49,8 @@ h2 {
 	width: 100%;
 	margin-top: 1%;
 }
+
+#images-container img {
+	width: 65%;
+	height: 100%;
+}
