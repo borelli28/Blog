@@ -32,6 +32,8 @@ const EVENT_SIGNATURES = {
   'Image upload failed': { signatureId: '2006', severity: 'Medium' },
   'Image not found for deletion': { signatureId: '2007', severity: 'Medium' },
   'Attempted upload of invalid file type for image': { signatureId: '2008', severity: 'High' },
+  'Failed to delete image file': { signatureId: '2009', severity: 'Medium' },
+  'Blog images deleted from database': { signatureId: '2010', severity: 'Medium' },
   'User registered': { signatureId: '3001', severity: 'Medium' },
   'Password updated': { signatureId: '3004', severity: 'Medium' },
   'Username fetched': { signatureId: '3005', severity: 'Low' },
