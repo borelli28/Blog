@@ -8,6 +8,8 @@ const Logs = () => {
   const [alert, setAlert] = useState({ show: false, message: '', type: '' });
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState('timestamp');
+  const [filterValue, setFilterValue] = useState('');
 
   useEffect(() => {
     fetchLogs();
@@ -68,6 +70,37 @@ const Logs = () => {
     }
   };
 
+  const handleRemoveFiltered = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/logs/filtered`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': getCSRFToken(),
+        },
+        body: JSON.stringify({
+          filter: selectedFilter,
+          value: filterValue || '*'
+        }),
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        await fetchLogs(); // Refresh the logs
+        setAlert({ show: true, message: 'Logs successfully removed!', type: 'success' });
+        setFilterValue(''); // Reset filter value
+        console.log(response);
+      } else {
+        setAlert({ show: true, message: 'Failed to remove logs', type: 'danger' });
+      }
+      setTimeout(() => setAlert({ show: false, message: '', type: '' }), 3000);
+    } catch (error) {
+      console.error('Error removing logs:', error);
+      setAlert({ show: true, message: 'Error removing logs', type: 'danger' });
+      setTimeout(() => setAlert({ show: false, message: '', type: '' }), 3000);
+    }
+  };
+
   const requestSort = (key) => {
     let direction = 'ascending';
     if (sortConfig.key === key && sortConfig.direction === 'ascending') {
@@ -114,6 +147,28 @@ const Logs = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="form-control mb-3"
         />
+        <form onSubmit={handleRemoveFiltered}>
+          <div className="mb-3 d-flex gap-2">
+            <select 
+              className="form-select w-auto"
+              value={selectedFilter}
+              onChange={(e) => setSelectedFilter(e.target.value)}
+            >
+              <option value="timestamp">Timestamp</option>
+              <option value="level">Level</option>
+              <option value="name">Event Name</option>
+              <option value="severity">Severity</option>
+            </select>
+            <input
+              type="text"
+              className="form-control w-auto"
+              placeholder="Filter value (empty for all)"
+              value={filterValue}
+              onChange={(e) => setFilterValue(e.target.value)}
+            />
+            <button type="submit" className="btn btn-primary">Delete Filtered Logs</button>
+          </div>
+        </form>
         <table className="table table-bordered table-striped-columns table-hover">
           <thead className="table-light">
             <tr>
