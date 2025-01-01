@@ -156,7 +156,7 @@ const Logs = () => {
             >
               <option value="timestamp">Timestamp</option>
               <option value="level">Level</option>
-              <option value="name">Event Name</option>
+              <option value="signatureId">Signature ID</option>
               <option value="severity">Severity</option>
             </select>
             <input

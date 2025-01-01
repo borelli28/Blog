@@ -149,7 +149,7 @@ export const removeFilteredLogs = [getUsername, (req, res) => {
               return !log.includes(`rt=${value}`);
             case 'level':
               return !log.includes(`level=${value}`);
-            case 'name':
+            case 'signatureId':
               return logParts[4] !== value;
             case 'severity':
               return logParts[6] !== value;
