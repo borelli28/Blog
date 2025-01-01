@@ -166,7 +166,7 @@ const Logs = () => {
               value={filterValue}
               onChange={(e) => setFilterValue(e.target.value)}
             />
-            <button type="submit" className="btn btn-primary">Delete Filtered Logs</button>
+            <button type="submit" className="btn btn-primary">Remove Filtered Logs</button>
           </div>
         </form>
         <table className="table table-bordered table-striped-columns table-hover">
