@@ -121,3 +121,62 @@ export const removeLog = [getUsername, (req, res) => {
     res.status(500).json({ error: 'An unexpected error occurred' });
   }
 }];
+
+export const removeFilteredLogs = [getUsername, (req, res) => {
+  try {
+    const { filter, value } = req.body;
+
+    fs.readFile(logFile, 'utf8', (err, data) => {
+      if (err) {
+        logger.error(`Failed to read log file`, {
+          error: err.message,
+          stack: err.stack,
+          username: req.username,
+        });
+        return res.status(500).json({ error: 'Failed to read logs' });
+      }
+
+      const logs = data.split('\n').filter(Boolean);
+      let updatedLogs;
+
+      if (value === '*') { // Delete all logs
+        updatedLogs = [];
+      } else { // Delete logs that match the filter
+        updatedLogs = logs.filter(log => {
+          const logParts = log.split('|');
+          switch(filter) {
+            case 'timestamp':
+              return !log.includes(`rt=${value}`);
+            case 'level':
+              return !log.includes(`level=${value}`);
+            case 'name':
+              return logParts[4] !== value;
+            case 'severity':
+              return logParts[6] !== value;
+            default:
+              return true;
+          }
+        });
+      }
+
+      fs.writeFile(logFile, updatedLogs.join('\n') + (updatedLogs.length > 0 ? '\n' : ''), (writeErr) => {
+        if (writeErr) {
+          logger.error(`Failed to write updated log file`, {
+            error: writeErr.message,
+            stack: writeErr.stack,
+            username: req.username,
+          });
+          return res.status(500).json({ error: 'Failed to remove logs' });
+        }
+        res.json({ message: 'Logs removed successfully' });
+      });
+    });
+  } catch (error) {
+    logger.error(`Unexpected error in removeFilteredLogs`, {
+      error: error.message,
+      stack: error.stack,
+      username: req.username,
+    });
+    res.status(500).json({ error: 'An unexpected error occurred' });
+  }
+}];
