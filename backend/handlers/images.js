@@ -11,6 +11,12 @@ const sanitizeInput = (input) => {
   return input.replace(/[^a-zA-Z0-9-]/g, ''); // Remove all characters except alphanumeric and hyphens
 };
 
+// Create uploads directory if it doesn't exist
+const uploadDir = 'uploads';
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, 'uploads/');
