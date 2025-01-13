@@ -3,7 +3,6 @@
 ## Components
 
 ### 1. Core Server (`server.js`)
-- Entry point for the application
 - Express.js server configuration 
 - CORS and security middleware setup
 - CSRF token generation and validation
@@ -69,6 +68,27 @@
   * Input sanitization
   * User data validation
   * Password requirements
+
+### 6. Backup System
+- **Core Functionality**
+  * Automated database and file system backups
+  * Retention policy management
+  * Integrity verification
+
+- **Tools Used**
+  * SQLite .backup utility
+  * tar/gzip compression
+  * Shell scripts
+  * Cron scheduling
+
+- **Backup Strategy**
+  * Daily backups (7-day retention)
+  * Monthly backups (3-month retention)
+
+- **Security Measures**
+  * Backup encryption
+  * Integrity verification
+  * Secure files transfer
 
 ## Basic Workflow
 
