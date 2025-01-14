@@ -56,11 +56,6 @@ const EditPost = () => {
       }
     };
 
-    fetchBlogAndImages();
-    checkAuth();
-  }, [id]);
-
-  useEffect(() => {
     if (editorRef.current) {
       const easyMDE = new EasyMDE({ element: editorRef.current });
       return () => {
@@ -68,7 +63,22 @@ const EditPost = () => {
         easyMDE.cleanup();
       };
     }
-  }, [blog]);
+
+    const fetchCSRFToken = async () => {
+      try {
+        await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
+          method: 'GET',
+          credentials: 'include'
+        });
+      } catch (error) {
+        console.error('Error fetching CSRF token:', error);
+      }
+    };
+    fetchCSRFToken();
+
+    fetchBlogAndImages();
+    checkAuth();
+  }, [id, blog]);
 
   // Removes any non-alphanumeric characters except whitespace
   const sanitizeInput = (input) => {
