@@ -35,6 +35,18 @@ const CreatePost = () => {
         easyMDE.cleanup();
       };
     }
+
+    const fetchCSRFToken = async () => {
+      try {
+        await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
+          method: 'GET',
+          credentials: 'include'
+        });
+      } catch (error) {
+        console.error('Error fetching CSRF token:', error);
+      }
+    };
+    fetchCSRFToken();
   }, []);
 
   const checkAuth = async () => {
@@ -64,7 +76,6 @@ const CreatePost = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRF-Token': getCSRFToken(),
         },
         body: JSON.stringify(blogData),
         credentials: 'include',
