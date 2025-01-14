@@ -11,8 +11,7 @@ export const loginLimiter = rateLimit({
             path: req.path,
             attemptCount: req.rateLimit.current,
             limit: req.rateLimit.limit,
-            remaining: req.rateLimit.remaining,
-            resetTime: new Date(Date.now() + req.rateLimit.resetTime).toISOString()
+            remaining: req.rateLimit.remaining
         });
         res.status(429).json(options.message);
     }
@@ -28,8 +27,7 @@ export const registerLimiter = rateLimit({
             path: req.path,
             attemptCount: req.rateLimit.current,
             limit: req.rateLimit.limit,
-            remaining: req.rateLimit.remaining,
-            resetTime: new Date(Date.now() + req.rateLimit.resetTime).toISOString()
+            remaining: req.rateLimit.remaining
         });
         res.status(429).json(options.message);
     }
