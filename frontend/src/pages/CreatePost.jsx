@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { getCSRFToken } from '../services/csrf';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import EasyMDE from 'easymde';
@@ -64,7 +63,6 @@ const CreatePost = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRF-Token': getCSRFToken(),
         },
         body: JSON.stringify(blogData),
         credentials: 'include',

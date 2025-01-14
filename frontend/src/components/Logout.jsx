@@ -1,4 +1,3 @@
-import { getCSRFToken } from '../services/csrf';
 import { useNavigate } from 'react-router-dom';
 import React from 'react';
 import '../styles/Logout.css';
@@ -10,9 +9,6 @@ const Logout = () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
         method: 'POST',
-        headers: {
-          'X-CSRF-Token': getCSRFToken(),
-        },
         credentials: 'include',
       });
 

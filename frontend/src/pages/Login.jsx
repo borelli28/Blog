@@ -1,8 +1,7 @@
 import { sanitizeUsername, validateUsername, validatePassword } from '../services/inputValidation';
-import { getCSRFToken } from '../services/csrf';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/Auth.css';
 
 const Login = () => {
@@ -10,6 +9,21 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchCSRFToken = async () => {
+      try {
+        await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
+          method: 'GET',
+          credentials: 'include'
+        });
+      } catch (error) {
+        console.error('Error fetching CSRF token:', error);
+      }
+    };
+
+    fetchCSRFToken();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,7 +48,6 @@ const Login = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRF-Token': getCSRFToken(),
         },
         body: JSON.stringify({ username: safeUsername, password: password }),
         credentials: 'include',

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { getCSRFToken } from '../services/csrf';
 import Layout from '../components/Layout';
 import { Link } from 'react-router-dom';
 import '../styles/Dashboard.css';
@@ -65,7 +64,6 @@ const Dashboard = () => {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRF-Token': getCSRFToken(),
         },
         body: JSON.stringify({ is_favorite: isFavorite }),
         credentials: 'include',
@@ -89,7 +87,6 @@ const Dashboard = () => {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRF-Token': getCSRFToken(),
         },
         body: JSON.stringify({ is_public: isPublic }),
         credentials: 'include',
@@ -113,7 +110,6 @@ const Dashboard = () => {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRF-Token': getCSRFToken(),
         },
         body: JSON.stringify({ id: blogId }),
         credentials: 'include',
@@ -135,7 +131,6 @@ const Dashboard = () => {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRF-Token': getCSRFToken(),
         },
         body: JSON.stringify({ title: sanitizeInput(blogId) }),
         credentials: 'include',
@@ -169,7 +164,6 @@ const Dashboard = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRF-Token': getCSRFToken(),
         },
         body: JSON.stringify({ username: safeUsername, password: password }),
         credentials: 'include',

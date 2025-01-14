@@ -25,30 +25,41 @@ const tokens = new Tokens();
 
 app.use(cookieParser());
 
-// Middleware to issue and validate CSRF tokens
+// Validate CSRF_SECRET existence
+const CSRF_SECRET = process.env.CSRF_SECRET;
+if (!CSRF_SECRET) {
+  throw new Error('CSRF_SECRET must be defined in environment variables');
+}
+
+// Middleware to issue CSRF tokens to the frontend on every GET request
 app.use((req, res, next) => {
-  // Retrieve or generate a CSRF secret
-  let csrfSecret = req.cookies['csrf-secret'];
-  if (!csrfSecret) {
-    csrfSecret = tokens.secretSync();
-    res.cookie('csrf-secret', csrfSecret, { httpOnly: true, secure: true, sameSite: 'Strict' });
+  if (req.method === 'GET') {
+    const csrfToken = tokens.create(CSRF_SECRET);
+    res.cookie('csrf-token', csrfToken, { 
+      secure: true, 
+      sameSite: 'Strict',
+      httpOnly: true
+    });
+    req.csrfToken = csrfToken;
   }
-
-  // Generate a new CSRF token for this request
-  const csrfToken = tokens.create(csrfSecret);
-  res.cookie('csrf-token', csrfToken, { secure: true, sameSite: 'Strict' });
-
-  req.csrfToken = csrfToken;
   next();
 });
 
 // Middleware to validate CSRF tokens for state-changing requests
 app.use((req, res, next) => {
   if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
-    const csrfSecret = req.cookies['csrf-secret'];
-    const csrfToken = req.headers['x-csrf-token'];
-    if (!tokens.verify(csrfSecret, csrfToken)) {
-      return res.status(403).json({ error: 'Invalid CSRF token' });
+    const token = req.cookies['csrf-token'];
+    
+    if (!token) {
+      return res.status(403).json({ 
+        error: 'CSRF token missing' 
+      });
+    }
+
+    if (!tokens.verify(CSRF_SECRET, token)) {
+      return res.status(403).json({ 
+        error: 'Invalid CSRF token' 
+      });
     }
   }
   next();
