@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { getCSRFToken } from '../services/csrf';
 import Layout from '../components/Layout';
 
 const Logs = () => {
@@ -12,18 +11,6 @@ const Logs = () => {
   const [filterValue, setFilterValue] = useState('');
 
   useEffect(() => {
-    const fetchCSRFToken = async () => {
-      try {
-        await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
-          method: 'GET',
-          credentials: 'include'
-        });
-      } catch (error) {
-        console.error('Error fetching CSRF token:', error);
-      }
-    };
-
-    fetchCSRFToken();
     fetchLogs();
     checkAuth();
   }, []);

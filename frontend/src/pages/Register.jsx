@@ -1,7 +1,6 @@
 import { sanitizeUsername, validateUsername, validatePassword } from '../services/inputValidation';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
-import { getCSRFToken } from '../services/csrf';
 import React, { useState, useEffect } from 'react';
 import '../styles/Auth.css';
 
@@ -15,7 +14,7 @@ const Register = () => {
   useEffect(() => {
     const fetchCSRFToken = async () => {
       try {
-        await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
+        await fetch(`${import.meta.env.VITE_API_URL}/auth/register`, {
           method: 'GET',
           credentials: 'include'
         });

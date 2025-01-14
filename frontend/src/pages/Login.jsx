@@ -1,5 +1,4 @@
 import { sanitizeUsername, validateUsername, validatePassword } from '../services/inputValidation';
-import { getCSRFToken } from '../services/csrf';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import React, { useState, useEffect } from 'react';

@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { getCSRFToken } from '../services/csrf';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import EasyMDE from 'easymde';
@@ -35,18 +34,6 @@ const CreatePost = () => {
         easyMDE.cleanup();
       };
     }
-
-    const fetchCSRFToken = async () => {
-      try {
-        await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
-          method: 'GET',
-          credentials: 'include'
-        });
-      } catch (error) {
-        console.error('Error fetching CSRF token:', error);
-      }
-    };
-    fetchCSRFToken();
   }, []);
 
   const checkAuth = async () => {

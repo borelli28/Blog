@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { getCSRFToken } from '../services/csrf';
 import Layout from '../components/Layout';
 import { Link } from 'react-router-dom';
 import '../styles/Dashboard.css';
@@ -19,18 +18,6 @@ const Dashboard = () => {
   const currentBlogs = blogs.filter(blog => !blog.is_deleted).slice(indexOfFirstBlog, indexOfLastBlog);
 
   useEffect(() => {
-    const fetchCSRFToken = async () => {
-      try {
-        await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
-          method: 'GET',
-          credentials: 'include'
-        });
-      } catch (error) {
-        console.error('Error fetching CSRF token:', error);
-      }
-    };
-
-    fetchCSRFToken();
     fetchBlogs();
     fetchUsername();
   }, []);
