@@ -49,9 +49,6 @@ const Logs = () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/logs/${encodeURIComponent(timestamp)}`, {
         method: 'DELETE',
-        headers: {
-          'X-CSRF-Token': getCSRFToken(),
-        },
         credentials: 'include',
       });
 
@@ -76,7 +73,6 @@ const Logs = () => {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRF-Token': getCSRFToken(),
         },
         body: JSON.stringify({
           filter: selectedFilter,
