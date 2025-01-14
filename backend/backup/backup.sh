@@ -29,15 +29,16 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Compress database and uploads
-tar -czf "$BACKUP_DIR/daily/backup_$DATE.tar.gz" \
-    "$BACKUP_DIR/daily/blog_$DATE.db" \
-    "$UPLOADS_DIR"
+# Compress and encrypt database and uploads
+tar -czf - "$BACKUP_DIR/daily/blog_$DATE.db" "$UPLOADS_DIR" | \
+gpg --encrypt --recipient "$BACKUP_GPG_KEY" \
+    --trust-model always \
+    --output "$BACKUP_DIR/daily/backup_$DATE.tar.gz.gpg"
 
-# Create monthly backup on the first day of each month
+# Monthly backup (modified for encrypted file)
 if [ "$(date +%d)" = "01" ]; then
-    cp "$BACKUP_DIR/daily/backup_$DATE.tar.gz" \
-       "$BACKUP_DIR/monthly/backup_$MONTH.tar.gz"
+    cp "$BACKUP_DIR/daily/backup_$DATE.tar.gz.gpg" \
+       "$BACKUP_DIR/monthly/backup_$MONTH.tar.gz.gpg"
 fi
 
 # Cleanup old backups
