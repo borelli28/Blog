@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import Layout from '../components/Layout';
+import Navbar from '../components/Navbar';
 import '../styles/Blog.css';
 import ReactMarkdown from 'react-markdown';
 
@@ -55,36 +55,35 @@ const PostDetail = () => {
 
   return (
     <div id="blog-page">
-      <Layout isAuthenticated={isAuthenticated}>
-        <article>
-          <h1>{blog.title}</h1>
+      <Navbar />
+      <article>
+        <h1>{blog.title}</h1>
 
-          <div id="article-img">
-            {blog.article_img && (
-              <img
-                alt="Article Image" 
-                src={`${import.meta.env.VITE_BACKEND_URL}/uploads/${blog.article_img}`}
-                onError={(e) => {
-                  console.error('Error loading image:', e);
-                  e.currentTarget.style.display = 'none';
-                }}
-              />
-            )}
-          </div>
-
-          <p className="date">Created: {new Date(blog.created_at).toLocaleDateString()}</p>
-          <p className="date">Last Update: {new Date(blog.updated_at).toLocaleDateString()}</p>
-
-          <div id="content">
-            <ReactMarkdown>{blog.content}</ReactMarkdown>
-          </div>
-        </article>
-        <div id="edit-link">
-        {isAuthenticated && (
-          <Link to={`/blog/edit/${encodeURIComponent(blog.id)}`} className="btn btn-warning">Edit Post</Link>
-        )}
+        <div id="article-img">
+          {blog.article_img && (
+            <img
+              alt="Article Image" 
+              src={`${import.meta.env.VITE_BACKEND_URL}/uploads/${blog.article_img}`}
+              onError={(e) => {
+                console.error('Error loading image:', e);
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+          )}
         </div>
-      </Layout>
+
+        <p className="date">Created: {new Date(blog.created_at).toLocaleDateString()}</p>
+        <p className="date">Last Update: {new Date(blog.updated_at).toLocaleDateString()}</p>
+
+        <div id="content">
+          <ReactMarkdown>{blog.content}</ReactMarkdown>
+        </div>
+      </article>
+      <div id="edit-link">
+      {isAuthenticated && (
+        <Link to={`/blog/edit/${encodeURIComponent(blog.id)}`} className="btn btn-warning">Edit Post</Link>
+      )}
+      </div>
     </div>
   );
 };

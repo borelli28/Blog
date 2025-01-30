@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import Layout from '../components/Layout';
+import Navbar from '../components/Navbar';
 import '../styles/Blogs.css';
 
 const PostList = () => {
@@ -34,20 +34,19 @@ const PostList = () => {
   }, []);
 
   return (
-    <Layout isAuthenticated={isAuthenticated}>
-      <div id="cards">
-        {blogs.map((blog) => (
-          <div className="row" key={blog.title}>
-            <div className="card hoverable grey darken-3">
-              <Link to={`/blog/${encodeURIComponent(blog.id)}`} className="card-content white-text">
-                <span className="card-title">{blog.title}</span>
-                <p className="card-description">{blog.description}</p>
-              </Link>
-            </div>
+    <main id="blogs-container">
+      <Navbar />
+      {blogs.map((blog) => (
+        <div className="row" key={blog.title}>
+          <div className="card hoverable grey darken-3">
+            <Link to={`/blog/${encodeURIComponent(blog.id)}`} className="card-content white-text">
+              <span className="card-title">{blog.title}</span>
+              <p className="card-description">{blog.description}</p>
+            </Link>
           </div>
-        ))}
-      </div>
-    </Layout>
+        </div>
+      ))}
+    </main>
   );
 };
 

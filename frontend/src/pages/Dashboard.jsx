@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Layout from '../components/Layout';
+import Navbar from '../components/Navbar';
 import { Link } from 'react-router-dom';
 import '../styles/Dashboard.css';
 import { sanitizeUsername, validateUsername, validatePassword } from '../services/inputValidation';
@@ -204,95 +204,94 @@ const Dashboard = () => {
   };
 
   return (
-    <Layout isAuthenticated={true}>
-      <div className="container-fluid">
-        <main className="container">
-          {messages.length > 0 && (
-            <div className="alert alert-danger">
-              <ul className="mb-0">
-                {messages.map((message, index) => (
-                  <li key={index}>{message}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-          <div id="blogs" className="row">
-            {currentBlogs.map(blog => (
-              <div key={blog.id} className="col-md-6 mb-4">
-                <div className="card">
-                  <div className="card-body">
-                    <h4 className="card-title">{blog.title}</h4>
-                    <h6 className="card-subtitle mb-2 text-muted">Created: {blog.created_at}</h6>
-                    <h6 className="card-subtitle mb-2 text-muted">Last update: {blog.updated_at}</h6>
-                    <div className="btn-group mt-3" role="group">
-                      <button onClick={() => handleFavoriteToggle(blog.id, !blog.is_favorite)}
-                        className={`btn ${blog.is_favorite ? 'btn-success' : 'btn-outline-success'}`}
-                      >
-                        {blog.is_favorite ? 'Unfavorite' : 'Mark as Favorite'}
-                      </button>
-                      <button onClick={() => handlePublishToggle(blog.id, !blog.is_public)}
-                        className={`btn ${blog.is_public ? 'btn-primary' : 'btn-outline-primary'}`}
-                      >
-                        {blog.is_public ? 'Unpublish' : 'Publish'}
-                      </button>
-                    </div>
-                    <div className="mt-3">
-                      <Link to={`/blog/edit/${blog.id}`} className="btn btn-warning me-2">Edit</Link>
-                      <Link to={`/blog/${blog.id}`} className="btn btn-info">See Preview</Link>
-                    </div>
+    <div className="container-fluid">
+      <Navbar />
+      <main className="container">
+        {messages.length > 0 && (
+          <div className="alert alert-danger">
+            <ul className="mb-0">
+              {messages.map((message, index) => (
+                <li key={index}>{message}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+        <div id="blogs" className="row">
+          {currentBlogs.map(blog => (
+            <div key={blog.id} className="col-md-6 mb-4">
+              <div className="card">
+                <div className="card-body">
+                  <h4 className="card-title">{blog.title}</h4>
+                  <h6 className="card-subtitle mb-2 text-muted">Created: {blog.created_at}</h6>
+                  <h6 className="card-subtitle mb-2 text-muted">Last update: {blog.updated_at}</h6>
+                  <div className="btn-group mt-3" role="group">
+                    <button onClick={() => handleFavoriteToggle(blog.id, !blog.is_favorite)}
+                      className={`btn ${blog.is_favorite ? 'btn-success' : 'btn-outline-success'}`}
+                    >
+                      {blog.is_favorite ? 'Unfavorite' : 'Mark as Favorite'}
+                    </button>
+                    <button onClick={() => handlePublishToggle(blog.id, !blog.is_public)}
+                      className={`btn ${blog.is_public ? 'btn-primary' : 'btn-outline-primary'}`}
+                    >
+                      {blog.is_public ? 'Unpublish' : 'Publish'}
+                    </button>
+                  </div>
+                  <div className="mt-3">
+                    <Link to={`/blog/edit/${blog.id}`} className="btn btn-warning me-2">Edit</Link>
+                    <Link to={`/blog/${blog.id}`} className="btn btn-info">See Preview</Link>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-          <Pagination
-            blogsPerPage={blogsPerPage}
-            totalBlogs={blogs.filter(blog => !blog.is_deleted).length}
-            paginate={paginate}
-            currentPage={currentPage}
-          />
-        </main>
-        <div id="deleted-blogs" className="container mb-4">
-          <h5>Deleted Blogs</h5>
-          {blogs.filter(blog => blog.is_deleted).map(blog => (
-            <div key={blog.id} className="card mb-3">
-              <div className="card-body">
-                <h6 className="card-title">{blog.title}</h6>
-                <p className="card-text">Last update: {blog.updated_at}</p>
-                <button onClick={() => handlePermanentDelete(blog.id)} className="btn btn-danger">
-                  Permanently Delete
-                </button>
-                <button onClick={() => handleRecoverBlog(blog.id)} className="btn btn-primary">
-                  Recover
-                </button>
               </div>
             </div>
           ))}
         </div>
-        <div className="container mb-4">
-          <div id="update-password" className="card">
+        <Pagination
+          blogsPerPage={blogsPerPage}
+          totalBlogs={blogs.filter(blog => !blog.is_deleted).length}
+          paginate={paginate}
+          currentPage={currentPage}
+        />
+      </main>
+      <div id="deleted-blogs" className="container mb-4">
+        <h5>Deleted Blogs</h5>
+        {blogs.filter(blog => blog.is_deleted).map(blog => (
+          <div key={blog.id} className="card mb-3">
             <div className="card-body">
-              <h6 className="card-title">Update Password</h6>
-              <form onSubmit={handlePasswordUpdate}>
-                <div className="mb-3">
-                  <label htmlFor="password" className="form-label">New Password</label>
-                  <input
-                    type="password"
-                    className="form-control"
-                    id="password"
-                    name="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                <button type="submit" className="btn btn-primary">Change Password</button>
-              </form>
+              <h6 className="card-title">{blog.title}</h6>
+              <p className="card-text">Last update: {blog.updated_at}</p>
+              <button onClick={() => handlePermanentDelete(blog.id)} className="btn btn-danger">
+                Permanently Delete
+              </button>
+              <button onClick={() => handleRecoverBlog(blog.id)} className="btn btn-primary">
+                Recover
+              </button>
             </div>
+          </div>
+        ))}
+      </div>
+      <div className="container mb-4">
+        <div id="update-password" className="card">
+          <div className="card-body">
+            <h6 className="card-title">Update Password</h6>
+            <form onSubmit={handlePasswordUpdate}>
+              <div className="mb-3">
+                <label htmlFor="password" className="form-label">New Password</label>
+                <input
+                  type="password"
+                  className="form-control"
+                  id="password"
+                  name="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <button type="submit" className="btn btn-primary">Change Password</button>
+            </form>
           </div>
         </div>
       </div>
-    </Layout>
+    </div>
   );
 };
 
