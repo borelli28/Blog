@@ -1,15 +1,7 @@
 html, body, #root {
-  height: 100vh;
-  margin: 0;
-  padding: 0;
+  height: 100%;
   background-color: #f0f0f0 !important;
   font-family: Verdana;
-}
-
-body {
-  display: flex;
-  width: 100%;
-  min-height: 100vh;
 }
 
 #root {
@@ -17,11 +9,30 @@ body {
   display: flex;
 }
 
-#home-container {
-  flex: 1;
+body {
+  display: flex;
   width: 100%;
-  min-height: 100vh;
+}
+
+/** {
+  outline: 1px dashed red;
+}*/
+
+#home-container {
+  width: 100%;
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
+  text-align: center;
+}
+
+#intro  {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+#card-container {
+  width: 100%;
 }
