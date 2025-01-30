@@ -31,9 +31,6 @@ const Navbar = ({ isAuthenticated }) => {
             <li className="nav-item">
               <Link to="/" className="nav-link btn btn-outline-secondary mx-1">Home</Link>
             </li>
-            <li className="nav-item">
-              <Link to="/blogs" className="nav-link btn btn-outline-secondary mx-1">Blogs</Link>
-            </li>
             {isAuthenticated && (
               <>
                 <li className="nav-item">
