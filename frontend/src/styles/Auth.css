@@ -1,9 +1,23 @@
-main {
+#auth-page-container {
+  width: 100%;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  text-align: center;
-  width: 750px;
+}
+
+#auth-content {
+  width: 100%;
+  max-width: 750px;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.form-container {
+  width: 100%;
+  max-width: 500px;
 }
 
 .error {

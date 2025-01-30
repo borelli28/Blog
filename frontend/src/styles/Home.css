@@ -15,7 +15,6 @@ body {
 #root {
   width: 100%;
   display: flex;
-  flex-direction: column;
 }
 
 #home-container {
@@ -23,6 +22,6 @@ body {
   width: 100%;
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
 }

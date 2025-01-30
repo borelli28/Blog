@@ -74,11 +74,11 @@ const Register = () => {
   };
 
   return (
-    <main className="container mt-5">
+    <div id="auth-page-container">
       <Navbar />
-      <div className="row justify-content-center">
-        <div className="col-md-6">
-          <h2 className="mb-4">Register</h2>
+      <div id="auth-content">
+        <h2 className="mb-4">Register</h2>
+        <div className="form-container">
           {errors.general && <div className="alert alert-danger">{errors.general}</div>}
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
@@ -121,7 +121,7 @@ const Register = () => {
           </form>
         </div>
       </div>
-    </main>
+    </div>
   );
 };
 
