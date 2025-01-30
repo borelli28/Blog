@@ -36,7 +36,6 @@ const EVENT_SIGNATURES = {
   'Blog images deleted from database': { signatureId: '2010', severity: 'Medium' },
   'User registered': { signatureId: '3001', severity: 'Medium' },
   'Password updated': { signatureId: '3004', severity: 'Medium' },
-  'Username fetched': { signatureId: '3005', severity: 'Low' },
   'Login failed': { signatureId: '3006', severity: 'Medium' },
   'Authentication failed': { signatureId: '3007', severity: 'Medium' },
   'Password update failed': { signatureId: '3008', severity: 'Medium' },
