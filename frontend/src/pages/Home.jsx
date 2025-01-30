@@ -41,20 +41,7 @@ const Home = () => {
       }
     };
 
-    const checkAuth = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/check`, {
-          method: 'GET',
-          credentials: 'include',
-        });
-        setIsAuthenticated(response.ok);
-      } catch (error) {
-        setIsAuthenticated(false);
-      }
-    };
-
     fetchAllBlogs();
-    checkAuth();
   }, []);
 
   const renderBlog = (blog) => (

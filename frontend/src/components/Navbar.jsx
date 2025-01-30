@@ -1,10 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Logout from './Logout';
 import '../styles/Navbar.css';
+import { checkAuth } from '../services/AuthService';
+import useTokenRefresh from './TokenRefresh';
 
-const Navbar = ({ isAuthenticated }) => {
+const Navbar = () => {
   const [isNavCollapsed, setIsNavCollapsed] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  useTokenRefresh();
+
+  useEffect(() => {
+    const verifyAuth = async () => {
+      const authStatus = await checkAuth();
+      setIsAuthenticated(authStatus);
+    };
+    verifyAuth();
+  }, []);
 
   const handleNavCollapse = () => setIsNavCollapsed(!isNavCollapsed);
 
