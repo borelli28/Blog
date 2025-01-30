@@ -23,3 +23,4 @@ sketch
 *.db
 .env
 uploads/
+cef-agent-v1.0.0/
