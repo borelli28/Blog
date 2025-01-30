@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 import '../styles/Blog.css';
 import ReactMarkdown from 'react-markdown';
 
-const PostDetail = () => {
+const Blog = () => {
   const [blog, setBlog] = useState(null);
   const [error, setError] = useState(null);
   const { id } = useParams();
@@ -88,4 +88,4 @@ const PostDetail = () => {
   );
 };
 
-export default PostDetail;
+export default Blog;
