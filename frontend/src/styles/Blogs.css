@@ -1,4 +1,4 @@
-#cards {
+main #blogs-container {
     display: flex;
     justify-content: center;
     text-align: center;
@@ -6,17 +6,19 @@
     width: 100%;
 }
 
-#cards a {
-    text-decoration: none;
+#blogs-container {
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px 0;
 }
 
 .row {
-    width: 75%;
-    margin: 1%;
+  width: 100%;
+  margin: 10px 0;
 }
 
-a .card-title {
-    color: black;
+.card {
+  width: 100%;
 }
 
 .card-description {
