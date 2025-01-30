@@ -17,7 +17,7 @@ const EVENT_SIGNATURES = {
   'Blog post updated': { signatureId: '1007', severity: 'Medium' },
   'Blog post status updated': { signatureId: '1008', severity: 'Medium' },
   'Blog post permanently deleted': { signatureId: '1009', severity: 'Medium' },
-  'Blog post not found': { signatureId: '1016', severity: 'Low' },
+  'Blog post not found': { signatureId: '1010', severity: 'Low' },
   'Article image uploaded': { signatureId: '2001', severity: 'Low' },
   'Image uploaded': { signatureId: '2002', severity: 'Low' },
   'Image alt text updated': { signatureId: '2003', severity: 'Low' },
