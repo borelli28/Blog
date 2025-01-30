@@ -19,24 +19,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchBlogs();
-    fetchUsername();
   }, []);
-
-  const fetchUsername = async () => {
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/getUsername`, {
-        credentials: 'include',
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setUsername(data.username);
-      } else {
-        console.error('Failed to fetch username');
-      }
-    } catch (error) {
-      console.error('Error fetching username:', error);
-    }
-  };
 
   const fetchBlogs = async () => {
     try {
