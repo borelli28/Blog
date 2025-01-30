@@ -63,9 +63,6 @@ export const getAllPosts = [getUsername, (req, res) => {
       });
       return res.status(500).json({ error: err.message });
     }
-    logger.infoWithMeta('All blog posts retrieved', 'All blog posts retrieved', { 
-      username: req.username, blog_count: rows.length 
-    });
     res.json(rows);
   });
 }];
@@ -90,12 +87,6 @@ export const getPubPost = [getUsername, (req, res) => {
       return res.status(404).json({ error: 'Post not found' });
     }
 
-    logger.infoWithMeta('Blog post retrieved', 'Blog post retrieved', {
-      blog_id: id,
-      blog_title: row.title,
-      username: req.username
-    });
-
     res.json(row);
   });
 }];
@@ -119,12 +110,6 @@ export const getPost = [getUsername, (req, res) => {
       });
       return res.status(404).json({ error: 'Post not found' });
     }
-
-    logger.infoWithMeta('Blog post retrieved', 'Blog post retrieved', {
-      blog_id: id,
-      blog_title: row.title,
-      username: req.username
-    });
 
     res.json(row);
   });
@@ -398,12 +383,6 @@ export const getPostImages = [getUsername, (req, res) => {
         });
         return res.status(500).json({ error: err.message });
       }
-      logger.infoWithMeta('Post images retrieved', 'Post images retrieved', { 
-        username: req.username,
-        blog_id: id,
-        blog_title: row.title,
-        images_count: images.length
-      });
       res.json(images);
     });
   });
@@ -419,10 +398,6 @@ export const getFeaturedPosts = [getUsername, (req, res) => {
       });
       return res.status(500).json({ error: err.message });
     }
-    logger.infoWithMeta('Featured posts retrieved', 'Featured posts retrieved', { 
-      username: req.username,
-      blog_count: rows.length
-    });
     res.json(rows);
   });
 }];
@@ -437,10 +412,6 @@ export const getPublishedPosts = [getUsername, (req, res) => {
       });
       return res.status(500).json({ error: err.message });
     }
-    logger.infoWithMeta('Published posts retrieved', 'Published posts retrieved', { 
-      username: req.username,
-      blog_count: rows.length
-    });
     res.json(rows);
   });
 }];
@@ -455,10 +426,6 @@ export const getAllPostsIncludingDeleted = [getUsername, (req, res) => {
       });
       return res.status(500).json({ error: err.message });
     }
-    logger.infoWithMeta('All posts including deleted retrieved', 'All posts including deleted retrieved', {
-      username: req.username,
-      blog_count: rows.length
-    });
     res.json(rows);
   });
 }];
