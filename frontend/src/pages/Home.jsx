@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import Layout from '../components/Layout';
 import '../styles/Home.css';
 
 const Home = () => {
@@ -46,41 +45,39 @@ const Home = () => {
   }, []);
 
   return (
-    <Layout isAuthenticated={isAuthenticated}>
-      <main>
-        <div id="intro">
-          <h2>Welcome!</h2>
-          <p>Writing sometimes about whatever I'm working on these days</p>
-        </div>
+    <main>
+      <div id="intro">
+        <h2>Welcome!</h2>
+        <p>Writing sometimes about whatever I'm working on these days</p>
+      </div>
 
-        {isLoading ? (
-          <p>Loading blogs...</p>
-        ) : error ? (
-          <p className="error">{error}</p>
-        ) : (
-          <div id="cards">
-            <div className="card-container">
-              {blogs.length > 0 ? (
-                blogs.map((blog) => (
-                  <div className="row" key={blog.title}>
-                    <div className="card hoverable">
-                      <Link to={`/blog/${encodeURIComponent(blog.id)}`}>
-                        <div className="card-content grey darken-3">
-                          <span className="card-title">{blog.title}</span>
-                          <p className="card-description">{blog.description}</p>
-                        </div>
-                      </Link>
-                    </div>
+      {isLoading ? (
+        <p>Loading blogs...</p>
+      ) : error ? (
+        <p className="error">{error}</p>
+      ) : (
+        <div id="cards">
+          <div className="card-container">
+            {blogs.length > 0 ? (
+              blogs.map((blog) => (
+                <div className="row" key={blog.title}>
+                  <div className="card hoverable">
+                    <Link to={`/blog/${encodeURIComponent(blog.id)}`}>
+                      <div className="card-content grey darken-3">
+                        <span className="card-title">{blog.title}</span>
+                        <p className="card-description">{blog.description}</p>
+                      </div>
+                    </Link>
                   </div>
-                ))
-              ) : (
-                <p>No featured blogs available.</p>
-              )}
-            </div>
+                </div>
+              ))
+            ) : (
+              <p>No featured blogs available.</p>
+            )}
           </div>
-        )}
-      </main>
-    </Layout>
+        </div>
+      )}
+    </main>
   );
 };
 
