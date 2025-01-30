@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import Layout from '../components/Layout';
+import Navbar from '../components/Navbar';
 import EasyMDE from 'easymde';
 import 'easymde/dist/easymde.min.css';
 import '../styles/CreatePost.css';
@@ -246,99 +246,98 @@ const EditPost = () => {
   if (!blog) return <div>Loading...</div>;
 
   return (
-    <Layout isAuthenticated={isAuthenticated}>
-      <main className="container">
-        {messages.length > 0 && (
-          <ul className="messages">
-            {messages.map((message, index) => (
-              <li key={index} className="alert alert-danger">{message}</li>
-            ))}
-          </ul>
-        )}
-        <div>
-          <h2>Edit Blog</h2>
+    <main className="container">
+      <Navbar />
+      {messages.length > 0 && (
+        <ul className="messages">
+          {messages.map((message, index) => (
+            <li key={index} className="alert alert-danger">{message}</li>
+          ))}
+        </ul>
+      )}
+      <div>
+        <h2>Edit Blog</h2>
 
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label htmlFor="title">Title</label>
-              <input type="text" className="form-control" name="title" defaultValue={blog.title} required/>
-              
-              {blog.article_img && (
-                <>
-                  <label htmlFor="article_img">Article Image</label>
-                  <input type="text" className="form-control" name="article_img" defaultValue={blog.article_img} required/>
-                </>
-              )}
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="title">Title</label>
+            <input type="text" className="form-control" name="title" defaultValue={blog.title} required/>
+            
+            {blog.article_img && (
+              <>
+                <label htmlFor="article_img">Article Image</label>
+                <input type="text" className="form-control" name="article_img" defaultValue={blog.article_img} required/>
+              </>
+            )}
 
-              <label htmlFor="desc">Description</label>
-              <input type="text" className="form-control" name="desc" defaultValue={blog.description} required/>
+            <label htmlFor="desc">Description</label>
+            <input type="text" className="form-control" name="desc" defaultValue={blog.description} required/>
 
-              <label htmlFor="content">Content</label>
-              <textarea name="content" id="editor" ref={editorRef} defaultValue={blog.content}></textarea>
+            <label htmlFor="content">Content</label>
+            <textarea name="content" id="editor" ref={editorRef} defaultValue={blog.content}></textarea>
 
-              <button type="submit" className="btn btn-primary">Submit</button>
-            </div>
-          </form>
-
-          <div id="actions">
-            <button
-              onClick={() => navigate(`/blog/${encodeURIComponent(blog.id)}`)}
-              className="btn btn-info"
-            >
-              See Preview
-            </button>
-            <button onClick={handleDelete} className="btn btn-danger">Delete Post</button>
+            <button type="submit" className="btn btn-primary">Submit</button>
           </div>
+        </form>
 
-          <div id="images">
-            <div id="img-upload-container">
-              <form onSubmit={handleArticleImageUpload} encType="multipart/form-data">
-                <label htmlFor="article_image">Upload Article Image</label>
-                <input type="file" id="article_image" name="image" required/>
-                <button type="submit" className="btn btn-primary">Upload Article Image</button>
-              </form>
+        <div id="actions">
+          <button
+            onClick={() => navigate(`/blog/${encodeURIComponent(blog.id)}`)}
+            className="btn btn-info"
+          >
+            See Preview
+          </button>
+          <button onClick={handleDelete} className="btn btn-danger">Delete Post</button>
+        </div>
 
-              <form onSubmit={handleBlogImageUpload} encType="multipart/form-data">
-                <label htmlFor="blog_image">Upload a Blog Image</label>
-                <input type="file" id="blog_image" name="image" required/>
-                <button type="submit" className="btn btn-primary">Upload Blog Image</button>
-              </form>
-            </div>
-            <div id="images-container">
-              <h4 id="images-containers-title">Blog Images</h4>
-              {images.map((img) => (
-                <div key={img.id} id="image">
-                  <p>{img.image}</p>
-                  <div id="img-container">
-                    <img 
-                      src={`${import.meta.env.VITE_BACKEND_URL}/uploads/${img.image}`} 
-                      alt={img.description} 
+        <div id="images">
+          <div id="img-upload-container">
+            <form onSubmit={handleArticleImageUpload} encType="multipart/form-data">
+              <label htmlFor="article_image">Upload Article Image</label>
+              <input type="file" id="article_image" name="image" required/>
+              <button type="submit" className="btn btn-primary">Upload Article Image</button>
+            </form>
+
+            <form onSubmit={handleBlogImageUpload} encType="multipart/form-data">
+              <label htmlFor="blog_image">Upload a Blog Image</label>
+              <input type="file" id="blog_image" name="image" required/>
+              <button type="submit" className="btn btn-primary">Upload Blog Image</button>
+            </form>
+          </div>
+          <div id="images-container">
+            <h4 id="images-containers-title">Blog Images</h4>
+            {images.map((img) => (
+              <div key={img.id} id="image">
+                <p>{img.image}</p>
+                <div id="img-container">
+                  <img 
+                    src={`${import.meta.env.VITE_BACKEND_URL}/uploads/${img.image}`} 
+                    alt={img.description} 
+                  />
+                  <form onSubmit={(e) => {
+                    e.preventDefault();
+                    const newDescription = e.currentTarget.img_desc.value;
+                    handleImageDescriptionUpdate(img.id, newDescription);
+                  }}>
+                    <input 
+                      type="text" 
+                      className="form-control" 
+                      name="img_desc" 
+                      defaultValue={img.description}
+                      required
                     />
-                    <form onSubmit={(e) => {
-                      e.preventDefault();
-                      const newDescription = e.currentTarget.img_desc.value;
-                      handleImageDescriptionUpdate(img.id, newDescription);
-                    }}>
-                      <input 
-                        type="text" 
-                        className="form-control" 
-                        name="img_desc" 
-                        defaultValue={img.description}
-                        required
-                      />
-                      <button type="submit" className="btn btn-secondary">Edit Description</button>
-                    </form>
-                    <button onClick={() => handleImageDelete(img.id)} className="btn btn-danger">
-                      Delete Image
-                    </button>
-                  </div>
+                    <button type="submit" className="btn btn-secondary">Edit Description</button>
+                  </form>
+                  <button onClick={() => handleImageDelete(img.id)} className="btn btn-danger">
+                    Delete Image
+                  </button>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
-      </main>
-    </Layout>
+      </div>
+    </main>
   );
 };
 

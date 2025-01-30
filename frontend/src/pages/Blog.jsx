@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import Layout from '../components/Layout';
+import Navbar from '../components/Navbar';
 import '../styles/Blog.css';
 import ReactMarkdown from 'react-markdown';
 
-const PostDetail = () => {
+const Blog = () => {
   const [blog, setBlog] = useState(null);
   const [error, setError] = useState(null);
   const { id } = useParams();
@@ -54,11 +54,11 @@ const PostDetail = () => {
   if (!blog) return <div>Loading...</div>;
 
   return (
-    <div id="blog-page">
-      <Layout isAuthenticated={isAuthenticated}>
+    <div id="blog-page-container">
+      <Navbar />
+      <div id="blog-content">
         <article>
           <h1>{blog.title}</h1>
-
           <div id="article-img">
             {blog.article_img && (
               <img
@@ -71,22 +71,20 @@ const PostDetail = () => {
               />
             )}
           </div>
-
           <p className="date">Created: {new Date(blog.created_at).toLocaleDateString()}</p>
           <p className="date">Last Update: {new Date(blog.updated_at).toLocaleDateString()}</p>
-
           <div id="content">
             <ReactMarkdown>{blog.content}</ReactMarkdown>
           </div>
         </article>
         <div id="edit-link">
-        {isAuthenticated && (
-          <Link to={`/blog/edit/${encodeURIComponent(blog.id)}`} className="btn btn-warning">Edit Post</Link>
-        )}
+          {isAuthenticated && (
+            <Link to={`/blog/edit/${encodeURIComponent(blog.id)}`} className="btn btn-warning">Edit Post</Link>
+          )}
         </div>
-      </Layout>
+      </div>
     </div>
   );
 };
 
-export default PostDetail;
+export default Blog;

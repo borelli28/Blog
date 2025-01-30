@@ -1,10 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Logout from './Logout';
 import '../styles/Navbar.css';
+import { checkAuth } from '../services/AuthService';
+import useTokenRefresh from './TokenRefresh';
 
-const Navbar = ({ isAuthenticated }) => {
+const Navbar = () => {
   const [isNavCollapsed, setIsNavCollapsed] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  useTokenRefresh();
+
+  useEffect(() => {
+    const verifyAuth = async () => {
+      const authStatus = await checkAuth();
+      setIsAuthenticated(authStatus);
+    };
+    verifyAuth();
+  }, []);
 
   const handleNavCollapse = () => setIsNavCollapsed(!isNavCollapsed);
 
@@ -12,7 +24,7 @@ const Navbar = ({ isAuthenticated }) => {
     <nav className={`navbar navbar-expand-lg navbar-light mb-4 ${isNavCollapsed ? 'navbar-collapsed' : ''}`}>
       <div className="container">
         <Link to="/" className="navbar-brand">
-          <h5 className="mb-0">Title Here</h5>
+          <h5 className="mb-0">Armando Borelli</h5>
         </Link>
         <button
           className="navbar-toggler"
@@ -30,9 +42,6 @@ const Navbar = ({ isAuthenticated }) => {
           <ul className="navbar-nav ms-auto">
             <li className="nav-item">
               <Link to="/" className="nav-link btn btn-outline-secondary mx-1">Home</Link>
-            </li>
-            <li className="nav-item">
-              <Link to="/blogs" className="nav-link btn btn-outline-secondary mx-1">Blogs</Link>
             </li>
             {isAuthenticated && (
               <>

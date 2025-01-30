@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Layout from '../components/Layout';
+import Navbar from '../components/Navbar';
 
 const Logs = () => {
   const [logs, setLogs] = useState([]);
@@ -127,121 +127,120 @@ const Logs = () => {
   );
 
   return (
-    <Layout isAuthenticated={isAuthenticated}>
-      <div className="container">
-        <h1>Logs</h1>
-        {alert.show && (
-          <div className={`alert alert-${alert.type}`} role="alert">
-            {alert.message}
-          </div>
-        )}
-        <input
-          type="text"
-          placeholder="Search logs..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="form-control mb-3"
-        />
-        <form onSubmit={handleRemoveFiltered}>
-          <div className="mb-3 d-flex gap-2">
-            <select 
-              className="form-select w-auto"
-              value={selectedFilter}
-              onChange={(e) => setSelectedFilter(e.target.value)}
+    <div className="container">
+      <Navbar />
+      <h1>Logs</h1>
+      {alert.show && (
+        <div className={`alert alert-${alert.type}`} role="alert">
+          {alert.message}
+        </div>
+      )}
+      <input
+        type="text"
+        placeholder="Search logs..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="form-control mb-3"
+      />
+      <form onSubmit={handleRemoveFiltered}>
+        <div className="mb-3 d-flex gap-2">
+          <select 
+            className="form-select w-auto"
+            value={selectedFilter}
+            onChange={(e) => setSelectedFilter(e.target.value)}
+          >
+            <option value="timestamp">Timestamp</option>
+            <option value="level">Level</option>
+            <option value="signatureId">Signature ID</option>
+            <option value="severity">Severity</option>
+          </select>
+          <input
+            type="text"
+            className="form-control w-auto"
+            placeholder="Filter value (empty for all)"
+            value={filterValue}
+            onChange={(e) => setFilterValue(e.target.value)}
+          />
+          <button type="submit" className="btn btn-primary">Remove Filtered Logs</button>
+        </div>
+      </form>
+      <table className="table table-bordered table-striped-columns table-hover">
+        <thead className="table-light">
+          <tr>
+            <th 
+              scope="col" 
+              onClick={() => requestSort('timestamp')} 
+              style={{ cursor: 'pointer' }}
             >
-              <option value="timestamp">Timestamp</option>
-              <option value="level">Level</option>
-              <option value="signatureId">Signature ID</option>
-              <option value="severity">Severity</option>
-            </select>
-            <input
-              type="text"
-              className="form-control w-auto"
-              placeholder="Filter value (empty for all)"
-              value={filterValue}
-              onChange={(e) => setFilterValue(e.target.value)}
-            />
-            <button type="submit" className="btn btn-primary">Remove Filtered Logs</button>
-          </div>
-        </form>
-        <table className="table table-bordered table-striped-columns table-hover">
-          <thead className="table-light">
-            <tr>
-              <th 
-                scope="col" 
-                onClick={() => requestSort('timestamp')} 
-                style={{ cursor: 'pointer' }}
-              >
-                Timestamp {sortConfig.key === 'timestamp' && (
-                  <span>{sortConfig.direction === 'ascending' ? '▲' : '▼'}</span>
-                )}
-              </th>
-              <th 
-                scope="col" 
-                onClick={() => requestSort('level')} 
-                style={{ cursor: 'pointer' }}
-              >
-                Level {sortConfig.key === 'level' && (
-                  <span>{sortConfig.direction === 'ascending' ? '▲' : '▼'}</span>
-                )}
-              </th>
-              <th 
-                scope="col" 
-                onClick={() => requestSort('name')} 
-                style={{ cursor: 'pointer' }}
-              >
-                Event Name {sortConfig.key === 'name' && (
-                  <span>{sortConfig.direction === 'ascending' ? '▲' : '▼'}</span>
-                )}
-              </th>
-              <th 
-                scope="col" 
-                onClick={() => requestSort('signatureId')} 
-                style={{ cursor: 'pointer' }}
-              >
-                Signature ID {sortConfig.key === 'signatureId' && (
-                  <span>{sortConfig.direction === 'ascending' ? '▲' : '▼'}</span>
-                )}
-              </th>
-              <th 
-                scope="col" 
-                onClick={() => requestSort('severity')} 
-                style={{ cursor: 'pointer' }}
-              >
-                Severity {sortConfig.key === 'severity' && (
-                  <span>{sortConfig.direction === 'ascending' ? '▲' : '▼'}</span>
-                )}
-              </th>
-              <th scope="col">Details</th>
-              <th scope="col">Actions</th>
+              Timestamp {sortConfig.key === 'timestamp' && (
+                <span>{sortConfig.direction === 'ascending' ? '▲' : '▼'}</span>
+              )}
+            </th>
+            <th 
+              scope="col" 
+              onClick={() => requestSort('level')} 
+              style={{ cursor: 'pointer' }}
+            >
+              Level {sortConfig.key === 'level' && (
+                <span>{sortConfig.direction === 'ascending' ? '▲' : '▼'}</span>
+              )}
+            </th>
+            <th 
+              scope="col" 
+              onClick={() => requestSort('name')} 
+              style={{ cursor: 'pointer' }}
+            >
+              Event Name {sortConfig.key === 'name' && (
+                <span>{sortConfig.direction === 'ascending' ? '▲' : '▼'}</span>
+              )}
+            </th>
+            <th 
+              scope="col" 
+              onClick={() => requestSort('signatureId')} 
+              style={{ cursor: 'pointer' }}
+            >
+              Signature ID {sortConfig.key === 'signatureId' && (
+                <span>{sortConfig.direction === 'ascending' ? '▲' : '▼'}</span>
+              )}
+            </th>
+            <th 
+              scope="col" 
+              onClick={() => requestSort('severity')} 
+              style={{ cursor: 'pointer' }}
+            >
+              Severity {sortConfig.key === 'severity' && (
+                <span>{sortConfig.direction === 'ascending' ? '▲' : '▼'}</span>
+              )}
+            </th>
+            <th scope="col">Details</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredLogs.map((log, index) => (
+            <tr key={index}>
+              <td>{log.timestamp}</td>
+              <td>{log.level}</td>
+              <td>{log.name}</td>
+              <td>{log.signatureId}</td>
+              <td>{log.severity}</td>
+              <td>
+                {Object.entries(log)
+                  .filter(([key]) => !['timestamp', 'level', 'name', 'signatureId', 'severity', 'rt'].includes(key))
+                  .map(([key, value]) => (
+                    <div key={key}>
+                      <strong>{key}:</strong> {value}
+                    </div>
+                  ))}
+              </td>
+              <td>
+                <button className="btn btn-danger" onClick={() => handleRemoveLog(log.timestamp)}>Remove</button>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {filteredLogs.map((log, index) => (
-              <tr key={index}>
-                <td>{log.timestamp}</td>
-                <td>{log.level}</td>
-                <td>{log.name}</td>
-                <td>{log.signatureId}</td>
-                <td>{log.severity}</td>
-                <td>
-                  {Object.entries(log)
-                    .filter(([key]) => !['timestamp', 'level', 'name', 'signatureId', 'severity', 'rt'].includes(key))
-                    .map(([key, value]) => (
-                      <div key={key}>
-                        <strong>{key}:</strong> {value}
-                      </div>
-                    ))}
-                </td>
-                <td>
-                  <button className="btn btn-danger" onClick={() => handleRemoveLog(log.timestamp)}>Remove</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </Layout>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 };
 

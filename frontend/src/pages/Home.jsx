@@ -1,24 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import Layout from '../components/Layout';
+import Navbar from '../components/Navbar';
 import '../styles/Home.css';
 
 const Home = () => {
-  const [blogs, setBlogs] = useState([]);
+  const [featuredBlogs, setFeaturedBlogs] = useState([]);
+  const [allBlogs, setAllBlogs] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchBlogs = async () => {
+    const fetchAllBlogs = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/featured`, {
-          credentials: 'include',
-        });
-        if (response.ok) {
-          const fetchedBlogs = await response.json();
-          setBlogs(fetchedBlogs);
+        const [featuredResponse, publishedResponse] = await Promise.all([
+          fetch(`${import.meta.env.VITE_API_URL}/posts/featured`, {
+            credentials: 'include',
+          }),
+          fetch(`${import.meta.env.VITE_API_URL}/posts/published`, {
+            credentials: 'include',
+          })
+        ]);
+
+        if (featuredResponse.ok && publishedResponse.ok) {
+          const featured = await featuredResponse.json();
+          const published = await publishedResponse.json();
+          setFeaturedBlogs(featured);
+          // Filter out featured blogs from all blogs
+          const featuredIds = new Set(featured.map(blog => blog.id));
+          const nonFeaturedBlogs = published.filter(blog => !featuredIds.has(blog.id));
+          setAllBlogs(nonFeaturedBlogs);
         } else {
           setError('Failed to fetch blogs');
         }
@@ -29,58 +41,46 @@ const Home = () => {
       }
     };
 
-    const checkAuth = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/check`, {
-          method: 'GET',
-          credentials: 'include',
-        });
-        setIsAuthenticated(response.ok);
-      } catch (error) {
-        setIsAuthenticated(false);
-      }
-    };
-
-    fetchBlogs();
-    checkAuth();
+    fetchAllBlogs();
   }, []);
 
-  return (
-    <Layout isAuthenticated={isAuthenticated}>
-      <main>
-        <div id="intro">
-          <h2>Welcome</h2>
-          <p>Some description here...</p>
-        </div>
-
-        {isLoading ? (
-          <p>Loading blogs...</p>
-        ) : error ? (
-          <p className="error">{error}</p>
-        ) : (
-          <div id="cards">
-            <div className="card-container">
-              {blogs.length > 0 ? (
-                blogs.map((blog) => (
-                  <div className="row" key={blog.title}>
-                    <div className="card hoverable">
-                      <Link to={`/blog/${encodeURIComponent(blog.id)}`}>
-                        <div className="card-content grey darken-3">
-                          <span className="card-title">{blog.title}</span>
-                          <p className="card-description">{blog.description}</p>
-                        </div>
-                      </Link>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p>No featured blogs available.</p>
-              )}
-            </div>
+  const renderBlog = (blog) => (
+    <div className="row" key={blog.title}>
+      <div className="card hoverable">
+        <Link to={`/blog/${encodeURIComponent(blog.id)}`}>
+          <div className="card-content grey darken-3">
+            <span className="card-title">{blog.title}</span>
+            <p className="card-description">{blog.description}</p>
           </div>
-        )}
-      </main>
-    </Layout>
+        </Link>
+      </div>
+    </div>
+  );
+
+  return (
+    <div id="home-container">
+      <Navbar />
+      <div id="intro">
+        <h2>Welcome!</h2>
+        <p>Writing sometimes about whatever I'm working on these days</p>
+      </div>
+
+      {isLoading ? (
+        <p>Loading blogs...</p>
+      ) : error ? (
+        <p className="error">{error}</p>
+      ) : (
+        <div id="content">
+          <div className="card-container">
+            {featuredBlogs.map(renderBlog)}
+            {allBlogs.map(renderBlog)}
+          </div>
+          {!featuredBlogs.length && !allBlogs.length && (
+            <p>No blogs available.</p>
+          )}
+        </div>
+      )}
+    </div>
   );
 };
 

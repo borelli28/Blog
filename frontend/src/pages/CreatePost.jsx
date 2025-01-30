@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Layout from '../components/Layout';
+import Navbar from '../components/Navbar';
 import EasyMDE from 'easymde';
 import 'easymde/dist/easymde.min.css';
 import '../styles/CustomEasyMDE.css';
@@ -79,25 +79,24 @@ const CreatePost = () => {
   };
 
   return (
-    <Layout isAuthenticated={isAuthenticated}>
-      <main>
-        <h2>Create Blog</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="title">Title</label>
-            <input type="text" className="form-control" name="title" required/>
-        
-            <label htmlFor="desc">Description</label>
-            <input type="text" className="form-control" name="desc" required/>
-            
-            <label htmlFor="content">Content</label>
-            <textarea id="editor" name="content" ref={editorRef}></textarea>
+    <main>
+      <Navbar />
+      <h2>Create Blog</h2>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="title">Title</label>
+          <input type="text" className="form-control" name="title" required/>
+      
+          <label htmlFor="desc">Description</label>
+          <input type="text" className="form-control" name="desc" required/>
+          
+          <label htmlFor="content">Content</label>
+          <textarea id="editor" name="content" ref={editorRef}></textarea>
 
-            <button type="submit" className="btn btn-primary">Submit</button>
-          </div>
-        </form>
-      </main>
-    </Layout>
+          <button type="submit" className="btn btn-primary">Submit</button>
+        </div>
+      </form>
+    </main>
   );
 };
 

@@ -1,49 +1,38 @@
-body, #root {
+html, body, #root {
+  height: 100%;
   background-color: #f0f0f0 !important;
+  font-family: Verdana;
+}
+
+#root {
+  width: 100%;
+  display: flex;
 }
 
 body {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    text-align: center;
-    font-family: Verdana;
-    width: 100%;
-    height: 100%;
-    outline: 1px solid green;
+  display: flex;
+  width: 100%;
 }
 
-main {
-    display: flex;
-    justify-content: center;
-    text-align: center;
-    flex-wrap: wrap;
-    width: 100%;
+/** {
+  outline: 1px dashed red;
+}*/
+
+#home-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  text-align: center;
 }
 
-#intro {
-    width: 100%;
+#intro  {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
-#cards {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.card-container {
-    width: 100%;
-    margin: 4%;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-a .card-title {
-    color: black;
-}
-
-.card-description {
-    margin: 1.5% 0; 
+#card-container {
+  width: 100%;
 }

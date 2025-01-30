@@ -1,6 +1,6 @@
 import { sanitizeUsername, validateUsername, validatePassword } from '../services/inputValidation';
 import { useNavigate } from 'react-router-dom';
-import Layout from '../components/Layout';
+import Navbar from '../components/Navbar';
 import React, { useState, useEffect } from 'react';
 import '../styles/Auth.css';
 
@@ -66,43 +66,42 @@ const Login = () => {
   };
 
   return (
-    <Layout>
-      <main className="container mt-5">
-        <div className="row justify-content-center">
-          <div className="col-md-6">
-            <h2 className="mb-4">Login</h2>
-            {errors.general && <div className="alert alert-danger">{errors.general}</div>}
-            <form onSubmit={handleSubmit}>
-              <div className="mb-3">
-                <label htmlFor="username" className="form-label">Username</label>
-                <input
-                  type="text"
-                  className={`form-control ${errors.username ? 'is-invalid' : ''}`}
-                  id="username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                />
-                {errors.username && <div className="invalid-feedback">{errors.username}</div>}
-              </div>
-              <div className="mb-3">
-                <label htmlFor="password" className="form-label">Password</label>
-                <input
-                  type="password"
-                  className={`form-control ${errors.password ? 'is-invalid' : ''}`}
-                  id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-                {errors.password && <div className="invalid-feedback">{errors.password}</div>}
-              </div>
-              <button type="submit" className="btn btn-primary">Login</button>
-            </form>
-          </div>
+    <div id="auth-page-container">
+      <Navbar />
+      <div id="auth-content">
+        <h2 className="mb-4">Login</h2>
+        <div className="form-container">
+          {errors.general && <div className="alert alert-danger">{errors.general}</div>}
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label htmlFor="username" className="form-label">Username</label>
+              <input
+                type="text"
+                className={`form-control ${errors.username ? 'is-invalid' : ''}`}
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+              {errors.username && <div className="invalid-feedback">{errors.username}</div>}
+            </div>
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label">Password</label>
+              <input
+                type="password"
+                className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              {errors.password && <div className="invalid-feedback">{errors.password}</div>}
+            </div>
+            <button type="submit" className="btn btn-primary">Login</button>
+          </form>
         </div>
-      </main>
-    </Layout>
+      </div>
+    </div>
   );
 };
 
