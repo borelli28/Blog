@@ -34,7 +34,7 @@ const Blogs = () => {
   }, []);
 
   return (
-    <main id="blogs-container">
+    <div id="blogs-container">
       <Navbar />
       {blogs.map((blog) => (
         <div className="row" key={blog.title}>
@@ -46,7 +46,7 @@ const Blogs = () => {
           </div>
         </div>
       ))}
-    </main>
+    </div>
   );
 };
 

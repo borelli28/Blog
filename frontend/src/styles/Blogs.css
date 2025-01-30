@@ -1,4 +1,4 @@
-main #blogs-container {
+#blogs-container {
     display: flex;
     justify-content: center;
     text-align: center;
