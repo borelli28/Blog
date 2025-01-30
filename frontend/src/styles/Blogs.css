@@ -1,15 +1,18 @@
-#blogs-container {
-    display: flex;
-    justify-content: center;
-    text-align: center;
-    flex-wrap: wrap;
-    width: 100%;
+#blogs-page-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 #blogs-container {
   width: 100%;
-  margin: 0 auto;
+  max-width: 800px;
   padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .row {
@@ -22,5 +25,5 @@
 }
 
 .card-description {
-    margin-top: 1.5%;
+  margin-top: 1.5%;
 }
