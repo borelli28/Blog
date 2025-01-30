@@ -4,6 +4,8 @@ nav {
   flex-wrap: wrap;
   text-align: center;
   width: 100%;
+  height: 25%;
+  margin-bottom: 2%;
 }
 
 nav h5 {
