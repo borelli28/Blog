@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import Navbar from '../components/Navbar';
 import '../styles/Home.css';
 
 const Home = () => {
@@ -46,6 +47,7 @@ const Home = () => {
 
   return (
     <main>
+      <Navbar />
       <div id="intro">
         <h2>Welcome!</h2>
         <p>Writing sometimes about whatever I'm working on these days</p>
