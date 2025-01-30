@@ -14,7 +14,6 @@ const Home = () => {
     const fetchAllBlogs = async () => {
       setIsLoading(true);
       try {
-        // Fetch both featured and published blogs
         const [featuredResponse, publishedResponse] = await Promise.all([
           fetch(`${import.meta.env.VITE_API_URL}/posts/featured`, {
             credentials: 'include',
@@ -28,7 +27,10 @@ const Home = () => {
           const featured = await featuredResponse.json();
           const published = await publishedResponse.json();
           setFeaturedBlogs(featured);
-          setAllBlogs(published);
+          // Filter out featured blogs from all blogs
+          const featuredIds = new Set(featured.map(blog => blog.id));
+          const nonFeaturedBlogs = published.filter(blog => !featuredIds.has(blog.id));
+          setAllBlogs(nonFeaturedBlogs);
         } else {
           setError('Failed to fetch blogs');
         }
@@ -55,22 +57,15 @@ const Home = () => {
     checkAuth();
   }, []);
 
-  const renderBlogs = (blogs, title) => (
-    <div className="blog-section">
-      <h3>{title}</h3>
-      <div className="card-container">
-        {blogs.map((blog) => (
-          <div className="row" key={blog.title}>
-            <div className="card hoverable">
-              <Link to={`/blog/${encodeURIComponent(blog.id)}`}>
-                <div className="card-content grey darken-3">
-                  <span className="card-title">{blog.title}</span>
-                  <p className="card-description">{blog.description}</p>
-                </div>
-              </Link>
-            </div>
+  const renderBlog = (blog) => (
+    <div className="row" key={blog.title}>
+      <div className="card hoverable">
+        <Link to={`/blog/${encodeURIComponent(blog.id)}`}>
+          <div className="card-content grey darken-3">
+            <span className="card-title">{blog.title}</span>
+            <p className="card-description">{blog.description}</p>
           </div>
-        ))}
+        </Link>
       </div>
     </div>
   );
@@ -89,8 +84,10 @@ const Home = () => {
         <p className="error">{error}</p>
       ) : (
         <div id="content">
-          {featuredBlogs.length > 0 && renderBlogs(featuredBlogs, "Featured Posts")}
-          {allBlogs.length > 0 && renderBlogs(allBlogs, "All Posts")}
+          <div className="card-container">
+            {featuredBlogs.map(renderBlog)}
+            {allBlogs.map(renderBlog)}
+          </div>
           {!featuredBlogs.length && !allBlogs.length && (
             <p>No blogs available.</p>
           )}
