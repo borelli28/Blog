@@ -29,7 +29,6 @@ export const authenticateToken = (req, res, next) => {
   const token = req.cookies.token;
 
   if (!token) {
-    logger.infoWithMeta('Authentication failed', 'No token provided');
     return res.status(401).json({ error: 'Authentication required' });
   }
 
