@@ -1,63 +1,80 @@
-import React, { Suspense, lazy } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import ProtectedRoute from './components/ProtectedRoute';
+import Home from './pages/Home';
+import PostList from './pages/PostList';
+import PostDetail from './pages/PostDetail';
+import CreatePost from './pages/CreatePost';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+import EditPost from './pages/EditPost';
+import Logs from './pages/Logs';
 import Logout from './components/Logout';
-
-const Home = lazy(() => import('./pages/Home'));
-const PostList = lazy(() => import('./pages/PostList'));
-const PostDetail = lazy(() => import('./pages/PostDetail'));
-const CreatePost = lazy(() => import('./pages/CreatePost'));
-const Login = lazy(() => import('./pages/Login'));
-const Register = lazy(() => import('./pages/Register'));
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const EditPost = lazy(() => import('./pages/EditPost'));
-const Logs = lazy(() => import('./pages/Logs'));
+import ProtectedRoute from './components/ProtectedRoute';
+import Navbar from './components/Navbar';
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/check`, {
+          credentials: 'include',
+        });
+        setIsAuthenticated(response.ok);
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        setIsAuthenticated(false);
+      }
+    };
+    
+    checkAuth();
+  }, []);
+
   return (
     <Router>
-      <Suspense fallback={<div>Loading...</div>}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/blogs" element={<PostList />} />
-          <Route path="/blog/:id" element={<PostDetail />} />
-          <Route
-            path="/create"
-            element={
-              <ProtectedRoute>
-                <CreatePost />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/blog/edit/:id"
-            element={
-              <ProtectedRoute>
-                <EditPost />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/logs"
-            element={
-              <ProtectedRoute>
-                <Logs />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/logout" element={<Logout />} />
-        </Routes>
-      </Suspense>
+      <Navbar isAuthenticated={isAuthenticated} />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/blogs" element={<PostList />} />
+        <Route path="/blog/:id" element={<PostDetail />} />
+        <Route
+          path="/create"
+          element={
+            <ProtectedRoute>
+              <CreatePost />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/blog/edit/:id"
+          element={
+            <ProtectedRoute>
+              <EditPost />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/logs"
+          element={
+            <ProtectedRoute>
+              <Logs />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/logout" element={<Logout />} />
+      </Routes>
     </Router>
   );
 }
