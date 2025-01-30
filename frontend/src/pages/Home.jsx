@@ -49,8 +49,8 @@ const Home = () => {
     <Layout isAuthenticated={isAuthenticated}>
       <main>
         <div id="intro">
-          <h2>Welcome</h2>
-          <p>Some description here...</p>
+          <h2>Welcome!</h2>
+          <p>Writing sometimes about whatever I'm working on these days</p>
         </div>
 
         {isLoading ? (
