@@ -11,7 +11,6 @@ import EditPost from './pages/EditPost';
 import Logs from './pages/Logs';
 import Logout from './components/Logout';
 import ProtectedRoute from './components/ProtectedRoute';
-import Navbar from './components/Navbar';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -34,7 +33,6 @@ function App() {
 
   return (
     <Router>
-      <Navbar isAuthenticated={isAuthenticated} />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/blogs" element={<PostList />} />
