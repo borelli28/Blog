@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import '../styles/Blogs.css';
 
-const PostList = () => {
+const Blogs = () => {
   const [blogs, setBlogs] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -50,4 +50,4 @@ const PostList = () => {
   );
 };
 
-export default PostList;
+export default Blogs;

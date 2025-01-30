@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './pages/Home';
-import PostList from './pages/PostList';
+import Blogs from './pages/Blogs';
 import PostDetail from './pages/PostDetail';
 import CreatePost from './pages/CreatePost';
 import Login from './pages/Login';
@@ -35,7 +35,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/blogs" element={<PostList />} />
+        <Route path="/blogs" element={<Blogs />} />
         <Route path="/blog/:id" element={<PostDetail />} />
         <Route
           path="/create"
