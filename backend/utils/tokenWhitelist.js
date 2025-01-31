@@ -1,7 +1,8 @@
 const tokens = new Map();
 
 export const addToken = (token) => {
-  const expirationTime = Date.now() + 3600000; // 1 hour from now
+  const ONE_HOUR_IN_MS = 60 * 60 * 1000;
+  const expirationTime = Date.now() + ONE_HOUR_IN_MS;
   tokens.set(token, expirationTime);
 };
 

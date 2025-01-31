@@ -224,10 +224,6 @@ export const getUsername = (req, res) => {
         logger.infoWithMeta('Username fetch failed', 'User not found', { user_id: userId });
         return res.status(404).json({ error: 'User not found' });
       }
-      logger.infoWithMeta('Username fetched', 'Username fetched', {
-        user_id: userId,
-        username: row.username
-      });
       res.json({ username: row.username });
     });
   });
