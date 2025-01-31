@@ -1,7 +1,6 @@
 main {
 	display: flex;
 	justify-content: center;
-	text-align: center;
 	flex-wrap: wrap;
 	width: 100%;
 }
@@ -18,7 +17,6 @@ h2 {
 	display: flex;
 	justify-content: center;
 	flex-wrap: wrap;
-	text-align: center;
 }
 
 #img-upload-container form {

@@ -1,6 +1,5 @@
 #auth-page-container {
   width: 100%;
-  min-height: 100vh;
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
@@ -8,16 +7,15 @@
 
 #auth-content {
   width: 100%;
-  max-width: 750px;
-  padding: 20px;
+  height: 100%;
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
+  align-content: flex-start;
 }
 
 .form-container {
-  width: 100%;
-  max-width: 500px;
+  width: 50%;
 }
 
 .error {
