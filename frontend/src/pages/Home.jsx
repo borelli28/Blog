@@ -62,7 +62,7 @@ const Home = () => {
       <Navbar />
       <div id="intro">
         <h2>Welcome!</h2>
-        <p>I write sometimes about whatever I'm working or interested on</p>
+        <p>Description</p>
       </div>
 
       {isLoading ? (

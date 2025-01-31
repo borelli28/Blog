@@ -24,7 +24,7 @@ const Navbar = () => {
     <nav className={`navbar navbar-expand-lg navbar-light mb-4 ${isNavCollapsed ? 'navbar-collapsed' : ''}`}>
       <div className="container">
         <Link to="/" className="navbar-brand">
-          <h5 className="mb-0">Armando Borelli</h5>
+          <h5 className="mb-0">Title</h5>
         </Link>
         <button
           className="navbar-toggler"
