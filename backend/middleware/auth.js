@@ -25,6 +25,14 @@ export const authMiddleware = (req, res, next) => {
   }
 };
 
+const clearTokenCookie = (res) => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.ENV === 'production',
+    sameSite: 'strict',
+  });
+};
+
 export const authenticateToken = (req, res, next) => {
   const token = req.cookies.token;
 
@@ -32,20 +40,34 @@ export const authenticateToken = (req, res, next) => {
     return res.status(401).json({ error: 'Authentication required' });
   }
 
+  let isExpired = false;
+  try {
+    jwt.verify(token, JWT_SECRET);
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      isExpired = true;
+    } else {
+      logger.infoWithMeta('Authentication failed', 'Invalid token', { token: token.substring(0, 8) + '...', error: err.message });
+      clearTokenCookie(res);
+      return res.status(403).json({ error: 'Invalid token' });
+    }
+  }
+
   if (!isTokenValid(token)) {
-    logger.infoWithMeta('Authentication failed', 'Token not in whitelist');
+    if (isExpired) {
+      logger.infoWithMeta('Authentication failed', 'Token has expired', { token: token.substring(0, 8) + '...' });
+    } else {
+      logger.infoWithMeta('Authentication failed', `Token not in whitelist: ${token.substring(0, 8) + '...'}`, {
+        tokenIdentifier: token.substring(0, 8) + '...',
+        action: 'Token validation failure',
+      });
+    }
+    clearTokenCookie(res);
     return res.status(401).json({ error: 'Invalid or expired token' });
   }
 
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) {
-      logger.infoWithMeta('Authentication failed', 'Invalid or expired token', { error: err.message });
-      return res.status(403).json({ error: 'Invalid or expired token' });
-    }
-
-    req.user = user;
-    next();
-  });
+  req.user = jwt.verify(token, JWT_SECRET);
+  next();
 };
 
 export const refreshToken = (req, res) => {
