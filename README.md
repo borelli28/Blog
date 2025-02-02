@@ -10,6 +10,8 @@ Cd into project
 
 Setup /backend
 `cd backend && bun install`
+or use NPM
+`cd backend && npm install`
 
 Create .env in /backend
 `echo "JWT_SECRET=your_jwt_secret" > .env && \
@@ -18,8 +20,12 @@ echo "ENV=development" >> .env`
 
 Start backend server
 `bun server.js`
+or use NPM
+`npm start`
 
 Setup frontend
 `cd ../frontend && bun install && bun dev`
+or use NPM
+`cd ../frontend && npm install && npm run dev`
 
 Open browser in http://localhost:3000/register
