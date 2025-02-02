@@ -9,7 +9,7 @@ git clone https://github.com/borelli28/Blog.git
 
 Cd into project
 ```bash
-cd Blogs
+cd Blog
 ```
 
 Setup /backend
@@ -40,11 +40,26 @@ npm start
 
 Setup frontend
 ```bash
-cd ../frontend && bun install && bun dev
+cd ../frontend && bun install
 ```
 or use NPM
 ```bash
-cd ../frontend && npm install && npm run dev
+cd ../frontend && npm install
+```
+
+Create .env in /frontend
+```bash
+echo "VITE_API_URL=http://localhost:8080/api" > .env && \
+echo "VITE_BACKEND_URL=http://localhost:8080" >> .env
+```
+
+Start frontend server
+```bash
+bun dev
+```
+or use NPM
+```bash
+npm run dev
 ```
 
 Open browser in http://localhost:3000/register
