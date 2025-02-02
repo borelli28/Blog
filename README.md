@@ -12,6 +12,7 @@ Cd into project
 cd Blog
 ```
 
+##### Backend
 Setup /backend
 ```bash
 cd backend && bun install
@@ -38,7 +39,8 @@ or use NPM
 npm start
 ```
 
-Setup frontend
+##### Frontend
+Setup frontend in a new tab
 ```bash
 cd ../frontend && bun install
 ```
