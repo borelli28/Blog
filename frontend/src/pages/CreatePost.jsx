@@ -69,7 +69,7 @@ const CreatePost = () => {
       });
 
       if (response.ok) {
-        navigate('/blogs');
+        navigate('/dashboard');
       } else {
         console.error('Failed to create blog post');
       }
