@@ -9,7 +9,7 @@ git clone https://github.com/borelli28/Blog.git
 
 Cd into project
 ```bash
-cd Blogs
+cd Blog
 ```
 
 Setup /backend
