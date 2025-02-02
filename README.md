@@ -65,3 +65,5 @@ npm run dev
 ```
 
 Open browser in http://localhost:3000/register
+
+Use `admin` as username
